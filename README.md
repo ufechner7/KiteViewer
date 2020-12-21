@@ -1,5 +1,5 @@
 # KiteViewer
-3D viewer for tethered wind drones and kites for airborne wind energy applications
+3D viewer for to visualize the flight path and power production of tethered wind drones and kites for airborne wind energy applications
 
 ## Requirements
 
@@ -46,7 +46,7 @@ include("src/KiteViewer.jl")
 main()
 ```
 
-Use the right mouse butto to zoom and the left mouse button to pan
+Use the right mouse button to zoom and the left mouse button to pan
 the 3D view. 
 
 ## Fixing OpenGL problems
