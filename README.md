@@ -13,7 +13,8 @@ bash -ci "$(curl -fsSL https://raw.githubusercontent.com/abelsiqueira/jill/maste
 A fast PC with 8 GB is recommended.
 OpenGL must be working.
 
-It should work on Windows, Linux and Mac, but until now only tested on Linux.
+It should work on Windows, Linux and Mac, but until now only tested on Linux
+(Ubuntu 18.04 and Ubuntu 20.04).
 
 ## Installation
 
