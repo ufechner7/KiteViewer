@@ -61,3 +61,18 @@ build GLMakie
 ```
 
 Removing the version of libstdc++.so.6 supplied with Julia is only needed for Julia versions older than 1.6.0 due to this bug: https://github.com/JuliaGL/GLFW.jl/issues/198
+
+## Hacking the code
+Use the package revise to speed up testing of code changes:
+```
+julia --project
+using Revise
+includet("src/KiteViewer.jl")
+```
+Please don't forget the t at end of the includet command.
+
+Now make changes to KiteViewer.jl and then execute
+```
+main()
+```
+Revise is watching the file KiteViewer.jl, and each time a changed version is saved any changed function is recompiled, but only the function that was changed and nothing else, therefore this is much faster than restarting Julia after a change.
