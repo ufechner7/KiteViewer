@@ -1,4 +1,4 @@
-# KiteViewer.jl
+# KiteViewer
 3D viewer for tethered wind drones and kites for airborne wind energy applications
 
 ## Requirements
@@ -36,7 +36,7 @@ Pkg.instantiate()
 Run the program and show the GUI:
 
 ```
-using KiteViewer
+include("src/KiteViewer.jl")
 main()
 ```
 
