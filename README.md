@@ -21,7 +21,7 @@ cd repos
 ```
 Check out the source code:
 ```
-git checkout xxx
+git clone https://github.com/ufechner7/KiteViewer.git
 cd KiteViewer
 ```
 
@@ -29,7 +29,8 @@ Launch Julia and install the depndencies:
 
 ```
 julia --project
-instanciate .
+using Pkg
+Pkg.instantiate()
 ```
 
 Run the program and show the GUI:
