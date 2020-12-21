@@ -5,6 +5,11 @@
 
 Julia 1.5 or higher must be installed. You can download it at https://www.julialang.org/
 
+On Linux or MAC you can install the latest Julia version with the following command:
+```
+bash -ci "$(curl -fsSL https://raw.githubusercontent.com/abelsiqueira/jill/master/jill.sh)"
+```
+
 A fast PC with 8 GB is recommended.
 OpenGL must be working.
 
