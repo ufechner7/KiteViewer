@@ -63,7 +63,7 @@ build GLMakie
 Removing the version of libstdc++.so.6 supplied with Julia is only needed for Julia versions older than 1.6.0 due to this bug: https://github.com/JuliaGL/GLFW.jl/issues/198
 
 ## Hacking the code
-Use the package revise to speed up testing of code changes:
+Use the package [Revise](https://timholy.github.io/Revise.jl/stable/) to speed up testing of code changes:
 ```
 julia --project
 using Revise
