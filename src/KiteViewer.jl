@@ -20,9 +20,10 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE. =#
 
-using GeometryBasics, GLMakie
+using GeometryBasics, GLMakie, FileIO
 
 const SCALE = 1.2
+const KITE = FileIO.load("data/kite.obj")
 
 function create_coordinate_system(scene, points = 10, length = 10)
     # create origin
@@ -71,12 +72,16 @@ function drawParticles!(scene, X, Y, Z)
     for i in range(1, length=length(X))
         mesh!(scene, Sphere(Point3f0(X[i], Y[i], Z[i]), 0.07 * SCALE), color=:yellow)
     end
+    end_point = Point3f0(0,0,0)
     # loop over the springs of the main tether and render them as cylinders
     for i in range(1, length=length(X) - 1)
-        start = Point3f0(X[i], Y[i], Z[i])
-        stop  = Point3f0(X[i+1], Y[i+1], Z[i+1])
-        mesh!(scene, Cylinder(start, stop, Float32(0.035 * SCALE)), color=:yellow)
+        start_point = Point3f0(X[i], Y[i], Z[i])
+        end_point  = Point3f0(X[i+1], Y[i+1], Z[i+1])
+        mesh!(scene, Cylinder(start_point, end_point, Float32(0.035 * SCALE)), color=:yellow)
     end
+    rot = Quaternionf0(1, 0, -1, 0)
+    # kite.rot = rot3d(vec3(0, -1, 0), vec3(1, 0, 0), vec3(0, 0, -1), x, y, z)
+    meshscatter!(scene, end_point, marker=KITE, markersize = 0.5, rotations = Vec3f0.(0, -1, 0), color=:blue)
 end
 
 function show_tether(scene)
@@ -85,6 +90,12 @@ function show_tether(scene)
     Y = zeros(length(X)) 
     Z = (a .* cosh.(X./a) .- a)
     drawParticles!(scene, X, Y, Z)
+end
+
+function show_kite(scene)
+    kitemesh = FileIO.load("data/kite.obj")
+    # mesh!(scene, kitemesh, color=:blue)
+    meshscatter!(scene, Point3f0(8., 0., 8.), marker=kitemesh, color=:blue)
 end
 
 function main()
