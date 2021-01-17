@@ -20,16 +20,9 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE. =#
 
-using GeometryBasics, Makie, GLMakie
+using GeometryBasics, GLMakie
 
 const SCALE = 1.2
-
-function demo1()
-    x = [2 .* (i/3) .* cos(i) for i in range(0, stop = 4pi, length = 30)]
-    y = [2 .* (i/3) .* sin(i) for i in range(0, stop = 4pi, length = 30)]
-    z = range(0, stop = 5, length = 30)
-    meshscatter(x, y, z, markersize = 0.5, color = to_colormap(:blues, 30))
-end
 
 function create_coordinate_system(scene, points = 10, length = 10)
     # create origin
@@ -74,12 +67,24 @@ function create_coordinate_system(scene, points = 10, length = 10)
     end 
 end
 
+function drawParticles!(scene, X, Y, Z)
+    for i in range(1, length=length(X))
+        mesh!(scene, Sphere(Point3f0(X[i], Y[i], Z[i]), 0.07 * SCALE), color=:yellow)
+    end
+    # loop over the springs of the main tether and render them as cylinders
+    for i in range(1, length=length(X) - 1)
+        start = Point3f0(X[i], Y[i], Z[i])
+        stop  = Point3f0(X[i+1], Y[i+1], Z[i+1])
+        mesh!(scene, Cylinder(start, stop, Float32(0.035 * SCALE)), color=:yellow)
+    end
+end
+
 function show_tether(scene)
     a = 10
     X = range(0, stop=10, length=8)
     Y = zeros(length(X)) 
     Z = (a .* cosh.(X./a) .- a)
-    lines!(scene, X, Y, Z, color = :yellow, linewidth = 3)
+    drawParticles!(scene, X, Y, Z)
 end
 
 function main()
