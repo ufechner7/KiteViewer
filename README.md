@@ -10,11 +10,11 @@ On Linux or MAC you can install the latest Julia version with the following comm
 bash -ci "$(curl -fsSL https://raw.githubusercontent.com/abelsiqueira/jill/master/jill.sh)"
 ```
 
-A fast PC with 8 GB is recommended.
+A fast PC with 8 GB is recommended. 
 OpenGL must be working.
 
 It should work on Windows, Linux and Mac, but until now only tested on Linux
-(Ubuntu 18.04 and Ubuntu 20.04).
+(Ubuntu 18.04 and Ubuntu 20.04) and Windows 10.
 
 ## Installation
 
@@ -38,6 +38,8 @@ julia --project
 using Pkg
 Pkg.instantiate()
 ```
+The last command will need 10 min or more to install all
+required packages.
 
 Run the program and show the GUI:
 
