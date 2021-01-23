@@ -2,10 +2,47 @@
 
 If you want to use Kiteviewer on Windows, I suggest to install
 
-1. a decent editor, for example VSCodium
+1. a decent editor, for example VSCodium  
+   You can download it from https://github.com/VSCodium/vscodium/releases  
+   At the time of writing you would need the file **VSCodiumSetup-x64-1.52.1.exe**
 
-2. Git for Windows. During installation, selec VSCodium as editor.
-
-3. Julia. During installation select "Add Julia to the path." 
+2. Git for Windows. During installation, selec VSCodium (or your prefered editor) as editor and select
+   bash as your prefered terminal.
+3. Julia. During installation select "Add Julia to the path."  
+   You can download it from https://julialang.org/downloads/ 
+   At the time of writing version 1.6.0beta1 is suggested.
 
 Git for Windows will not only provide the git version control system, but also a bash shall. When using the bash shall you can use the same commands that I am suggesting in [README.md](./README.md)  for Linux.
+
+## Important bash commands
+
+### Print the current directory
+
+pwd
+
+### Change the current directory
+
+cd
+
+### List the content of the current directory
+
+ls
+
+ls -la
+
+The second version prints more information about each file.
+
+### Start Julia
+
+julia --project
+
+This launches julia and uses the packages of the file Project.toml as environment.
+
+## Using VSCodium
+Use the menu "Open file or directory..." to opent the folder "repos/KiteViewer"
+
+Then open the file src/KiteViewer.jl in the Explorer on the left.
+
+Use the menu entry "View->Terminal" to open a Terminal. In the terminal launch julia with the command  
+julia --version
+
