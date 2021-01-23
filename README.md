@@ -37,7 +37,7 @@ Launch Julia and install the depndencies:
 julia --project
 using Pkg
 Pkg.instantiate()
-precompile
+Pkg.precompile()
 ```
 The last two commands will need 3 min or more each to install and precompile all
 required packages when using Julia 1.6 on Windows, longer with Julia 1.5 and shorter on Linux.
