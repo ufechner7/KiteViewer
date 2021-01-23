@@ -1,0 +1,6 @@
+TODO
+
+1. The orientation of the kite is wrong. Correct it using Rotations.jl
+2. Add a button to restore the default view
+3. Add a slider to set the desired height
+4. Update the scene when the height changes 
