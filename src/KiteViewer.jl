@@ -99,13 +99,19 @@ function show_kite(scene)
 end
 
 function main()
-    scene=Scene(show_axis=false, limits = Rect(-7,-10.0,0, 11,10,11), resolution = (800, 800), backgroundcolor = RGBf0(0.7, 0.8, 1), camera=cam3d_cad!)
-    create_coordinate_system(scene)
-    show_tether(scene)
+    scene, layout = layoutscene(resolution = (800, 900), backgroundcolor = RGBf0(0.7, 0.8, 1))
+    scene3D = LScene(scene, scenekw = (show_axis=false, limits = Rect(-7,-10.0,0, 11,10,11), resolution = (800, 800), backgroundcolor = RGBf0(0.7, 0.8, 1), camera = cam3d_cad!, raw = false))
+    create_coordinate_system(scene3D)
+    show_tether(scene3D)
 
-    cam = cameracontrols(scene)
+    cam = cameracontrols(scene3D.scene)
     cam.lookat[] = [0,0,5]
     cam.eyeposition[] = [-15,-15,5]
-    update_cam!(scene)
+    update_cam!(scene3D.scene)
+
+    layout[1, 1] = scene3D
+    layout[2, 1] = buttongrid = GridLayout(tellwidth = false)
+
+    buttongrid[1, 1:3] = [Button(scene, label = "RESET"), Button(scene, label = "Zoom +"), Button(scene, label = "Zoom -")]
     return scene
 end
