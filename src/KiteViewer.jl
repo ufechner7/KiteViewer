@@ -134,12 +134,10 @@ function main()
 
     on(btn_ZOOM_in.clicks) do c
         zoom_scene(scene3D.scene, 1.2f0)
-        println(c)
     end
 
     on(btn_ZOOM_out.clicks) do c
         zoom_scene(scene3D.scene, 1.0f0/1.2f0)
-        println(c)
     end
 
     return scene
