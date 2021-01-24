@@ -68,7 +68,9 @@ function create_coordinate_system(scene, points = 10, length = 10)
     end 
 end
 
-function drawParticles!(scene, X, Y, Z)
+# draw the kite power system, consisting of the tether and the kite
+function draw_system(scene, X, Y, Z)
+    # loop over the particles of the main tether and render them as spheres
     for i in range(1, length=length(X))
         mesh!(scene, Sphere(Point3f0(X[i], Y[i], Z[i]), 0.07 * SCALE), color=:yellow)
     end
@@ -81,6 +83,7 @@ function drawParticles!(scene, X, Y, Z)
     end
     rot = Quaternionf0(1, 0, -1, 0)
     # kite.rot = rot3d(vec3(0, -1, 0), vec3(1, 0, 0), vec3(0, 0, -1), x, y, z)
+    # render the kite
     meshscatter!(scene, end_point, marker=KITE, markersize = 0.5, rotations = Vec3f0.(0, -1, 0), color=:blue)
 end
 
@@ -89,12 +92,7 @@ function show_tether(scene)
     X = range(0, stop=10, length=8)
     Y = zeros(length(X)) 
     Z = (a .* cosh.(X./a) .- a)
-    drawParticles!(scene, X, Y, Z)
-end
-
-function show_kite(scene)
-    kitemesh = FileIO.load("data/kite.obj")
-    meshscatter!(scene, Point3f0(8., 0., 8.), marker=kitemesh, color=:blue)
+    draw_system(scene, X, Y, Z)
 end
 
 function reset_view(scene3D)
@@ -117,6 +115,11 @@ function main()
     scene, layout = layoutscene(resolution = (840, 900), backgroundcolor = RGBf0(0.7, 0.8, 1))
     scene3D = LScene(scene, scenekw = (show_axis=false, limits = Rect(-7,-10.0,0, 11,10,11), resolution = (800, 800), camera = cam3d_cad!), raw=false)
     create_coordinate_system(scene3D)
+
+    text!(scene, "z", position = Point2f0(314, 820), textsize = 30, align = (:left, :bottom), show_axis = false)
+    text!(scene, "x", position = Point2f0(650, 323), textsize = 30, align = (:left, :bottom), show_axis = false)
+    text!(scene, "y", position = Point2f0( 73, 315), textsize = 30, align = (:left, :bottom), show_axis = false)
+
     show_tether(scene3D)
 
     layout[1, 1] = scene3D

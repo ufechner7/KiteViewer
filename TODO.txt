@@ -1,8 +1,8 @@
 DONE
 1. Add a button to restore the default view and zoom buttons
+2. add X, Y and Z to the axis lables
 
 TODO
 1. The orientation of the kite is wrong. Correct it using Rotations.jl
 2. Add a slider to set the desired height
 3. Update the scene when the height changes 
-4. add X, Y and Z to the axis lables !!!
