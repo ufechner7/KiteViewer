@@ -102,6 +102,7 @@ function reset_view(scene3D)
     cam.lookat[] = [0,0,5]
     cam.eyeposition[] = [-15,-15,5]
     update_cam!(scene3D.scene)
+    zoom_scene(scene3D.scene, 1.2f0)
 end
 
 function zoom_scene(scene, zoom=1.0f0)
@@ -117,7 +118,6 @@ function main()
     scene3D = LScene(scene, scenekw = (show_axis=false, limits = Rect(-7,-10.0,0, 11,10,11), resolution = (800, 800), camera = cam3d_cad!), raw=false)
     create_coordinate_system(scene3D)
     show_tether(scene3D)
-    reset_view(scene3D)
 
     layout[1, 1] = scene3D
     layout[2, 1] = buttongrid = GridLayout(tellwidth = false)
@@ -137,8 +137,11 @@ function main()
     end
 
     on(btn_ZOOM_out.clicks) do c
-        zoom_scene(scene3D.scene, 1.0f0/1.2f0)
+        zoom_scene(scene3D.scene, 0.75f0)
     end
+
+    reset_view(scene3D)
+    trim!(layout)
 
     return scene
 end
