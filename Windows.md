@@ -18,25 +18,41 @@ Git for Windows will not only provide the git version control system, but also a
 
 ### Print the current directory
 
-pwd
+`pwd`
 
 ### Change the current directory
 
-cd
+`cd`
 
 ### List the content of the current directory
 
-ls
+`ls`
 
-ls -la
+`ls -la`
 
 The second version prints more information about each file.
 
 ### Start Julia
 
-julia --project
+`julia --project`
 
 This launches julia and uses the packages of the file Project.toml as environment.
+
+### Quit Julia
+
+`exit()`
+
+### Update KiteViewer
+
+`git pull`
+
+This might fail if you made changes to KiteViewer.jl yourself.
+
+In that case create a backup copy of your version, check out the original version with
+
+`git checkout src/KiteViewer.jl`
+
+and then try  `git pull` again.
 
 ## Using VSCodium
 Use the menu "Open file or directory..." to opent the folder "repos/KiteViewer"
@@ -44,5 +60,6 @@ Use the menu "Open file or directory..." to opent the folder "repos/KiteViewer"
 Then open the file src/KiteViewer.jl in the Explorer on the left.
 
 Use the menu entry "View->Terminal" to open a Terminal. In the terminal launch julia with the command  
-julia --version
+julia --project
+
 
