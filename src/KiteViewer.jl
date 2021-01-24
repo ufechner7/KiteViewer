@@ -114,6 +114,13 @@ function main()
     layout[1, 1] = scene3D
     layout[2, 1] = buttongrid = GridLayout(tellwidth = false)
 
-    buttongrid[1, 1:3] = [Button(scene, label = "RESET"), Button(scene, label = "Zoom +"), Button(scene, label = "Zoom -")]
+    btn_RESET = Button(scene, label = "RESET")
+
+    buttongrid[1, 1:3] = [btn_RESET, Button(scene, label = "Zoom +"), Button(scene, label = "Zoom -")]
+
+    on(btn_RESET.clicks) do c
+        reset_view(scene3D)
+    end
+
     return scene
 end
