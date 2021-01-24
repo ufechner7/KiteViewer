@@ -140,8 +140,7 @@ function main()
         zoom_scene(scene3D.scene, 0.75f0)
     end
 
+    display(scene)
     reset_view(scene3D)
-    trim!(layout)
-
-    return scene
+    return nothing
 end
