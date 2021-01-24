@@ -104,8 +104,16 @@ function reset_view(scene3D)
     update_cam!(scene3D.scene)
 end
 
+function zoom_scene(scene, zoom=1.0f0)
+    camera =cameracontrols(scene)
+    @extractvalue camera (fov, near, projectiontype, lookat, eyeposition, upvector)
+    dir_vector = eyeposition - lookat
+    new_eyeposition = lookat + dir_vector * (2.0f0 - zoom)
+    update_cam!(scene, new_eyeposition, lookat)
+end
+
 function main()
-    scene, layout = layoutscene(resolution = (800, 900), backgroundcolor = RGBf0(0.7, 0.8, 1))
+    scene, layout = layoutscene(resolution = (840, 900), backgroundcolor = RGBf0(0.7, 0.8, 1))
     scene3D = LScene(scene, scenekw = (show_axis=false, limits = Rect(-7,-10.0,0, 11,10,11), resolution = (800, 800), camera = cam3d_cad!), raw=false)
     create_coordinate_system(scene3D)
     show_tether(scene3D)
@@ -115,11 +123,23 @@ function main()
     layout[2, 1] = buttongrid = GridLayout(tellwidth = false)
 
     btn_RESET = Button(scene, label = "RESET")
+    btn_ZOOM_in = Button(scene, label = "Zoom +")
+    btn_ZOOM_out = Button(scene, label = "Zoom -")
 
-    buttongrid[1, 1:3] = [btn_RESET, Button(scene, label = "Zoom +"), Button(scene, label = "Zoom -")]
+    buttongrid[1, 1:3] = [btn_RESET, btn_ZOOM_in, btn_ZOOM_out]
 
     on(btn_RESET.clicks) do c
         reset_view(scene3D)
+    end
+
+    on(btn_ZOOM_in.clicks) do c
+        zoom_scene(scene3D.scene, 1.2f0)
+        println(c)
+    end
+
+    on(btn_ZOOM_out.clicks) do c
+        zoom_scene(scene3D.scene, 1.0f0/1.2f0)
+        println(c)
     end
 
     return scene
