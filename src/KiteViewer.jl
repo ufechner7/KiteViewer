@@ -94,20 +94,22 @@ end
 
 function show_kite(scene)
     kitemesh = FileIO.load("data/kite.obj")
-    # mesh!(scene, kitemesh, color=:blue)
     meshscatter!(scene, Point3f0(8., 0., 8.), marker=kitemesh, color=:blue)
 end
 
-function main()
-    scene, layout = layoutscene(resolution = (800, 900), backgroundcolor = RGBf0(0.7, 0.8, 1))
-    scene3D = LScene(scene, scenekw = (show_axis=false, limits = Rect(-7,-10.0,0, 11,10,11), resolution = (800, 800), backgroundcolor = RGBf0(0.7, 0.8, 1), camera = cam3d_cad!, raw = false))
-    create_coordinate_system(scene3D)
-    show_tether(scene3D)
-
+function reset_view(scene3D)
     cam = cameracontrols(scene3D.scene)
     cam.lookat[] = [0,0,5]
     cam.eyeposition[] = [-15,-15,5]
     update_cam!(scene3D.scene)
+end
+
+function main()
+    scene, layout = layoutscene(resolution = (800, 900), backgroundcolor = RGBf0(0.7, 0.8, 1))
+    scene3D = LScene(scene, scenekw = (show_axis=false, limits = Rect(-7,-10.0,0, 11,10,11), resolution = (800, 800), camera = cam3d_cad!), raw=false)
+    create_coordinate_system(scene3D)
+    show_tether(scene3D)
+    reset_view(scene3D)
 
     layout[1, 1] = scene3D
     layout[2, 1] = buttongrid = GridLayout(tellwidth = false)
