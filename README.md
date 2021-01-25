@@ -1,6 +1,8 @@
 # KiteViewer
 3D viewer for to visualize the flight path and power production of tethered wind drones and kites for airborne wind energy applications
 
+<p align="center"><img src="./doc/KiteViewer.png" /></p>
+
 ## Requirements
 
 Julia 1.5 or higher must be installed. You can download it at https://www.julialang.org/
