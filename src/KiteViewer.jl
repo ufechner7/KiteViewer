@@ -111,7 +111,7 @@ function zoom_scene(scene, zoom=1.0f0)
     update_cam!(scene, new_eyeposition, lookat)
 end
 
-function main()
+function main(gl_wait=false)
     scene, layout = layoutscene(resolution = (840, 900), backgroundcolor = RGBf0(0.7, 0.8, 1))
     scene3D = LScene(scene, scenekw = (show_axis=false, limits = Rect(-7,-10.0,0, 11,10,11), resolution = (800, 800), camera = cam3d_cad!), raw=false)
     create_coordinate_system(scene3D)
@@ -143,7 +143,10 @@ function main()
         zoom_scene(scene3D.scene, 0.75f0)
     end
 
-    display(scene)
+    gl_screen = display(scene)
     reset_view(scene3D)
+    if gl_wait
+        wait(gl_screen)
+    end
     return nothing
 end
