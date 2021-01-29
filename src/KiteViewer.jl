@@ -22,6 +22,10 @@ SOFTWARE. =#
 
 using GeometryBasics, GLMakie, FileIO
 
+using Revise
+includet("./Utils.jl")
+using .Utils
+
 const SCALE = 1.2
 const KITE = FileIO.load("data/kite.obj")
 
