@@ -22,7 +22,7 @@ function create_coordinate_system(scene, points = 10, length = 10)
     end
 end
 
-function main(gl_wait=false)
+function main()
     scene, layout = layoutscene(resolution = (840, 900), backgroundcolor = RGBf0(0.7, 0.8, 1))
 
     scene3D = LScene(scene, scenekw = (show_axis=false, limits = Rect(-7,-10.0,0, 11,10,11), resolution = (800, 800)), raw=false)
