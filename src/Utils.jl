@@ -26,7 +26,7 @@ using Rotations, StaticArrays
 export demo_state, SEGMENTS
 
 const MyFloat = Float32
-const SEGMENTS = 7
+const SEGMENTS = 7                    # number of tether segments
 
 struct SysState
     time::Float64                     # time since launch in seconds
@@ -36,11 +36,11 @@ struct SysState
     Z::MVector{SEGMENTS+1, MyFloat}   # vector of particle positions in z
 end 
 
-function demo_state()
+function demo_state(rel_height=1.0)
     a = 10
     X = range(0, stop=10, length=SEGMENTS+1)
     Y = zeros(length(X)) 
-    Z = (a .* cosh.(X./a) .- a) 
+    Z = (a .* cosh.(X./a) .- a) * rel_height 
     orient = UnitQuaternion(1.0,0,0,0)
     state = SysState(0.0, orient, X, Y, Z)
     return state
