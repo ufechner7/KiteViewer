@@ -38,19 +38,29 @@ function main()
 
     display(scene)
 
+    particles = Vector{AbstractPlotting.Mesh}(undef, SEGMENTS+1)
+
     for i = 0:4
         # calculate a vector of 3D coordinates
         X = range(0, stop=10, length=SEGMENTS+1)
         Y = zeros(length(X)) 
-        Z = (10 .* cosh.(X./10) .- 10) * i/5.0 
+        Z = (10 .* cosh.(X./10) .- 10) * i/4.0 
 
         # loop over the particles of the main tether and render them as spheres
-        for i in range(1, length=length(X))
-            mesh!(scene3D, Sphere(Point3f0(X[i], Y[i], Z[i]), 0.07 * SCALE), color=:yellow)
+        if i == 0
+            for j in range(1, length=length(X))
+                particle = mesh!(scene3D, Sphere(Point3f0(X[j], Y[j], Z[j]), 0.07 * SCALE), color=:yellow)
+                particles[j] = particle
+            end
+        else
+            j=1
+            for particle in particles
+                translate!(particle, X[j], Y[j], Z[j])
+                j += 1
+            end
         end
-
         sleep(0.2)
     end
     
-    return scene3D
+    return nothing
 end
