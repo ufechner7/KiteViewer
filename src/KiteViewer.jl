@@ -73,16 +73,16 @@ function create_coordinate_system(scene, points = 10, length = 10)
 end
 
 # draw the kite power system, consisting of the tether and the kite
-function draw_system(scene, X, Y, Z)
+function draw_system(scene, state)
     # loop over the particles of the main tether and render them as spheres
-    for i in range(1, length=length(X))
-        mesh!(scene, Sphere(Point3f0(X[i], Y[i], Z[i]), 0.07 * SCALE), color=:yellow)
+    for i in range(1, length=length(state.X))
+        mesh!(scene, Sphere(Point3f0(state.X[i], state.Y[i], state.Z[i]), 0.07 * SCALE), color=:yellow)
     end
     end_point = Point3f0(0,0,0)
     # loop over the springs of the main tether and render them as cylinders
-    for i in range(1, length=length(X) - 1)
-        start_point = Point3f0(X[i], Y[i], Z[i])
-        end_point  = Point3f0(X[i+1], Y[i+1], Z[i+1])
+    for i in range(1, length=length(state.X) - 1)
+        start_point = Point3f0(state.X[i], state.Y[i], state.Z[i])
+        end_point  = Point3f0(state.X[i+1], state.Y[i+1], state.Z[i+1])
         mesh!(scene, Cylinder(start_point, end_point, Float32(0.035 * SCALE)), color=:yellow)
     end
     rot = Quaternionf0(1, 0, -1, 0)
@@ -91,12 +91,8 @@ function draw_system(scene, X, Y, Z)
     meshscatter!(scene, end_point, marker=KITE, markersize = 0.5, rotations = Vec3f0.(0, -1, 0), color=:blue)
 end
 
-function show_tether(scene)
-    a = 10
-    X = range(0, stop=10, length=8)
-    Y = zeros(length(X)) 
-    Z = (a .* cosh.(X./a) .- a)
-    draw_system(scene, X, Y, Z)
+function show_demo(scene)
+    draw_system(scene, demo_state())
 end
 
 function reset_view(scene3D)
@@ -124,7 +120,7 @@ function main(gl_wait=false)
     text!(scene, "x", position = Point2f0(650, 323), textsize = 30, align = (:left, :bottom), show_axis = false)
     text!(scene, "y", position = Point2f0( 73, 315), textsize = 30, align = (:left, :bottom), show_axis = false)
 
-    show_tether(scene3D)
+    show_demo(scene3D)
 
     layout[1, 1] = scene3D
     layout[2, 1] = buttongrid = GridLayout(tellwidth = false)
