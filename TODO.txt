@@ -3,6 +3,8 @@ DONE
 2. add X, Y and Z to the axis lables
 
 TODO
-1. The orientation of the kite is wrong. Correct it using Rotations.jl
-2. Add a slider to set the desired height
-3. Update the scene when the height changes 
+1. write a script that lets the kite move in 10 steps
+
+2. The orientation of the kite is wrong. Correct it using Rotations.jl
+3. Add a slider to set the desired height
+4. Update the scene when the height changes 
