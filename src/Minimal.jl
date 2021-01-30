@@ -47,22 +47,6 @@ function create_coordinate_system(scene, points = 10, length = 10)
     end
 end
 
-function reset_view(scene3D)
-    cam = cameracontrols(scene3D.scene)
-    cam.lookat[] = [0,0,5]
-    cam.eyeposition[] = [-15,-15,5]
-    update_cam!(scene3D.scene)
-    zoom_scene(scene3D.scene, 1.2f0)
-end
-
-function zoom_scene(scene, zoom=1.0f0)
-    camera =cameracontrols(scene)
-    @extractvalue camera (fov, near, projectiontype, lookat, eyeposition, upvector)
-    dir_vector = eyeposition - lookat
-    new_eyeposition = lookat + dir_vector * (2.0f0 - zoom)
-    update_cam!(scene, new_eyeposition, lookat)
-end
-
 function main(gl_wait=false)
     scene, layout = layoutscene(resolution = (840, 900), backgroundcolor = RGBf0(0.7, 0.8, 1))
     scene3D = LScene(scene, scenekw = (show_axis=false, limits = Rect(-7,-10.0,0, 11,10,11), resolution = (800, 800), camera = cam3d_cad!), raw=false)
@@ -76,6 +60,7 @@ function main(gl_wait=false)
     btn_ZOOM_out = Button(scene, label = "Zoom -")
 
     buttongrid[1, 1:3] = [btn_RESET, btn_ZOOM_in, btn_ZOOM_out]
+
     for i = 0:4
         # calculate a vector of 3D coordinates
         state = demo_state(i/5.0)
@@ -84,7 +69,12 @@ function main(gl_wait=false)
             mesh!(scene3D, Sphere(Point3f0(state.X[i], state.Y[i], state.Z[i]), 0.07 * SCALE), color=:yellow)
         end
         display(scene)
-        reset_view(scene3D)
+        
+        cam = cameracontrols(scene3D.scene)
+        cam.lookat[] = [0,0,5]
+        cam.eyeposition[] = [-15,-15,5]
+        update_cam!(scene3D.scene)
+
         sleep(0.2)
     end
     
