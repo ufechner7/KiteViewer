@@ -24,9 +24,9 @@ end
 
 function main()
     scene, layout = layoutscene(resolution = (840, 900), backgroundcolor = RGBf0(0.7, 0.8, 1))
-
     scene3D = LScene(scene, scenekw = (show_axis=false, limits = Rect(-7,-10.0,0, 11,10,11), resolution = (800, 800)), raw=false)
     create_coordinate_system(scene3D)
+
     cam = cameracontrols(scene3D.scene)
     cam.lookat[] = [0,0,5]
     cam.eyeposition[] = [-15,-15,5]
@@ -34,8 +34,9 @@ function main()
 
     layout[1, 1] = scene3D
     layout[2, 1] = buttongrid = GridLayout(tellwidth = false)
-
     buttongrid[1, 1:1] = [Button(scene, label = "RESET")]
+
+    display(scene)
 
     for i = 0:4
         # calculate a vector of 3D coordinates
@@ -47,10 +48,9 @@ function main()
         for i in range(1, length=length(X))
             mesh!(scene3D, Sphere(Point3f0(X[i], Y[i], Z[i]), 0.07 * SCALE), color=:yellow)
         end
-        display(scene)
 
         sleep(0.2)
     end
     
-    return nothing
+    return scene3D
 end
