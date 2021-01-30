@@ -47,15 +47,6 @@ function create_coordinate_system(scene, points = 10, length = 10)
     end
 end
 
-# draw the kite power system, consisting of the tether and the kite
-function draw_system(scene, state)
-    # loop over the particles of the main tether and render them as spheres
-    for i in range(1, length=length(state.X))
-        mesh!(scene, Sphere(Point3f0(state.X[i], state.Y[i], state.Z[i]), 0.07 * SCALE), color=:yellow)
-    end
-    return nothing
-end
-
 function reset_view(scene3D)
     cam = cameracontrols(scene3D.scene)
     cam.lookat[] = [0,0,5]
@@ -86,7 +77,12 @@ function main(gl_wait=false)
 
     buttongrid[1, 1:3] = [btn_RESET, btn_ZOOM_in, btn_ZOOM_out]
     for i = 0:4
-        draw_system(scene3D, demo_state(i/5.0))
+        # calculate a vector of 3D coordinates
+        state = demo_state(i/5.0)
+        # loop over the particles of the main tether and render them as spheres
+        for i in range(1, length=length(state.X))
+            mesh!(scene3D, Sphere(Point3f0(state.X[i], state.Y[i], state.Z[i]), 0.07 * SCALE), color=:yellow)
+        end
         display(scene)
         reset_view(scene3D)
         sleep(0.2)
