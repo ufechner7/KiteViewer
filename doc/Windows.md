@@ -12,7 +12,7 @@ If you want to use Kiteviewer on Windows, I suggest to install
    You can download it from https://julialang.org/downloads/ 
    At the time of writing version 1.6.0beta1 is suggested.
 
-Git for Windows will not only provide the git version control system, but also a bash shall. When using the bash shall you can use the same commands that I am suggesting in [README.md](./README.md)  for Linux.
+Git for Windows will not only provide the git version control system, but also a bash shall. When using the bash shall you can use the same commands that I am suggesting in [README.md](../README.md)  for Linux.
 
 ## Important bash commands
 

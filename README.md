@@ -18,7 +18,7 @@ OpenGL, version 3.3 or higher must be working.
 It should work on Windows, Linux and Mac, but until now only tested on Linux
 (Ubuntu 18.04 and Ubuntu 20.04) and Windows 10.
 
-If you are using Windows, read [Windows.md](./Windows.md) first.
+If you are using Windows, read [Windows.md](./doc/Windows.md) first.
 
 ## Installation
 
