@@ -159,13 +159,16 @@ function main(gl_wait=false)
         zoom_scene(camera, scene3D.scene, 0.75f0)
     end
 
-    for i = 0:4
-        state = demo_state(i/4.0)
-        state.time =i*0.2
+    delta_t = 0.05
+    t_max   = 1.0
+    steps   = t_max/delta_t-1.0
+
+    for i = 0:Int(steps)
+        state = demo_state(i/steps, i*delta_t)
         draw_system(scene3D, state)
-        sleep(0.2)
+        sleep(delta_t)
     end
-    
+
     if gl_wait
         wait(gl_screen)
     end
