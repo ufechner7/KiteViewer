@@ -20,7 +20,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE. =#
 
-using GeometryBasics, GLMakie, FileIO
+using GeometryBasics, Rotations, GLMakie, FileIO
 
 using Revise
 includet("./Utils.jl")
@@ -100,13 +100,15 @@ function draw_system(scene, state)
         SEGS[i] = segment
     end
 
-    # rot = Quaternionf0(1, 0, -1, 0)
-    # # kite.rot = rot3d(vec3(0, -1, 0), vec3(1, 0, 0), vec3(0, 0, -1), x, y, z)
-    # # render the kite
+    r_xyz = RotXYZ(pi/2, -pi/2, 0)
+    q0 = UnitQuaternion(r_xyz) * state.orient
+    q  = Quaternionf0(q0.x, q0.y, q0.z, q0.w)
+
+    # render the kite
     if init[1]
         delete!(scene.scene,  KITE_MESH[1])
     end
-    KITE_MESH[1] = meshscatter!(scene, end_point, marker=KITE, markersize = 0.5, rotations = Vec3f0.(0, -1, 0), color=:blue)
+    KITE_MESH[1] = meshscatter!(scene, end_point, marker=KITE, markersize = 0.5, rotations=q, color=:blue)
     init[1] = true
 end
 
