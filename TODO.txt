@@ -2,9 +2,13 @@ DONE
 1. Add a button to restore the default view and zoom buttons
 2. add X, Y and Z to the axis lables
 3. write a loop that lets the kite move in n steps
+4. add a slider to control the set height
 
 TODO
 
-1. add a slider
-2. The orientation of the kite is wrong. Correct it using Rotations.jl
+1. The orientation of the kite is wrong. Correct it using Rotations.jl
+2. add a "Launch" button
+3. convert existing log file to .csv
+4. add code to load csv file
+5. add button to play log file
 
