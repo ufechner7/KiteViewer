@@ -131,18 +131,28 @@ function main(gl_wait=false)
 
     reset_view(cam, scene3D)
 
-    text!(scene, "z", position = Point2f0(318, 815), textsize = 30, align = (:left, :bottom), show_axis = false)
-    text!(scene, "x", position = Point2f0(670, 330), textsize = 30, align = (:left, :bottom), show_axis = false)
-    text!(scene, "y", position = Point2f0( 73, 315), textsize = 30, align = (:left, :bottom), show_axis = false)
+    text!(scene, "z", position = Point2f0(322, 815), textsize = 30, align = (:left, :bottom), show_axis = false)
+    text!(scene, "x", position = Point2f0(642, 352), textsize = 30, align = (:left, :bottom), show_axis = false)
+    text!(scene, "y", position = Point2f0( 90, 346), textsize = 30, align = (:left, :bottom), show_axis = false)
 
     layout[1, 1] = scene3D
     layout[2, 1] = buttongrid = GridLayout(tellwidth = false)
+    layout[3, 1] = slidergrid = GridLayout(tellwidth = false)
 
     btn_RESET = Button(scene, label = "RESET")
     btn_ZOOM_in = Button(scene, label = "Zoom +")
     btn_ZOOM_out = Button(scene, label = "Zoom -")
 
     buttongrid[1, 1:3] = [btn_RESET, btn_ZOOM_in, btn_ZOOM_out]
+
+    sl_height = Slider(scene, range = 0:0.01:10, startvalue = 3)
+    sl_label = Label(scene, "set_height", textsize = 18)
+    slidergrid[1, 1:2] = [sl_label, sl_height]
+
+    draw_system(scene3D, demo_state(3.0/10.0, 0))
+    on(sl_height.value) do val
+        draw_system(scene3D, demo_state(val/10.0, 0))
+    end
 
     gl_screen = display(scene)
 
@@ -166,18 +176,18 @@ function main(gl_wait=false)
         zoom_scene(camera, scene3D.scene, 0.75f0)
     end
 
-    delta_t = 0.05
-    t_max   = 10.0
-    steps   = t_max/delta_t-1.0
+    # delta_t = 0.05
+    # t_max   = 2.0
+    # steps   = t_max/delta_t-1.0
 
-    for i = 0:Int(steps)
-        state = demo_state(i/steps, i*delta_t)
-        draw_system(scene3D, state)
-        sleep(delta_t)
-    end
+    # for i = 0:Int(steps)
+    #     state = demo_state(i/steps, i*delta_t)
+    #     draw_system(scene3D, state)
+    #     sleep(delta_t)
+    # end
 
     if gl_wait
         wait(gl_screen)
     end
-    return scene3D
+    return sl_height
 end
