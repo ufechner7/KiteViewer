@@ -1,10 +1,10 @@
 DONE
 1. Add a button to restore the default view and zoom buttons
 2. add X, Y and Z to the axis lables
+3. write a loop that lets the kite move in n steps
 
 TODO
-1. write a script that lets the kite move in 10 steps
 
+1. add a slider
 2. The orientation of the kite is wrong. Correct it using Rotations.jl
-3. Add a slider to set the desired height
-4. Update the scene when the height changes 
+
