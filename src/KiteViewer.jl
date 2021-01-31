@@ -27,11 +27,14 @@ includet("./Utils.jl")
 using .Utils
 
 const SCALE = 1.2 
+const INITIAL_HEIGHT = 0.3 # relative value
 const KITE = FileIO.load("data/kite.obj")
 const PARTICLES = Vector{AbstractPlotting.Mesh}(undef, SEGMENTS+1)
 const SEGS      = Vector{AbstractPlotting.Mesh}(undef, SEGMENTS)
 const KITE_MESH = Vector{MeshScatter{Tuple{Vector{Point{3, Float32}}}}}(undef, 1)
 const init      = [false]
+const FLYING    = [false]
+const GUI_ACTIVE = [false]
 
 function create_coordinate_system(scene, points = 10, max_x = 15.0)
     # create origin
@@ -124,12 +127,14 @@ function zoom_scene(camera, scene, zoom=1.0f0)
     update_cam!(scene, new_eyeposition, lookat)
 end
 
-function main(gl_wait=false)
+function main(gl_wait=true)
     scene, layout = layoutscene(resolution = (840, 900), backgroundcolor = RGBf0(0.7, 0.8, 1))
     scene3D = LScene(scene, scenekw = (show_axis=false, limits = Rect(-7,-10.0,0, 11,10,11), resolution = (800, 800)), raw=false)
     create_coordinate_system(scene3D)
     cam = cameracontrols(scene3D.scene)
     init[1] = false
+    FLYING[1] = false
+    GUI_ACTIVE[1] = true
 
     reset_view(cam, scene3D)
 
@@ -141,17 +146,18 @@ function main(gl_wait=false)
     layout[2, 1] = buttongrid = GridLayout(tellwidth = false)
     layout[3, 1] = slidergrid = GridLayout(tellwidth = false)
 
-    btn_RESET = Button(scene, label = "RESET")
-    btn_ZOOM_in = Button(scene, label = "Zoom +")
+    btn_RESET    = Button(scene, label = "RESET")
+    btn_ZOOM_in  = Button(scene, label = "Zoom +")
     btn_ZOOM_out = Button(scene, label = "Zoom -")
+    btn_LAUNCH   = Button(scene, label = "LAUNCH")
 
-    buttongrid[1, 1:3] = [btn_RESET, btn_ZOOM_in, btn_ZOOM_out]
+    buttongrid[1, 1:4] = [btn_LAUNCH, btn_ZOOM_in, btn_ZOOM_out, btn_RESET]
 
-    sl_height = Slider(scene, range = 0:0.01:10, startvalue = 3)
+    sl_height = Slider(scene, range = 0:0.01:10, startvalue = INITIAL_HEIGHT*10)
     sl_label = Label(scene, "set_height", textsize = 18)
     slidergrid[1, 1:2] = [sl_label, sl_height]
 
-    draw_system(scene3D, demo_state(3.0/10.0, 0))
+    draw_system(scene3D, demo_state(INITIAL_HEIGHT, 0))
     on(sl_height.value) do val
         draw_system(scene3D, demo_state(val/10.0, 0))
     end
@@ -162,10 +168,15 @@ function main(gl_wait=false)
     update_cam!(scene3D.scene,  Float32[-17.505877, -21.005878, 5.5000005], Float32[-1.5, -5.0000005, 5.5000005])
     zoom_scene(camera, scene3D.scene, 1.13f0)
 
+    on(btn_LAUNCH.clicks) do c
+        FLYING[1] = true
+    end
+
     on(btn_RESET.clicks) do c
         camera = cameracontrols(scene3D.scene)
         update_cam!(scene3D.scene,  Float32[-17.505877, -21.005878, 5.5000005], Float32[-1.5, -5.0000005, 5.5000005])
         zoom_scene(camera, scene3D.scene, 1.13f0)
+        FLYING[1] = false
     end
 
     on(btn_ZOOM_in.clicks) do c    
@@ -178,18 +189,36 @@ function main(gl_wait=false)
         zoom_scene(camera, scene3D.scene, 0.75f0)
     end
 
-    # delta_t = 0.05
-    # t_max   = 2.0
-    # steps   = t_max/delta_t-1.0
-
-    # for i = 0:Int(steps)
-    #     state = demo_state(i/steps, i*delta_t)
-    #     draw_system(scene3D, state)
-    #     sleep(delta_t)
-    # end
+    # launch the kite on button click
+    delta_t = 0.05
+    t_max   = 10.0
+    steps   = t_max/delta_t-1.0
+    simulation = @async begin
+        while GUI_ACTIVE[1]
+            # wait for launch command
+            while ! FLYING[1] && GUI_ACTIVE[1]
+                sleep(0.10)
+            end
+            i=0
+            # fly...
+            while FLYING[1]
+                state = demo_state(i/steps, i*delta_t)
+                draw_system(scene3D, state)
+                sleep(delta_t)
+                i+=1
+                if i>=steps
+                    FLYING[1] = false
+                end
+            end
+        end
+     end
 
     if gl_wait
         wait(gl_screen)
     end
-    return sl_height
+
+    # terminate the simulation
+    FLYING[1] = false
+    GUI_ACTIVE[1] = false
+    return nothing
 end
