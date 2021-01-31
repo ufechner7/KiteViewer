@@ -1,6 +1,6 @@
 #= MIT License
 
-Copyright (c) 2020 Uwe Fechner
+Copyright (c) 2020, 2021 Uwe Fechner
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -91,8 +91,8 @@ function draw_system(scene, state)
         PARTICLES[i] = particle
     end
 
-    end_point = Point3f0(0,0,0)
     # loop over the springs of the main tether and render them as cylinders
+    end_point = Point3f0(0,0,0)
     for i in range(1, length=length(state.X) - 1)
         if init[1] 
             delete!(scene.scene, SEGS[i])
@@ -103,11 +103,12 @@ function draw_system(scene, state)
         SEGS[i] = segment
     end
 
+    # rotate the kite such that the nose points to the origin and apply state.orient(ation)
     r_xyz = RotXYZ(pi/2, -pi/2, 0)
     q0 = UnitQuaternion(r_xyz) * state.orient
     q  = Quaternionf0(q0.x, q0.y, q0.z, q0.w)
 
-    # render the kite
+    # delete and render the kite
     if init[1]
         delete!(scene.scene,  KITE_MESH[1])
     end
