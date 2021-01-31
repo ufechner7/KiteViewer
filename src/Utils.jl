@@ -39,7 +39,7 @@ end
 function demo_state(rel_height=1.0, time=0.0)
     a = 10
     X = range(0, stop=10, length=SEGMENTS+1)
-    Y = zeros(length(X)) 
+    Y = zeros(length(X))
     Z = (a .* cosh.(X./a) .- a) * rel_height 
     orient = UnitQuaternion(1.0,0,0,0)
     state = SysState(time, orient, X, Y, Z)

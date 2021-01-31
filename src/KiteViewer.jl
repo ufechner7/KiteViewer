@@ -26,24 +26,27 @@ using Revise
 includet("./Utils.jl")
 using .Utils
 
-const SCALE = 1.2
+const SCALE = 1.2 
 const KITE = FileIO.load("data/kite.obj")
 const PARTICLES = Vector{AbstractPlotting.Mesh}(undef, SEGMENTS+1)
 const SEGS      = Vector{AbstractPlotting.Mesh}(undef, SEGMENTS)
+const KITE_MESH = Vector{MeshScatter{Tuple{Vector{Point{3, Float32}}}}}(undef, 1)
+const init      = [false]
 
-function create_coordinate_system(scene, points = 10, length = 10)
+function create_coordinate_system(scene, points = 10, max_x = 15.0)
     # create origin
     mesh!(scene, Sphere(Point3f0(0, 0, 0), 0.1 * SCALE), color=RGBf0(0.7, 0.7, 0.7))
     
     # create x-axis in red
     points += 2
     for x in range(1, length=points)
-        mesh!(scene, Sphere(Point3f0(x * SCALE, 0, 0), 0.1 * SCALE), color=:red)
+        mesh!(scene, Sphere(Point3f0(x * max_x/points, 0, 0), 0.1 * SCALE), color=:red)
+        # println(x * max_x/points)
     end
-    mesh!(scene, Cylinder(Point3f0(-SCALE, 0, 0), Point3f0(points * SCALE, 0, 0), Float32(0.05 * SCALE)), color=:red)
-    for i in range(0, length=10)
-        start = Point3f0((points + 0.07 * (i-0.5)) * SCALE, 0, 0)
-        stop = Point3f0((points + 0.07 * (i+0.5)) * SCALE, 0, 0)
+    mesh!(scene, Cylinder(Point3f0(-max_x/points, 0, 0), Point3f0(points * max_x/points, 0, 0), Float32(0.05 * SCALE)), color=:red)
+    for i in range(0, length=points)
+        start = Point3f0((points + 0.07 * (i-0.5)) * max_x/points, 0, 0)
+        stop = Point3f0((points + 0.07 * (i+0.5)) * max_x/points, 0, 0)
         mesh!(scene, Cylinder(start, stop, Float32(0.018 * (10 - i) * SCALE)), color=:red)
     end
     
@@ -76,30 +79,35 @@ end
 
 # draw the kite power system, consisting of the tether and the kite
 function draw_system(scene, state)
-    if state.time == 0
-        # loop over the particles of the main tether and render them as spheres
-        for i in range(1, length=length(state.X))
-            particle = mesh!(scene, Sphere(Point3f0(state.X[i], state.Y[i], state.Z[i]), 0.07 * SCALE), color=:yellow)
-            PARTICLES[i] = particle
+    # loop over the particles of the main tether and render them as spheres
+    for i in range(1, length=length(state.X))
+        if init[1] 
+            delete!(scene.scene, PARTICLES[i])
         end
-    else
-        j=1
-        for particle in PARTICLES
-            translate!(particle, state.X[j], state.Y[j], state.Z[j])
-            j += 1
-        end
+        particle = mesh!(scene, Sphere(Point3f0(state.X[i], state.Y[i], state.Z[i]), 0.07 * SCALE), color=:yellow)
+        PARTICLES[i] = particle
     end
-    # end_point = Point3f0(0,0,0)
-    # # loop over the springs of the main tether and render them as cylinders
-    # for i in range(1, length=length(state.X) - 1)
-    #     start_point = Point3f0(state.X[i], state.Y[i], state.Z[i])
-    #     end_point  = Point3f0(state.X[i+1], state.Y[i+1], state.Z[i+1])
-    #     mesh!(scene, Cylinder(start_point, end_point, Float32(0.035 * SCALE)), color=:yellow)
-    # end
+
+    end_point = Point3f0(0,0,0)
+    # loop over the springs of the main tether and render them as cylinders
+    for i in range(1, length=length(state.X) - 1)
+        if init[1] 
+            delete!(scene.scene, SEGS[i])
+        end
+        start_point = Point3f0(state.X[i], state.Y[i], state.Z[i])
+        end_point  = Point3f0(state.X[i+1], state.Y[i+1], state.Z[i+1])
+        segment = mesh!(scene, Cylinder(start_point, end_point, Float32(0.035 * SCALE)), color=:yellow)
+        SEGS[i] = segment
+    end
+
     # rot = Quaternionf0(1, 0, -1, 0)
     # # kite.rot = rot3d(vec3(0, -1, 0), vec3(1, 0, 0), vec3(0, 0, -1), x, y, z)
     # # render the kite
-    # meshscatter!(scene, end_point, marker=KITE, markersize = 0.5, rotations = Vec3f0.(0, -1, 0), color=:blue)
+    if init[1]
+        delete!(scene.scene,  KITE_MESH[1])
+    end
+    KITE_MESH[1] = meshscatter!(scene, end_point, marker=KITE, markersize = 0.5, rotations = Vec3f0.(0, -1, 0), color=:blue)
+    init[1] = true
 end
 
 function reset_view(cam, scene3D)
@@ -119,11 +127,12 @@ function main(gl_wait=false)
     scene3D = LScene(scene, scenekw = (show_axis=false, limits = Rect(-7,-10.0,0, 11,10,11), resolution = (800, 800)), raw=false)
     create_coordinate_system(scene3D)
     cam = cameracontrols(scene3D.scene)
+    init[1] = false
 
     reset_view(cam, scene3D)
 
     text!(scene, "z", position = Point2f0(318, 815), textsize = 30, align = (:left, :bottom), show_axis = false)
-    text!(scene, "x", position = Point2f0(650, 323), textsize = 30, align = (:left, :bottom), show_axis = false)
+    text!(scene, "x", position = Point2f0(670, 330), textsize = 30, align = (:left, :bottom), show_axis = false)
     text!(scene, "y", position = Point2f0( 73, 315), textsize = 30, align = (:left, :bottom), show_axis = false)
 
     layout[1, 1] = scene3D
@@ -143,8 +152,6 @@ function main(gl_wait=false)
 
     on(btn_RESET.clicks) do c
         camera = cameracontrols(scene3D.scene)
-        @extractvalue camera (fov, near, projectiontype, lookat, eyeposition, upvector)
-        println(eyeposition, lookat)
         update_cam!(scene3D.scene,  Float32[-17.505877, -21.005878, 5.5000005], Float32[-1.5, -5.0000005, 5.5000005])
         zoom_scene(camera, scene3D.scene, 1.13f0)
     end
@@ -160,7 +167,7 @@ function main(gl_wait=false)
     end
 
     delta_t = 0.05
-    t_max   = 1.0
+    t_max   = 10.0
     steps   = t_max/delta_t-1.0
 
     for i = 0:Int(steps)
@@ -172,5 +179,5 @@ function main(gl_wait=false)
     if gl_wait
         wait(gl_screen)
     end
-    return nothing
+    return scene3D
 end
