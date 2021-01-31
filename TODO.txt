@@ -3,12 +3,10 @@ DONE
 2. add X, Y and Z to the axis lables
 3. write a loop that lets the kite move in n steps
 4. add a slider to control the set height
+5. correct the orientation of the kite using Rotations.jl
 
 TODO
-
-1. The orientation of the kite is wrong. Correct it using Rotations.jl
-2. add a "Launch" button
-3. convert existing log file to .csv
-4. add code to load csv file
-5. add button to play log file
-
+1. add a "Launch" button
+2. convert existing log file to .csv
+3. add code to load csv file
+4. add button to play log file
