@@ -27,7 +27,8 @@ includet("./Utils.jl")
 using .Utils
 
 const SCALE = 1.2 
-const INITIAL_HEIGHT = 0.3 # relative value
+const INITIAL_HEIGHT = 2.0 # meter
+const MAX_HEIGHT     = 6.0 # meter
 const KITE = FileIO.load("data/kite.obj")
 const PARTICLES = Vector{AbstractPlotting.Mesh}(undef, SEGMENTS+1)
 const SEGS      = Vector{AbstractPlotting.Mesh}(undef, SEGMENTS)
@@ -154,13 +155,13 @@ function main(gl_wait=true)
 
     buttongrid[1, 1:4] = [btn_LAUNCH, btn_ZOOM_in, btn_ZOOM_out, btn_RESET]
 
-    sl_height = Slider(scene, range = 0:0.01:10, startvalue = INITIAL_HEIGHT*10)
+    sl_height = Slider(scene, range = 0:0.01:MAX_HEIGHT, startvalue = INITIAL_HEIGHT)
     sl_label = Label(scene, "set_height", textsize = 18)
     slidergrid[1, 1:2] = [sl_label, sl_height]
 
     draw_system(scene3D, demo_state(INITIAL_HEIGHT, 0))
     on(sl_height.value) do val
-        draw_system(scene3D, demo_state(val/10.0, 0))
+        draw_system(scene3D, demo_state(val, 0))
     end
 
     gl_screen = display(scene)
@@ -191,9 +192,10 @@ function main(gl_wait=true)
     end
 
     # launch the kite on button click
-    delta_t = 0.05
+    delta_t = 1.0 / SAMPLE_FREQ
     t_max   = 10.0
-    steps   = t_max/delta_t-1.0
+    max_height = 6.0
+    steps   = t_max * SAMPLE_FREQ
     simulation = @async begin
         while GUI_ACTIVE[1]
             # wait for launch command
@@ -203,7 +205,7 @@ function main(gl_wait=true)
             i=0
             # fly...
             while FLYING[1]
-                state = demo_state(i/steps, i*delta_t)
+                state = demo_state(max_height * i/steps, i*delta_t)
                 draw_system(scene3D, state)
                 sleep(delta_t)
                 i+=1
