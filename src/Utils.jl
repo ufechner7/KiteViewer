@@ -24,6 +24,7 @@ module Utils
 
 using Rotations, StaticArrays
 export demo_state, demo_log, SEGMENTS, SAMPLE_FREQ
+export SysState, SysLog
 
 const MyFloat = Float32
 const SEGMENTS = 7                    # number of tether segments
@@ -55,8 +56,15 @@ end
 
 # create a demo flight log with given name [String] and duration [s]
 function demo_log(name, duration=10)
-
-
+    delta_t = 1.0 / SAMPLE_FREQ
+    t_max   = 10.0
+    max_height = 6.0
+    steps   = Int(t_max * SAMPLE_FREQ) + 1
+    log = Vector{SysState}(undef, steps)
+    for i in range(0, length=steps)
+        log[i+1] = demo_state(max_height * i/steps, i*delta_t)
+    end
+    return SysLog(name, log)
 end
 
 end
