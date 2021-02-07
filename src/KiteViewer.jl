@@ -194,7 +194,7 @@ function main(gl_wait=true)
     # launch the kite on button click
     delta_t = 1.0 / SAMPLE_FREQ
     log = demo_log("Launch test")
-    steps = length(log.log)
+    steps = length(log)
     simulation = @async begin
         while GUI_ACTIVE[1]
             # wait for launch command
@@ -204,7 +204,7 @@ function main(gl_wait=true)
             i=0
             # fly...
             while FLYING[1]
-                state = log.log[i+1]
+                state = log[i+1]
                 draw_system(scene3D, state)
                 sleep(delta_t)
                 i+=1

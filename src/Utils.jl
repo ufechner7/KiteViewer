@@ -22,7 +22,7 @@ SOFTWARE. =#
 
 module Utils
 
-using Rotations, StaticArrays
+using Rotations, StaticArrays, StructArrays
 export demo_state, demo_log, SEGMENTS, SAMPLE_FREQ
 export SysState, SysLog
 
@@ -38,11 +38,17 @@ struct SysState
     Z::MVector{SEGMENTS+1, MyFloat}   # vector of particle positions in z
 end 
 
-# recording of a flight
-struct SysLog
-    name::String
-    log::Vector{SysState}
-end
+# extended SysState containing derived values for plotting
+struct ExtSysState
+    time::Float64                     # time since launch in seconds
+    orient::Quat                      # orientation of the kite
+    X::MVector{SEGMENTS+1, MyFloat}   # vector of particle positions in x
+    Y::MVector{SEGMENTS+1, MyFloat}   # vector of particle positions in y
+    Z::MVector{SEGMENTS+1, MyFloat}   # vector of particle positions in z
+    x::MyFloat                        # kite position in x
+    y::MyFloat                        # kite position in y
+    z::MyFloat                        # kite position in z
+end 
 
 # create a demo state with a given height and time
 function demo_state(height=6.0, time=0.0)
@@ -55,16 +61,39 @@ function demo_state(height=6.0, time=0.0)
 end
 
 # create a demo flight log with given name [String] and duration [s]
-function demo_log(name, duration=10)
-    delta_t = 1.0 / SAMPLE_FREQ
-    t_max   = 10.0
+function demo_log(name="Test flight"; duration=10)
     max_height = 6.0
-    steps   = Int(t_max * SAMPLE_FREQ) + 1
+    steps   = Int(duration * SAMPLE_FREQ) + 1
     log = Vector{SysState}(undef, steps)
     for i in range(0, length=steps)
-        log[i+1] = demo_state(max_height * i/steps, i*delta_t)
+        log[i+1] = demo_state(max_height * i/steps, i/SAMPLE_FREQ)
     end
-    return SysLog(name, log)
+    return log
+end
+
+# convert vector of structs to struct of vectors for easy plotting
+function vos2sov(log::Vector)
+    steps=length(log)
+    time_vec = Vector{Float64}(undef, steps)
+    orient_vec = Vector{Quat}(undef, steps)
+    X_vec = Vector{MVector{SEGMENTS+1, MyFloat}}(undef, steps)
+    Y_vec = Vector{MVector{SEGMENTS+1, MyFloat}}(undef, steps)
+    Z_vec = Vector{MVector{SEGMENTS+1, MyFloat}}(undef, steps)
+    x = Vector{MyFloat}(undef, steps)
+    y = Vector{MyFloat}(undef, steps)
+    z = Vector{MyFloat}(undef, steps)
+    for i in range(1, length=steps)
+        state=log[i]
+        time_vec[i] = state.time
+        orient_vec[i] = state.orient
+        X_vec[i] = state.X
+        Y_vec[i] = state.Y
+        Z_vec[i] = state.Z
+        x[i] = state.X[end]
+        y[i] = state.Y[end]
+        z[i] = state.Z[end]
+    end
+    return StructArray{ExtSysState}((time_vec, orient_vec, X_vec, Y_vec, Z_vec, x, y, z))
 end
 
 end
