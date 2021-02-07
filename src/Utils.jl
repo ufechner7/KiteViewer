@@ -1,6 +1,6 @@
 #= MIT License
 
-Copyright (c) 2020 Uwe Fechner
+Copyright (c) 2020, 2021 Uwe Fechner
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -23,10 +23,11 @@ SOFTWARE. =#
 module Utils
 
 using Rotations, StaticArrays
-export demo_state, SEGMENTS
+export demo_state, demo_log, SEGMENTS, SAMPLE_FREQ
 
 const MyFloat = Float32
 const SEGMENTS = 7                    # number of tether segments
+const SAMPLE_FREQ = 20                # sample frequency in Hz
 
 struct SysState
     time::Float64                     # time since launch in seconds
@@ -36,13 +37,26 @@ struct SysState
     Z::MVector{SEGMENTS+1, MyFloat}   # vector of particle positions in z
 end 
 
-function demo_state(rel_height=1.0, time=0.0)
+# recording of a flight
+struct SysLog
+    name::String
+    log::Vector{SysState}
+end
+
+# create a demo state with a given height and time
+function demo_state(height=6.0, time=0.0)
     a = 10
     X = range(0, stop=10, length=SEGMENTS+1)
     Y = zeros(length(X))
-    Z = (a .* cosh.(X./a) .- a) * rel_height 
+    Z = (a .* cosh.(X./a) .- a) * height/ 5.430806 
     orient = UnitQuaternion(1.0,0,0,0)
     return SysState(time, orient, X, Y, Z)
+end
+
+# create a demo flight log with given name [String] and duration [s]
+function demo_log(name, duration=10)
+
+
 end
 
 end
