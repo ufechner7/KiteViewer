@@ -193,7 +193,7 @@ function main(gl_wait=true)
 
     # launch the kite on button click
     delta_t = 1.0 / SAMPLE_FREQ
-    log = demo_log("Launch test")
+    log = demo_log3d("Launch test")
     steps = length(log)
     simulation = @async begin
         while GUI_ACTIVE[1]

@@ -22,13 +22,14 @@ SOFTWARE. =#
 
 module Utils
 
-using Rotations, StaticArrays, StructArrays
-export demo_state, demo_log, SEGMENTS, SAMPLE_FREQ
+using Rotations, StaticArrays, StructArrays, Arrow
+export demo_state, demo_log, demo_log3d, save_log, SEGMENTS, SAMPLE_FREQ
 export SysState, SysLog
 
 const MyFloat = Float32
 const SEGMENTS = 7                    # number of tether segments
 const SAMPLE_FREQ = 20                # sample frequency in Hz
+const DATA_PATH = "./data"            # path for log files and other data
 
 struct SysState
     time::Float64                     # time since launch in seconds
@@ -50,6 +51,15 @@ struct ExtSysState
     z::MyFloat                        # kite position in z
 end 
 
+struct FlightLog
+    name::String
+    log_3d::Vector{SysState}          # vector of structs
+    log_2d::StructArray{ExtSysState}  # struct of vectors, derived from log_3d
+end
+
+function save_log(log::FlightLog)
+end
+
 # create a demo state with a given height and time
 function demo_state(height=6.0, time=0.0)
     a = 10
@@ -60,18 +70,18 @@ function demo_state(height=6.0, time=0.0)
     return SysState(time, orient, X, Y, Z)
 end
 
-# create a demo flight log with given name [String] and duration [s]
-function demo_log(name="Test flight"; duration=10)
+# create a demo flight log for 3d replay with given name [String] and duration [s]
+function demo_log3d(name="Test flight"; duration=10)
     max_height = 6.0
     steps   = Int(duration * SAMPLE_FREQ) + 1
-    log = Vector{SysState}(undef, steps)
+    log_3d = Vector{SysState}(undef, steps)
     for i in range(0, length=steps)
-        log[i+1] = demo_state(max_height * i/steps, i/SAMPLE_FREQ)
+        log_3d[i+1] = demo_state(max_height * i/steps, i/SAMPLE_FREQ)
     end
-    return log
+    return log_3d
 end
 
-# convert vector of structs to struct of vectors for easy plotting
+# convert vector of structs to struct of vectors for easy plotting in 2d
 function vos2sov(log::Vector)
     steps=length(log)
     time_vec = Vector{Float64}(undef, steps)
@@ -94,6 +104,18 @@ function vos2sov(log::Vector)
         z[i] = state.Z[end]
     end
     return StructArray{ExtSysState}((time_vec, orient_vec, X_vec, Y_vec, Z_vec, x, y, z))
+end
+
+function demo_log(name="Test_flight"; duration=10)
+    log_3d = demo_log3d(name, duration=duration)
+    log_2d = vos2sov(log_3d)
+    return FlightLog(name, log_3d, log_2d)
+end
+
+function save_log(log::FlightLog)
+    filename=joinpath(DATA_PATH, log.name) * ".arrow"
+    Arrow.write(filename, log.log_2d)
+    println(filename)
 end
 
 end
