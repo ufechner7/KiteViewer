@@ -23,7 +23,7 @@ SOFTWARE. =#
 module Utils
 
 using Rotations, StaticArrays, StructArrays, Arrow
-export demo_state, demo_log, demo_log3d, save_log, SEGMENTS, SAMPLE_FREQ
+export demo_state, demo_log, demo_log3d, load_log, save_log, SEGMENTS, SAMPLE_FREQ
 export SysState, SysLog
 
 const MyFloat = Float32
@@ -33,7 +33,7 @@ const DATA_PATH = "./data"            # path for log files and other data
 
 struct SysState
     time::Float64                     # time since launch in seconds
-    orient::Quat                      # orientation of the kite
+    orient::UnitQuaternion{Float32}   # orientation of the kite
     X::MVector{SEGMENTS+1, MyFloat}   # vector of particle positions in x
     Y::MVector{SEGMENTS+1, MyFloat}   # vector of particle positions in y
     Z::MVector{SEGMENTS+1, MyFloat}   # vector of particle positions in z
@@ -42,7 +42,7 @@ end
 # extended SysState containing derived values for plotting
 struct ExtSysState
     time::Float64                     # time since launch in seconds
-    orient::Quat                      # orientation of the kite
+    orient::UnitQuaternion{Float32}   # orientation of the kite
     X::MVector{SEGMENTS+1, MyFloat}   # vector of particle positions in x
     Y::MVector{SEGMENTS+1, MyFloat}   # vector of particle positions in y
     Z::MVector{SEGMENTS+1, MyFloat}   # vector of particle positions in z
@@ -55,9 +55,6 @@ struct FlightLog
     name::String
     log_3d::Vector{SysState}          # vector of structs
     log_2d::StructArray{ExtSysState}  # struct of vectors, derived from log_3d
-end
-
-function save_log(log::FlightLog)
 end
 
 # create a demo state with a given height and time
@@ -106,16 +103,52 @@ function vos2sov(log::Vector)
     return StructArray{ExtSysState}((time_vec, orient_vec, X_vec, Y_vec, Z_vec, x, y, z))
 end
 
+function arrow2vos(data)
+    steps=length(data[1])
+    vec = Vector{SysState}(undef, steps)
+    for i in range(1, length=steps)
+        state = SysState(data[1][i], data[2][i], data[3][i], data[4][i], data[5][i])
+        vec[i] = state   
+    end
+    return vec
+end
+
 function demo_log(name="Test_flight"; duration=10)
     log_3d = demo_log3d(name, duration=duration)
     log_2d = vos2sov(log_3d)
     return FlightLog(name, log_3d, log_2d)
 end
 
-function save_log(log::FlightLog)
-    filename=joinpath(DATA_PATH, log.name) * ".arrow"
-    Arrow.write(filename, log.log_2d)
-    println(filename)
+function save_log(flight_log::FlightLog)
+    table = (col1=flight_log.log_3d,)
+    filename=joinpath(DATA_PATH, flight_log.name) * ".arrow"
+    Arrow.write(filename, table)
+end
+
+function load_log(filename::String)
+    Arrow.ArrowTypes.registertype!(SysState, SysState)
+    if filename[findlast(isequal('.'), filename):end] == ".arrow"
+        fullname = joinpath(DATA_PATH, filename)
+    else
+        fullname = joinpath(DATA_PATH, filename) * ".arrow"
+    end
+    table = Arrow.Table(fullname)
+    log_3d = arrow2vos(table.col1.data)
+    log_2d = vos2sov(log_3d)
+    return FlightLog(basename(fullname[1:end-6]), log_3d, log_2d)
+end
+
+function test(save=false)
+    Arrow.ArrowTypes.registertype!(SysState, SysState)
+    Arrow.ArrowTypes.registertype!(UnitQuaternion{Float32}, UnitQuaternion{Float32})
+    Arrow.ArrowTypes.registertype!(MVector{SEGMENTS+1, Float32}, MVector{SEGMENTS+1, Float32})
+    
+    if save
+        log_to_save=demo_log()
+        save_log(log_to_save)
+    end
+    
+    return(load_log("Test_flight.arrow"))
 end
 
 end
