@@ -5,8 +5,10 @@ DONE
 4. add a slider to control the set height
 5. correct the orientation of the kite using Rotations.jl
 6. add a "Launch" button
+7. add and test functions for saving and loading flight data
 
 TODO
-1. convert existing log file to .csv
-2. add code to load csv file
-3. add button to play log file
+1. add a "Play" button
+2. convert existing log file to .csv
+3. convert csv to arrow format
+
