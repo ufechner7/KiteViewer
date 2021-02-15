@@ -107,8 +107,7 @@ function arrow2vos(data)
     steps=length(data[1])
     vec = Vector{SysState}(undef, steps)
     for i in range(1, length=steps)
-        state = SysState(data[1][i], data[2][i], data[3][i], data[4][i], data[5][i])
-        vec[i] = state   
+        vec[i] = SysState(data[1][i], data[2][i], data[3][i], data[4][i], data[5][i])
     end
     return vec
 end
@@ -120,9 +119,10 @@ function demo_log(name="Test_flight"; duration=10)
 end
 
 function save_log(flight_log::FlightLog)
+    Arrow.ArrowTypes.registertype!(SysState, SysState)
     table = (col1=flight_log.log_3d,)
     filename=joinpath(DATA_PATH, flight_log.name) * ".arrow"
-    Arrow.write(filename, table)
+    Arrow.write(filename, table, compress=:lz4)
 end
 
 function load_log(filename::String)
@@ -139,15 +139,10 @@ function load_log(filename::String)
 end
 
 function test(save=false)
-    Arrow.ArrowTypes.registertype!(SysState, SysState)
-    Arrow.ArrowTypes.registertype!(UnitQuaternion{Float32}, UnitQuaternion{Float32})
-    Arrow.ArrowTypes.registertype!(MVector{SEGMENTS+1, Float32}, MVector{SEGMENTS+1, Float32})
-    
     if save
         log_to_save=demo_log()
         save_log(log_to_save)
     end
-    
     return(load_log("Test_flight.arrow"))
 end
 
