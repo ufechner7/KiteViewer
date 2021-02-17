@@ -22,6 +22,9 @@ SOFTWARE. =#
 
 module Utils
 
+# data structures for the flight state and the flight log
+# functions for creating a demo flight state, demo flight log, loading and saving flight logs
+
 using Rotations, StaticArrays, StructArrays, RecursiveArrayTools, Arrow
 export demo_state, demo_syslog, demo_log, load_log, save_log, SEGMENTS, SAMPLE_FREQ
 export SysState, ExtSysState, SysLog
@@ -31,6 +34,7 @@ const SEGMENTS = 7                    # number of tether segments
 const SAMPLE_FREQ = 20                # sample frequency in Hz
 const DATA_PATH = "./data"            # path for log files and other data
 
+# basic system state; one of these will be saved per time step
 struct SysState
     time::Float64                     # time since launch in seconds
     orient::MVector{4, Float32}       # orientation of the kite (quaternion)
@@ -56,6 +60,9 @@ function ExtSysState(tab, i)
     ExtSysState(tab.time[i], UnitQuaternion(tab.orient[i]), tab.X[i], tab.Y[i], tab.Z[i], tab.X[i][end], tab.Y[i][end], tab.Z[i][end])
 end
 
+# flight log, containing the basic data as struct of arrays 
+# and in addition an extended view on the data that includes derived/ calculated values for plotting
+# finally meta data like the file name of the log file is included
 struct FlightLog
     name::String
     syslog::StructArray{SysState}    # struct of vectors
