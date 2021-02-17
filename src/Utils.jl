@@ -104,7 +104,7 @@ function syslog2extlog(syslog)
     return StructArray{ExtSysState}((syslog.time, orient_vec, syslog.X, syslog.Y, syslog.Z, x_vec, y_vec, z_vec))    
 end
 
-function demo_log(name="Test_flight2"; duration=10)
+function demo_log(name="Test_flight"; duration=10)
     syslog = demo_syslog(name, duration=duration)
     return FlightLog(name, syslog, syslog2extlog(syslog))
 end
@@ -133,7 +133,7 @@ function test(save=false)
         log_to_save=demo_log()
         save_log(log_to_save)
     end
-    return(load_log("Test_flight2.arrow"))
+    return(load_log("Test_flight.arrow"))
 end
 
 end

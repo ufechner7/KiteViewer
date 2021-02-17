@@ -6,9 +6,9 @@ DONE
 5. correct the orientation of the kite using Rotations.jl
 6. add a "Launch" button
 7. add and test functions for saving and loading flight data
+8. refactoring of Utils, two conversion functions less
 
 TODO
 1. add a "Play" button
 2. convert existing log file to .csv
 3. convert csv to arrow format
-
