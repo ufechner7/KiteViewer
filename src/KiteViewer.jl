@@ -106,7 +106,7 @@ function draw_system(scene, state)
 
     # rotate the kite such that the nose points to the origin and apply state.orient(ation)
     r_xyz = RotXYZ(pi/2, -pi/2, 0)
-    q0 = UnitQuaternion(r_xyz) * state.orient
+    q0 = UnitQuaternion(r_xyz) * UnitQuaternion(state.orient)
     q  = Quaternionf0(q0.x, q0.y, q0.z, q0.w)
 
     # delete and render the kite
@@ -193,7 +193,7 @@ function main(gl_wait=true)
 
     # launch the kite on button click
     delta_t = 1.0 / SAMPLE_FREQ
-    log = demo_log3d("Launch test")
+    log = demo_syslog("Launch test")
     steps = length(log)
     simulation = @async begin
         while GUI_ACTIVE[1]

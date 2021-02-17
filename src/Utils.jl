@@ -22,9 +22,9 @@ SOFTWARE. =#
 
 module Utils
 
-using Rotations, StaticArrays, StructArrays, Arrow
-export demo_state, demo_log, demo_log3d, load_log, save_log, SEGMENTS, SAMPLE_FREQ
-export SysState, SysLog
+using Rotations, StaticArrays, StructArrays, RecursiveArrayTools, Arrow
+export demo_state, demo_syslog, demo_log, load_log, save_log, SEGMENTS, SAMPLE_FREQ
+export SysState, ExtSysState, SysLog
 
 const MyFloat = Float32
 const SEGMENTS = 7                    # number of tether segments
@@ -33,11 +33,12 @@ const DATA_PATH = "./data"            # path for log files and other data
 
 struct SysState
     time::Float64                     # time since launch in seconds
-    orient::UnitQuaternion{Float32}   # orientation of the kite
+    orient::MVector{4, Float32}       # orientation of the kite (quaternion)
     X::MVector{SEGMENTS+1, MyFloat}   # vector of particle positions in x
     Y::MVector{SEGMENTS+1, MyFloat}   # vector of particle positions in y
     Z::MVector{SEGMENTS+1, MyFloat}   # vector of particle positions in z
 end 
+SysState(tab, i) = SysState(tab.time[i], tab.orient[i], tab.X[i], tab.Y[i], tab.Z[i])
 
 # extended SysState containing derived values for plotting
 struct ExtSysState
@@ -49,12 +50,16 @@ struct ExtSysState
     x::MyFloat                        # kite position in x
     y::MyFloat                        # kite position in y
     z::MyFloat                        # kite position in z
-end 
+end
+
+function ExtSysState(tab, i)
+    ExtSysState(tab.time[i], UnitQuaternion(tab.orient[i]), tab.X[i], tab.Y[i], tab.Z[i], tab.X[i][end], tab.Y[i][end], tab.Z[i][end])
+end
 
 struct FlightLog
     name::String
-    log_3d::Vector{SysState}          # vector of structs
-    log_2d::StructArray{ExtSysState}  # struct of vectors, derived from log_3d
+    syslog::StructArray{SysState}    # struct of vectors
+    extlog::StructArray{ExtSysState} # struct of vectors, containing derived values
 end
 
 # create a demo state with a given height and time
@@ -63,79 +68,64 @@ function demo_state(height=6.0, time=0.0)
     X = range(0, stop=10, length=SEGMENTS+1)
     Y = zeros(length(X))
     Z = (a .* cosh.(X./a) .- a) * height/ 5.430806 
-    orient = UnitQuaternion(1.0,0,0,0)
+    orient = MVector(1.0f0, 0, 0, 0)
     return SysState(time, orient, X, Y, Z)
 end
 
-# create a demo flight log for 3d replay with given name [String] and duration [s]
-function demo_log3d(name="Test flight"; duration=10)
+# create a demo flight log with given name [String] and duration [s]
+function demo_syslog(name="Test flight"; duration=10)
     max_height = 6.0
     steps   = Int(duration * SAMPLE_FREQ) + 1
-    log_3d = Vector{SysState}(undef, steps)
-    for i in range(0, length=steps)
-        log_3d[i+1] = demo_state(max_height * i/steps, i/SAMPLE_FREQ)
-    end
-    return log_3d
-end
-
-# convert vector of structs to struct of vectors for easy plotting in 2d
-function vos2sov(log::Vector)
-    steps=length(log)
     time_vec = Vector{Float64}(undef, steps)
-    orient_vec = Vector{Quat}(undef, steps)
+    orient_vec = Vector{MVector{4, Float32}}(undef, steps)
     X_vec = Vector{MVector{SEGMENTS+1, MyFloat}}(undef, steps)
     Y_vec = Vector{MVector{SEGMENTS+1, MyFloat}}(undef, steps)
     Z_vec = Vector{MVector{SEGMENTS+1, MyFloat}}(undef, steps)
-    x = Vector{MyFloat}(undef, steps)
-    y = Vector{MyFloat}(undef, steps)
-    z = Vector{MyFloat}(undef, steps)
-    for i in range(1, length=steps)
-        state=log[i]
-        time_vec[i] = state.time
-        orient_vec[i] = state.orient
-        X_vec[i] = state.X
-        Y_vec[i] = state.Y
-        Z_vec[i] = state.Z
-        x[i] = state.X[end]
-        y[i] = state.Y[end]
-        z[i] = state.Z[end]
+    for i in range(0, length=steps)
+        state = demo_state(max_height * i/steps, i/SAMPLE_FREQ)
+        time_vec[i+1] = state.time
+        orient_vec[i+1] = state.orient
+        X_vec[i+1] = state.X
+        Y_vec[i+1] = state.Y
+        Z_vec[i+1] = state.Z
     end
-    return StructArray{ExtSysState}((time_vec, orient_vec, X_vec, Y_vec, Z_vec, x, y, z))
+    return StructArray{SysState}((time_vec, orient_vec, X_vec, Y_vec, Z_vec))
 end
 
-function arrow2vos(data)
-    steps=length(data[1])
-    vec = Vector{SysState}(undef, steps)
-    for i in range(1, length=steps)
-        vec[i] = SysState(data[1][i], data[2][i], data[3][i], data[4][i], data[5][i])
+# extend a flight systom log with the fieds x, y, and z (kite positions) and convert the orientation to the type UnitQuaternion
+function syslog2extlog(syslog)
+    x_vec = @view VectorOfArray(syslog.X)[end,:]
+    y_vec = @view VectorOfArray(syslog.Y)[end,:]
+    z_vec = @view VectorOfArray(syslog.Z)[end,:]
+    orient_vec = Vector{UnitQuaternion{Float32}}(undef, length(syslog.time))
+    for i in range(1, length=length(syslog.time))
+        orient_vec[i] = UnitQuaternion(syslog.orient[i])
     end
-    return vec
+    return StructArray{ExtSysState}((syslog.time, orient_vec, syslog.X, syslog.Y, syslog.Z, x_vec, y_vec, z_vec))    
 end
 
-function demo_log(name="Test_flight"; duration=10)
-    log_3d = demo_log3d(name, duration=duration)
-    log_2d = vos2sov(log_3d)
-    return FlightLog(name, log_3d, log_2d)
+function demo_log(name="Test_flight2"; duration=10)
+    syslog = demo_syslog(name, duration=duration)
+    return FlightLog(name, syslog, syslog2extlog(syslog))
 end
 
 function save_log(flight_log::FlightLog)
     Arrow.ArrowTypes.registertype!(SysState, SysState)
-    table = (col1=flight_log.log_3d,)
     filename=joinpath(DATA_PATH, flight_log.name) * ".arrow"
-    Arrow.write(filename, table, compress=:lz4)
+    Arrow.write(filename, flight_log.syslog, compress=:lz4)
 end
 
 function load_log(filename::String)
     Arrow.ArrowTypes.registertype!(SysState, SysState)
-    if filename[findlast(isequal('.'), filename):end] == ".arrow"
-        fullname = joinpath(DATA_PATH, filename)
-    else
+    Arrow.ArrowTypes.registertype!(MVector{4, Float32}, MVector{4, Float32})
+    if isnothing(findlast(isequal('.'), filename))
         fullname = joinpath(DATA_PATH, filename) * ".arrow"
+    else
+        fullname = joinpath(DATA_PATH, filename) 
     end
     table = Arrow.Table(fullname)
-    log_3d = arrow2vos(table.col1.data)
-    log_2d = vos2sov(log_3d)
-    return FlightLog(basename(fullname[1:end-6]), log_3d, log_2d)
+    syslog = StructArray{SysState}((table.time, table.orient, table.X, table.Y, table.Z))
+    return FlightLog(basename(fullname[1:end-6]), syslog, syslog2extlog(syslog))
 end
 
 function test(save=false)
@@ -143,7 +133,7 @@ function test(save=false)
         log_to_save=demo_log()
         save_log(log_to_save)
     end
-    return(load_log("Test_flight.arrow"))
+    return(load_log("Test_flight2.arrow"))
 end
 
 end
