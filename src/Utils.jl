@@ -26,8 +26,9 @@ module Utils
 # functions for creating a demo flight state, demo flight log, loading and saving flight logs
 
 using Rotations, StaticArrays, StructArrays, RecursiveArrayTools, Arrow
-export demo_state, demo_syslog, demo_log, load_log, save_log, SEGMENTS, SAMPLE_FREQ
 export SysState, ExtSysState, SysLog
+
+export demo_state, demo_syslog, demo_log, load_log, save_log, SEGMENTS, SAMPLE_FREQ
 
 const MyFloat = Float32
 const SEGMENTS = 7                    # number of tether segments
@@ -58,7 +59,7 @@ end
 # flight log, containing the basic data as struct of arrays 
 # and in addition an extended view on the data that includes derived/ calculated values for plotting
 # finally meta data like the file name of the log file is included
-struct FlightLog
+struct SysLog
     name::String
     syslog::StructArray{SysState}    # struct of vectors
     extlog::StructArray{ExtSysState} # struct of vectors, containing derived values
@@ -108,10 +109,10 @@ end
 
 function demo_log(name="Test_flight"; duration=10)
     syslog = demo_syslog(name, duration=duration)
-    return FlightLog(name, syslog, syslog2extlog(syslog))
+    return SysLog(name, syslog, syslog2extlog(syslog))
 end
 
-function save_log(flight_log::FlightLog)
+function save_log(flight_log::SysLog)
     Arrow.ArrowTypes.registertype!(SysState, SysState)
     filename=joinpath(DATA_PATH, flight_log.name) * ".arrow"
     Arrow.write(filename, flight_log.syslog, compress=:lz4)
@@ -127,7 +128,7 @@ function load_log(filename::String)
     end
     table = Arrow.Table(fullname)
     syslog = StructArray{SysState}((table.time, table.orient, table.X, table.Y, table.Z))
-    return FlightLog(basename(fullname[1:end-6]), syslog, syslog2extlog(syslog))
+    return SysLog(basename(fullname[1:end-6]), syslog, syslog2extlog(syslog))
 end
 
 function test(save=false)
