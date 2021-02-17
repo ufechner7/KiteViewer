@@ -42,7 +42,6 @@ struct SysState
     Y::MVector{SEGMENTS+1, MyFloat}   # vector of particle positions in y
     Z::MVector{SEGMENTS+1, MyFloat}   # vector of particle positions in z
 end 
-SysState(tab, i) = SysState(tab.time[i], tab.orient[i], tab.X[i], tab.Y[i], tab.Z[i])
 
 # extended SysState containing derived values for plotting
 struct ExtSysState
@@ -54,10 +53,6 @@ struct ExtSysState
     x::MyFloat                        # kite position in x
     y::MyFloat                        # kite position in y
     z::MyFloat                        # kite position in z
-end
-
-function ExtSysState(tab, i)
-    ExtSysState(tab.time[i], UnitQuaternion(tab.orient[i]), tab.X[i], tab.Y[i], tab.Z[i], tab.X[i][end], tab.Y[i][end], tab.Z[i][end])
 end
 
 # flight log, containing the basic data as struct of arrays 
