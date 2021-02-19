@@ -92,7 +92,12 @@ Revise is watching the file KiteViewer.jl, and each time a changed version is sa
 
 ## Reducing the startup time
 Using a Julia system image that contains a precompiled version of the GUI library Makie.jl can drastically reduce the startup time.
-How to do that is explained here: [SystemImage.md](./doc/SystemImage.md)
+To create a system image just run the script: ```./create_sys_image.sh``` This needs to be done at least once, but also after important
+package updates because it freezes the package versions.
+
+If you now use the script ./runjulia.sh the new system image with the precompiled packages will be used.
+
+More detailed explaination here: [SystemImage.md](./doc/SystemImage.md)
 (Only tested on Linux.)
 
 ## Scientific background
