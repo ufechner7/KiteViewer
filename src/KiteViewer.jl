@@ -22,7 +22,7 @@ SOFTWARE. =#
 
 using GeometryBasics, Rotations, Makie
 AbstractPlotting.__init__()
-using GLMakie, FileIO, AbstractPlotting, AbstractPlotting.MakieLayout
+using GLMakie, FileIO
 
 using Revise
 includet("./Utils.jl")
