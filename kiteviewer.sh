@@ -6,4 +6,8 @@ if test -f "~/.bashrc"; then
 fi
 
 echo "Lauching KiteViewer..."
-julia --optimize=1 --project -e "include(\"./src/KiteViewer.jl\");main(true)"
+if test -f "MakieSys.so"; then
+    julia6 --startup-file=no  -J MakieSys.so --optimize=1 --project -e "include(\"./src/KiteViewer.jl\");main(true)"
+else
+    julia6 --startup-file=no --optimize=1 --project -e "include(\"./src/KiteViewer.jl\");main(true)"
+fi
