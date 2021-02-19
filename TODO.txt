@@ -7,6 +7,7 @@ DONE
 6. add a "Launch" button
 7. add and test functions for saving and loading flight data
 8. refactoring of Utils, two conversion functions less
+9. add scripts create_sys_image.sh and runjulia.sh, 10 times reduction of startup delay
 
 TODO
 1. add a "Play" button
