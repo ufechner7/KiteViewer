@@ -3,7 +3,7 @@ using TickTock
 tick();tock()
 
 tick()
-@time Utils.test(true)
+@time Utils.test(true);
 tock()
 
 
