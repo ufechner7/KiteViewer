@@ -40,14 +40,16 @@ On my computer (i7-7700K) this reduced the startup time from 41s to 4s.
 Before running the script ```create_sys_image.sh``` it is suggested to update your packages:
 
 ```
-./runjulia
+./runjulia.sh
 ]resolve
 instantiate
 up
 precompile
+<backspace>
+exit()
 ```
 
-### Error "Cannot find crti.o on Linux"
+### Error "Cannot find crti.o" on Linux
 Install the package gcc-multilib
 ```
 sudo apt install gcc-multilib
