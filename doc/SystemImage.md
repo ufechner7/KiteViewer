@@ -34,3 +34,21 @@ or the following command to launch the GUI without julia command line:
 ```./kiteviewer.sh```
 
 On my computer (i7-7700K) this reduced the startup time from 41s to 4s.
+
+## Troubleshooting
+### Preparation
+Before running the script ```create_sys_image.sh``` it is suggested to update your packages:
+
+```
+./runjulia
+]resolve
+instantiate
+up
+precompile
+```
+
+### Error "Cannot find crti.o on Linux"
+Install the package gcc-multilib
+```
+sudo apt install gcc-multilib
+``` 
