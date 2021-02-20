@@ -6,14 +6,6 @@ First make sure the KiteViewer directory is the current directory. Then execute 
 ```julia
 julia --project
 
-using Pkg
-Pkg.add("PackageCompiler")
-
-exit()
-```
-```julia
-julia --project
-
 using Makie, GLMakie, Arrow, MeshIO, RecursiveArrayTools, Revise, Rotations, StaticArrays, StructArrays, YAML
 
 using PackageCompiler
