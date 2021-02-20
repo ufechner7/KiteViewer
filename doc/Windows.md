@@ -38,7 +38,7 @@ The second version prints more information about each file.
 
 `julia --project` or  
 
-`./runjulia`
+`./runjulia.sh`
 
 This launches julia and uses the packages of the file Project.toml as environment.
 The second version uses the system image automatically (if available) and also loads
@@ -59,6 +59,18 @@ In that case create a backup copy of your version, check out the original versio
 `git checkout src/KiteViewer.jl`
 
 and then try  `git pull` again.
+
+## Update all packages
+```
+./runjulia.sh
+]resolve
+instantiate
+up
+precompile
+<backspace>
+exit()
+```
+If you are working with a precompiled system image this needs to be re-compiled after a package update by running `./create_sys_image.sh` .
 
 ## Using VSCodium
 Use the menu "Open file or directory..." to opent the folder "repos/KiteViewer"
