@@ -35,7 +35,7 @@ git clone https://github.com/ufechner7/KiteViewer.git
 cd KiteViewer
 ```
 
-Launch Julia and install the depndencies:
+Launch Julia and install the dependencies:
 
 ```
 julia --project
