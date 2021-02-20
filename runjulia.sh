@@ -1,3 +1,4 @@
+#!/bin/bash
 if test -f "MakieSys.so"; then
     julia -J MakieSys.so --project -e "using Revise" -i
 else

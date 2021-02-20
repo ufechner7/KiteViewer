@@ -98,7 +98,7 @@ package updates because it freezes the package versions.
 If you now use the script ./runjulia.sh the new system image with the precompiled packages will be used.
 
 More detailed explaination here: [SystemImage.md](./doc/SystemImage.md)
-(Only tested on Linux.)
+(Tested on Windows10 and Linux.)
 
 ## Scientific background
 See: [Research Fechner](https://research.tudelft.nl/en/publications/?search=Uwe+Fechner&pageSize=50&ordering=rating&descending=true) for the scientic background of this code.
