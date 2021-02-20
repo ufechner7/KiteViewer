@@ -36,9 +36,13 @@ The second version prints more information about each file.
 
 ### Start Julia
 
-`julia --project`
+`julia --project` or  
+
+`./runjulia`
 
 This launches julia and uses the packages of the file Project.toml as environment.
+The second version uses the system image automatically (if available) and also loads
+Revise for speedy development.
 
 ### Quit Julia
 
