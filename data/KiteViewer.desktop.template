@@ -6,6 +6,6 @@ GenericName=KiteViewer
 Comment=Viewer for airborne wind energy systems
 Exec=@APPDIR@/kiteviewer.sh
 Categories=Development;Science;
-Icon=gnome-calculator
+Icon=KiteViewer
 Terminal=false
 StartupNotify=true
