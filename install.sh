@@ -16,3 +16,6 @@ cp ${APPDIR}/data/KiteViewer.desktop.template ~/.local/share/applications
 APPDIR2=${APPDIR//\//\\/} # escape all / characters with \
 sed -i "s/@APPDIR@/${APPDIR2}/g" ~/.local/share/applications/KiteViewer.desktop.template
 mv ~/.local/share/applications/KiteViewer.desktop.template ~/.local/share/applications/KiteViewer.desktop
+
+# install icon
+cp ${APPDIR}/data/KiteViewer.png ~/.local/share/icons
