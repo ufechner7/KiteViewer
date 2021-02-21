@@ -18,4 +18,5 @@ sed -i "s/@APPDIR@/${APPDIR2}/g" ~/.local/share/applications/KiteViewer.desktop.
 mv ~/.local/share/applications/KiteViewer.desktop.template ~/.local/share/applications/KiteViewer.desktop
 
 # install icon
+mkdir -p ~/.local/share/icons
 cp ${APPDIR}/data/KiteViewer.png ~/.local/share/icons
