@@ -1,0 +1,13 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=KiteViewer
+GenericName=KiteViewer
+Comment=Viewer for airborne wind energy systems
+TryExec=@APPDIR@/kiteviewer.sh
+Exec=@APPDIR@/kiteviewer.sh %F
+Categories=Development;Science;
+Icon=spyder
+Terminal=false
+StartupNotify=true
+MimeType=text/x-python;
