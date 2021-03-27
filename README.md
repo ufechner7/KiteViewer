@@ -5,7 +5,7 @@
 
 ## Requirements
 
-Julia 1.5 or higher must be installed. You can download it at https://www.julialang.org/
+Julia 1.6 or higher must be installed. You can download it at https://www.julialang.org/
 
 On Linux or MAC you can install the latest Julia version with the following command:
 ```

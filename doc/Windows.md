@@ -12,7 +12,7 @@ If you want to use KiteViewer on Windows, I suggest to install
    bash as your prefered terminal.
 3. Julia. During installation select "Add Julia to the path."  
    You can download it from https://julialang.org/downloads/ 
-   At the time of writing version 1.6.0rc1 is suggested.
+   At the time of writing version 1.6.0 is suggested.
 
 Git for Windows will not only provide the git version control system, but also a bash shell. When using the bash shell you can use the same commands that I am suggesting in [README.md](../README.md)  for Linux.
 
