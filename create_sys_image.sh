@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -eu
 if test -f "MakieSys.so"; then
     cp MakieSys.so MakieSys.so.bak
 fi
