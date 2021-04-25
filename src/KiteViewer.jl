@@ -141,9 +141,9 @@ function main(gl_wait=true)
 
     reset_view(cam, scene3D)
 
-    text!(scene, "z", position = Point2f0(322, 815), textsize = 30, align = (:left, :bottom), show_axis = false)
-    text!(scene, "x", position = Point2f0(642, 352), textsize = 30, align = (:left, :bottom), show_axis = false)
-    text!(scene, "y", position = Point2f0( 90, 346), textsize = 30, align = (:left, :bottom), show_axis = false)
+    text!(scene3D, "z", position = Point3f0(0, 0, 14.6), textsize = 30, align = (:center, :center), show_axis = false)
+    text!(scene3D, "x", position = Point3f0(17, 0,0), textsize = 30, align = (:center, :center), show_axis = false)
+    text!(scene3D, "y", position = Point3f0( 0, 14.5, 0), textsize = 30, align = (:center, :center), show_axis = false)
 
     layout[1, 1] = scene3D
     layout[2, 1] = buttongrid = GridLayout(tellwidth = false)
