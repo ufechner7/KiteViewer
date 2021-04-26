@@ -26,12 +26,12 @@ module Utils
 # functions for creating a demo flight state, demo flight log, loading and saving flight logs
 
 using Rotations, StaticArrays, StructArrays, RecursiveArrayTools, Arrow
-export SysState, ExtSysState, SysLog
+export SysState, ExtSysState, SysLog, MyFloat
 
-export demo_state, demo_syslog, demo_log, load_log, save_log, SEGMENTS, SAMPLE_FREQ
+export demo_state, demo_syslog, demo_log, load_log, syslog2extlog, save_log, SEGMENTS, SAMPLE_FREQ
 
 const MyFloat = Float32
-const SEGMENTS = 7                    # number of tether segments
+const SEGMENTS = 6                    # number of tether segments
 const SAMPLE_FREQ = 20                # sample frequency in Hz
 const DATA_PATH = "./data"            # path for log files and other data
 
