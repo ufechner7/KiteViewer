@@ -1,6 +1,7 @@
 [deps]
 AbstractPlotting = "537997a7-5e4e-5d89-9595-2241ea00577e"
 Arrow = "69666777-d1a9-59fb-9406-91d4454c9d45"
+CodecXz = "ba30903b-d9e8-5048-a5ec-d1f5b0d4b47b"
 FileIO = "5789e2e9-d7fb-5bc7-8068-2c6fae9b9549"
 GLMakie = "e9467ef8-e4e7-5192-8a1a-b1aee30e663a"
 GeometryBasics = "5c1252a2-5f33-56bf-86c9-59e7332b4326"
