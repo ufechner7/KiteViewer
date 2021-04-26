@@ -12,4 +12,4 @@ DONE
 
 TODO
 1. add a "Play" button
-2. convert log_8700W_8ms.csv.xz to arrow format
+2. finalize conversion of log_8700W_8ms.csv.xz to arrow format (add orientation)
