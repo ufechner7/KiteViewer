@@ -8,8 +8,8 @@ DONE
 7. add and test functions for saving and loading flight data
 8. refactoring of Utils, two conversion functions less
 9. add scripts create_sys_image.sh and runjulia.sh, 10 times reduction of startup delay
+10. add log file of a good simulation to data folder
 
 TODO
 1. add a "Play" button
-2. convert existing log file to .csv
-3. convert csv to arrow format
+2. convert log_8700W_8ms.csv.xz to arrow format
