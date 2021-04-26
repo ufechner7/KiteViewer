@@ -56,6 +56,12 @@ main()
 Use the right mouse button to zoom and the left mouse button to pan
 the 3D view. 
 
+## Import flight data
+With the following command you can import one simulation flight data set:
+```
+include("src/import_log.jl")
+```
+
 ## Fixing OpenGL problems
 On a computer with Ubuntu 20.04 and Intel integrated graphics the following steps were needed to make OpenGL work:
 
