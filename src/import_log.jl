@@ -6,6 +6,7 @@
 #      sync_speed,system_state,time,time_rel,turn_rate,v_app,v_app_norm,v_reelout,vel_kite,yaw_angle
 
 # TODO: calculate the orientation based on v_app and the last tether segment
+# TODO: convert v_app in the data frame into a julia vector
 
 using CodecXz, CSV, DataFrames, StaticArrays, StructArrays
 include("./Utils.jl")
@@ -46,12 +47,23 @@ function df2syslog(df)
     return StructArray{SysState}((df.time_rel, orient_vec, df.X, df.Y, df.Z))
 end
 
+# calculate the rotation matrix of the kite based on the position of the
+# last two tether particles and the apparent wind speed vector
+function rot(pos_kite, pos_before, v_app)
+    delta = pos_kite - pos_before
+    c = -delta
+    z = normalize(c)
+    y = normalize(cross(v_app, c))
+    x = normalize(cross(y, c))
+    rot = rot3d([0,-1.0,0], [1.0,0,0], [0,0,-1.0], x, y, z)
+end
+
 # Main program
 decompress(FILENAME, CSV_FILE)
 
 # convert to DataFrame, cleanup, transform
 data = DataFrame(CSV.File(CSV_FILE))
-df = select(data, :time_rel, :position)
+df = select(data, :time_rel, :position, :v_app)
 df[!, :X] = getX.(df.position)
 df[!, :Y] = getY.(df.position)
 df[!, :Z] = getZ.(df.position)
