@@ -28,8 +28,9 @@ includet("./Utils.jl")
 using .Utils
 
 const SCALE = 1.2 
-const INITIAL_HEIGHT = 2.0 # meter
-const MAX_HEIGHT     = 6.0 # meter
+const TIME_LAPSE = 2       # time lapse factor, must be integer
+const INITIAL_HEIGHT = 2.0 # meter, for demo
+const MAX_HEIGHT     = 6.0 # meter, for demo
 const KITE = FileIO.load("data/kite.obj")
 const PARTICLES = Vector{AbstractPlotting.Mesh}(undef, SEGMENTS+1)
 const SEGS      = Vector{AbstractPlotting.Mesh}(undef, SEGMENTS)
@@ -106,10 +107,8 @@ function draw_system(scene, state)
         SEGS[i] = segment
     end
 
-    # rotate the kite such that the nose points to the origin and apply state.orient(ation)
-    # r_xyz = RotXYZ(pi/2, -pi/2, 0)
-    r_xyz = RotXYZ(0, 0, 0)
-    q0 = UnitQuaternion(r_xyz) * UnitQuaternion(state.orient)
+    # rotate the kite by applying state.orient(ation)
+    q0 = UnitQuaternion(state.orient)
     q  = Quaternionf0(q0.x, q0.y, q0.z, q0.w)
 
     # delete and render the kite
@@ -233,7 +232,7 @@ function main(gl_wait=true)
                 state = log[i+1]
                 draw_system(scene3D, state)
                 sleep(delta_t)
-                i+=2
+                i += TIME_LAPSE
                 if i>=steps
                     FLYING[1] = false
                     PLAYING[1] = false
