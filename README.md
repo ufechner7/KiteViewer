@@ -61,7 +61,7 @@ With the following command you can import one simulation flight data set:
 ```
 include("src/import_log.jl")
 ```
-After doining that restart Julia and run the main function of KiteViewer. If you now click on "Play" the log file
+After doing that restart Julia and run the main function of KiteViewer. If you now click on "Play" the log file
 is replayed.
 
 ## Fixing OpenGL problems
