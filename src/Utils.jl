@@ -28,7 +28,7 @@ module Utils
 using Rotations, StaticArrays, StructArrays, RecursiveArrayTools, Arrow
 export SysState, ExtSysState, SysLog, MyFloat
 
-export demo_state, demo_syslog, demo_log, load_log, syslog2extlog, save_log, SEGMENTS, SAMPLE_FREQ
+export demo_state, demo_syslog, demo_log, load_log, syslog2extlog, save_log, rot3d, SEGMENTS, SAMPLE_FREQ
 
 const MyFloat = Float32
 const SEGMENTS = 6                    # number of tether segments
@@ -63,6 +63,19 @@ struct SysLog
     name::String
     syslog::StructArray{SysState}    # struct of vectors
     extlog::StructArray{ExtSysState} # struct of vectors, containing derived values
+end
+
+"""
+Calculate the rotation of reference frame (ax, ay, az) so that it matches the reference frame 
+(bx, by, bz).
+All parameters must be 3-element vectors. Both refrence frames must be orthogonal,
+all vectors must already be normalized.
+Source: http://en.wikipedia.org/wiki/User:Snietfeld/TRIAD_Algorithm
+"""
+function rot3d(ax, ay, az, bx, by, bz)
+    R_ai = hcat(ax, az, ay)
+    R_bi = hcat(bx, bz, by)
+    return R_bi * R_ai'
 end
 
 # create a demo state with a given height and time
