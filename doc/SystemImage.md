@@ -6,12 +6,12 @@ First make sure the KiteViewer directory is the current directory. Then execute 
 ```julia
 julia --project
 
-using Makie, GLMakie, Arrow, MeshIO, RecursiveArrayTools, Revise, Rotations, StaticArrays, StructArrays, YAML
+using GLMakie, Arrow, MeshIO, RecursiveArrayTools, Revise, Rotations, StaticArrays, StructArrays, YAML
 
 using PackageCompiler
 
 PackageCompiler.create_sysimage(
-    [:Makie, :GLMakie, :Arrow, :MeshIO, :RecursiveArrayTools, :Revise, :Rotations, :StaticArrays, :StructArrays, :YAML];
+    [:GLMakie, :Arrow, :MeshIO, :RecursiveArrayTools, :Revise, :Rotations, :StaticArrays, :StructArrays, :YAML];
     sysimage_path="MakieSys.so",
     precompile_execution_file=joinpath("test", "test_for_precompile.jl")
 )

@@ -61,6 +61,8 @@ With the following command you can import one simulation flight data set:
 ```
 include("src/import_log.jl")
 ```
+After doining that restart Julia and run the main function of KiteViewer. If you now click on "Play" the log file
+is replayed.
 
 ## Fixing OpenGL problems
 On a computer with Ubuntu 20.04 and Intel integrated graphics the following steps were needed to make OpenGL work:
@@ -102,6 +104,7 @@ To create a system image just run the script: ```./create_sys_image.sh``` This n
 package updates because it freezes the package versions.
 
 If you now use the script ./runjulia.sh the new system image with the precompiled packages will be used.
+If you do not want to make changes to the code you can also run the app by typing ```./kiteviewer.sh```.
 
 More detailed explaination here: [SystemImage.md](./doc/SystemImage.md)
 (Tested on Windows10 and Linux.)
