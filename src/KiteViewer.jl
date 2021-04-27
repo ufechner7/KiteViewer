@@ -36,6 +36,7 @@ const PARTICLES = Vector{AbstractPlotting.Mesh}(undef, SEGMENTS+1)
 const SEGS      = Vector{AbstractPlotting.Mesh}(undef, SEGMENTS)
 const KITE_MESH = Vector{MeshScatter{Tuple{Vector{Point{3, Float32}}}}}(undef, 1)
 const init      = [false]
+const create_particles = [true]
 const FLYING    = [false]
 const PLAYING    = [false]
 const GUI_ACTIVE = [false]
@@ -87,12 +88,17 @@ end
 # draw the kite power system, consisting of the tether and the kite
 function draw_system(scene, state)
     # loop over the particles of the main tether and render them as spheres
-    for i in range(1, length=length(state.X))
-        if init[1] 
-            delete!(scene.scene, PARTICLES[i])
+    if create_particles[1]
+        for i in range(1, length=length(state.X))
+            particle = mesh!(scene, Sphere(Point3f0(0, 0, 0), 0.07 * SCALE), color=:yellow)
+            PARTICLES[i] = particle
         end
-        particle = mesh!(scene, Sphere(Point3f0(state.X[i], state.Y[i], state.Z[i]), 0.07 * SCALE), color=:yellow)
-        PARTICLES[i] = particle
+        create_particles[1] = false
+    end
+    i=1
+    for particle in PARTICLES
+        translate!(particle, state.X[i], state.Y[i], state.Z[i])
+        i += 1
     end
 
     # loop over the springs of the main tether and render them as cylinders
@@ -110,6 +116,7 @@ function draw_system(scene, state)
     # rotate the kite by applying state.orient(ation)
     q0 = UnitQuaternion(state.orient)
     q  = Quaternionf0(q0.x, q0.y, q0.z, q0.w)
+    end_point  = Point3f0(state.X[end], state.Y[end], state.Z[end])
 
     # delete and render the kite
     if init[1]
