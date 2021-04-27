@@ -12,6 +12,7 @@ using .Utils
 # Constants
 const FILENAME = "data/log_8700W_8ms.csv.xz"
 const CSV_FILE = FILENAME[1:end-3]
+const ZOOM = 0.03
 
 # Functions
 function decompress(in, out)
@@ -64,7 +65,7 @@ function df2syslog(df)
         q = UnitQuaternion(rotation)
         orient_vec[i] = MVector{4, Float32}(q.w, q.x, q.y, q.z)
     end
-    return StructArray{SysState}((df.time_rel, orient_vec, df.X, df.Y, df.Z))
+    return StructArray{SysState}((df.time_rel, orient_vec, df.X*ZOOM, df.Y*ZOOM, df.Z*ZOOM))
 end
 
 # Main program

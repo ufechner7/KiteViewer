@@ -36,6 +36,7 @@ const SEGS      = Vector{AbstractPlotting.Mesh}(undef, SEGMENTS)
 const KITE_MESH = Vector{MeshScatter{Tuple{Vector{Point{3, Float32}}}}}(undef, 1)
 const init      = [false]
 const FLYING    = [false]
+const PLAYING    = [false]
 const GUI_ACTIVE = [false]
 
 function create_coordinate_system(scene, points = 10, max_x = 15.0)
@@ -114,7 +115,7 @@ function draw_system(scene, state)
     if init[1]
         delete!(scene.scene,  KITE_MESH[1])
     end
-    KITE_MESH[1] = meshscatter!(scene, end_point, marker=KITE, markersize = 0.5, rotations=q, color=:blue)
+    KITE_MESH[1] = meshscatter!(scene, end_point, marker=KITE, markersize = 0.25, rotations=q, color=:blue)
     init[1] = true
 end
 
@@ -137,6 +138,7 @@ function main(gl_wait=true)
     cam = cameracontrols(scene3D.scene)
     init[1] = false
     FLYING[1] = false
+    PLAYING[1] = false
     GUI_ACTIVE[1] = true
 
     reset_view(cam, scene3D)
@@ -153,8 +155,9 @@ function main(gl_wait=true)
     btn_ZOOM_in  = Button(scene, label = "Zoom +")
     btn_ZOOM_out = Button(scene, label = "Zoom -")
     btn_LAUNCH   = Button(scene, label = "LAUNCH")
+    btn_PLAY     = Button(scene, label = "PLAY")
 
-    buttongrid[1, 1:4] = [btn_LAUNCH, btn_ZOOM_in, btn_ZOOM_out, btn_RESET]
+    buttongrid[1, 1:5] = [btn_PLAY, btn_LAUNCH, btn_ZOOM_in, btn_ZOOM_out, btn_RESET]
 
     sl_height = Slider(scene, range = 0:0.01:MAX_HEIGHT, startvalue = INITIAL_HEIGHT)
     sl_label = Label(scene, "set_height", textsize = 18)
@@ -173,6 +176,13 @@ function main(gl_wait=true)
 
     on(btn_LAUNCH.clicks) do c
         FLYING[1] = true
+        PLAYING[1] = false
+    end
+
+    on(btn_PLAY.clicks) do c
+        FLYING[1] = true
+        PLAYING[1] = true
+        println("Clicked PLAY!")
     end
 
     on(btn_RESET.clicks) do c
@@ -180,6 +190,7 @@ function main(gl_wait=true)
         update_cam!(scene3D.scene,  Float32[-17.505877, -21.005878, 5.5000005], Float32[-1.5, -5.0000005, 5.5000005])
         zoom_scene(camera, scene3D.scene, 1.13f0)
         FLYING[1] = false
+        PLAYING[1] = false
     end
 
     on(btn_ZOOM_in.clicks) do c    
@@ -194,13 +205,26 @@ function main(gl_wait=true)
 
     # launch the kite on button click
     delta_t = 1.0 / SAMPLE_FREQ
-    log = demo_syslog("Launch test")
-    steps = length(log)
+
+    active = false
     simulation = @async begin
         while GUI_ACTIVE[1]
             # wait for launch command
             while ! FLYING[1] && GUI_ACTIVE[1]
+                active = false
                 sleep(0.10)
+            end
+            if ! active && GUI_ACTIVE[1]
+                if PLAYING[1]
+                    log = (load_log("log_8700W_8ms")).syslog 
+                    println("Loaded log file!")
+                else
+                    log = demo_syslog("Launch test!")
+                    println("Loaded demo!")
+                end
+                steps = length(log)            
+                println("Steps: $steps")
+                active = true
             end
             i=0
             # fly...
@@ -208,9 +232,10 @@ function main(gl_wait=true)
                 state = log[i+1]
                 draw_system(scene3D, state)
                 sleep(delta_t)
-                i+=1
+                i+=2
                 if i>=steps
                     FLYING[1] = false
+                    PLAYING[1] = false
                 end
             end
         end
