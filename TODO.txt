@@ -1,4 +1,11 @@
-DONE
+TODO
+- toggle between PAUSE and PLAY
+- print rel_time and height on the screen
+- print force and v_reelout on the screen
+- print azimuth and elevation on the screen
+- make ZOOM a constant in KiteViewer
+
+DONE (Version 0.2)
 1. Add a button to restore the default view and zoom buttons
 2. add X, Y and Z to the axis lables
 3. write a loop that lets the kite move in n steps
