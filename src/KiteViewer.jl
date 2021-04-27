@@ -107,7 +107,8 @@ function draw_system(scene, state)
     end
 
     # rotate the kite such that the nose points to the origin and apply state.orient(ation)
-    r_xyz = RotXYZ(pi/2, -pi/2, 0)
+    # r_xyz = RotXYZ(pi/2, -pi/2, 0)
+    r_xyz = RotXYZ(0, 0, 0)
     q0 = UnitQuaternion(r_xyz) * UnitQuaternion(state.orient)
     q  = Quaternionf0(q0.x, q0.y, q0.z, q0.w)
 

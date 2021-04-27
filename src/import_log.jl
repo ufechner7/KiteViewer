@@ -47,9 +47,9 @@ function rot(pos_kite, pos_before, v_app)
     delta = pos_kite - pos_before
     c = -delta
     z = normalize(c)
-    y = normalize(cross(v_app, c))
+    y = normalize(cross(-v_app, c))
     x = normalize(cross(y, c))
-    rot = rot3d([0,-1.0,0], [1.0,0,0], [0,0,-1.0], x, y, z)
+    rot = rot3d([0,-1.0,0], [1.0,0,0], [0,0,-1.0], z, y, x)
 end
 
 function df2syslog(df)

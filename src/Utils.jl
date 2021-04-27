@@ -85,7 +85,9 @@ function demo_state(height=6.0, time=0.0)
     X = range(0, stop=10, length=SEGMENTS+1)
     Y = zeros(length(X))
     Z = (a .* cosh.(X./a) .- a) * height/ 5.430806 
-    orient = MVector(1.0f0, 0, 0, 0)
+    r_xyz = RotXYZ(pi/2, -pi/2, 0)
+    q = UnitQuaternion(r_xyz)
+    orient = MVector{4, Float32}(q.w, q.x, q.y, q.z)
     return SysState(time, orient, X, Y, Z)
 end
 

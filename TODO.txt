@@ -11,6 +11,3 @@ DONE
 10. add log file of a good simulation to data folder
 11. add script import_log.jl for converting the log file into arrow format
 12. add play button, replaying of log file works now :)
-
-TODO
-1. fix orientation of the kite
