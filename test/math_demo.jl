@@ -30,9 +30,9 @@ function rot3d(ax, ay, az, bx, by, bz)
 end
 
 # main
-ax, ay, az = [1,0,0], [ 0,1,0], [0,0,1]
-bx, by, bz = [0,1,0], [-1,0,0], [0,0,1]
-vec = [1,0,0]
+ax, ay, az = [1.,0,0], [ 0,1.,0], [0,0,1.]
+bx, by, bz = [0,1.,0], [-1.,0,0], [0,0,1.]
+vec = [1.,0,0]
 
 pprint(vec)
 
