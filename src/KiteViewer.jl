@@ -156,8 +156,9 @@ function main(gl_wait=true)
     btn_ZOOM_out = Button(scene, label = "Zoom -")
     btn_LAUNCH   = Button(scene, label = "LAUNCH")
     btn_PLAY     = Button(scene, label = "PLAY")
+    btn_STOP     = Button(scene, label = "STOP")
 
-    buttongrid[1, 1:5] = [btn_PLAY, btn_LAUNCH, btn_ZOOM_in, btn_ZOOM_out, btn_RESET]
+    buttongrid[1, 1:6] = [btn_PLAY, btn_LAUNCH, btn_ZOOM_in, btn_ZOOM_out, btn_RESET, btn_STOP]
 
     sl_height = Slider(scene, range = 0:0.01:MAX_HEIGHT, startvalue = INITIAL_HEIGHT)
     sl_label = Label(scene, "set_height", textsize = 18)
@@ -182,10 +183,15 @@ function main(gl_wait=true)
     on(btn_PLAY.clicks) do c
         FLYING[1] = true
         PLAYING[1] = true
-        println("Clicked PLAY!")
     end
 
     on(btn_RESET.clicks) do c
+        camera = cameracontrols(scene3D.scene)
+        update_cam!(scene3D.scene,  Float32[-17.505877, -21.005878, 5.5000005], Float32[-1.5, -5.0000005, 5.5000005])
+        zoom_scene(camera, scene3D.scene, 1.13f0)
+    end
+
+    on(btn_STOP.clicks) do c
         camera = cameracontrols(scene3D.scene)
         update_cam!(scene3D.scene,  Float32[-17.505877, -21.005878, 5.5000005], Float32[-1.5, -5.0000005, 5.5000005])
         zoom_scene(camera, scene3D.scene, 1.13f0)
@@ -217,10 +223,8 @@ function main(gl_wait=true)
             if ! active && GUI_ACTIVE[1]
                 if PLAYING[1]
                     log = (load_log("log_8700W_8ms")).syslog 
-                    println("Loaded log file!")
                 else
                     log = demo_syslog("Launch test!")
-                    println("Loaded demo!")
                 end
                 steps = length(log)            
                 println("Steps: $steps")
