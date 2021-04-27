@@ -49,17 +49,16 @@ function main()
         # loop over the particles of the main tether and render them as spheres
         if i == 0
             for j in range(1, length=length(X))
-                particle = mesh!(scene3D, Sphere(Point3f0(X[j], Y[j], Z[j]), 0.07 * SCALE), color=:yellow)
+                particle = mesh!(scene3D, Sphere(Point3f0(0,0,0), 0.07 * SCALE), color=:yellow)
                 particles[j] = particle
             end
-        else
-            j=1
-            for particle in particles
-                translate!(particle, X[j], Y[j], Z[j])
-                j += 1
-            end
         end
-        sleep(0.2)
+        i=1
+        for particle in particles
+            translate!(particle, X[i], Y[i], Z[i])
+            i += 1
+        end
+        sleep(0.5)
     end
     
     return nothing
