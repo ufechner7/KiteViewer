@@ -24,13 +24,14 @@ module Utils
 
 # data structures for the flight state and the flight log
 # functions for creating a demo flight state, demo flight log, loading and saving flight logs
+# in addition helper functions for working with rotations
 
 using Rotations, StaticArrays, StructArrays, RecursiveArrayTools, Arrow
 export SysState, ExtSysState, SysLog, MyFloat
 
 export demo_state, demo_syslog, demo_log, load_log, syslog2extlog, save_log, rot3d, SEGMENTS, SAMPLE_FREQ
 
-const MyFloat = Float32
+const MyFloat = Float32               # type to use for postions
 const SEGMENTS = 6                    # number of tether segments
 const SAMPLE_FREQ = 20                # sample frequency in Hz
 const DATA_PATH = "./data"            # path for log files and other data
@@ -65,9 +66,9 @@ struct SysLog
     extlog::StructArray{ExtSysState} # struct of vectors, containing derived values
 end
 
+# functions
 """
-Calculate the rotation of reference frame (ax, ay, az) so that it matches the reference frame 
-(bx, by, bz).
+Calculate the rotation of reference frame (ax, ay, az) so that it matches the reference frame (bx, by, bz).
 All parameters must be 3-element vectors. Both refrence frames must be orthogonal,
 all vectors must already be normalized.
 Source: http://en.wikipedia.org/wiki/User:Snietfeld/TRIAD_Algorithm
@@ -120,6 +121,7 @@ function syslog2extlog(syslog)
     return StructArray{ExtSysState}((syslog.time, orient_vec, syslog.X, syslog.Y, syslog.Z, x_vec, y_vec, z_vec))    
 end
 
+# create an artifical log file for demonstration purposes
 function demo_log(name="Test_flight"; duration=10)
     syslog = demo_syslog(name, duration=duration)
     return SysLog(name, syslog, syslog2extlog(syslog))

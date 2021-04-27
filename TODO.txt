@@ -9,7 +9,7 @@ DONE
 8. refactoring of Utils, two conversion functions less
 9. add scripts create_sys_image.sh and runjulia.sh, 10 times reduction of startup delay
 10. add log file of a good simulation to data folder
+11. add script import_log.jl for converting the log file into arrow format
 
 TODO
 1. add a "Play" button
-2. finalize conversion of log_8700W_8ms.csv.xz to arrow format (add orientation)
