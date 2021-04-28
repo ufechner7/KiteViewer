@@ -20,7 +20,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE. =#
 
-using GeometryBasics, Rotations, GLMakie, FileIO
+using GeometryBasics, Rotations, GLMakie, FileIO, LinearAlgebra
 AbstractPlotting.__init__()
 
 using Revise
@@ -40,6 +40,11 @@ const create_particles = [true]
 const FLYING    = [false]
 const PLAYING    = [false]
 const GUI_ACTIVE = [false]
+
+const points      = Vector{Point3f0}(undef, SEGMENTS+1)
+const positions   = Node([Point3f0(x,0,0) for x in 1:SEGMENTS])
+const markersizes = Node([Point3f0(1,1,1) for x in 1:SEGMENTS])
+const rotations   = Node([Point3f0(1,0,0) for x in 1:SEGMENTS])
 
 function create_coordinate_system(scene, points = 10, max_x = 15.0)
     # create origin
@@ -85,33 +90,30 @@ function create_coordinate_system(scene, points = 10, max_x = 15.0)
     end 
 end
 
+function init_tether(scene)
+    for i in range(1, length=SEGMENTS+1)
+        particle = mesh!(scene, Sphere(Point3f0(0, 0, 0), 0.07 * SCALE), color=:yellow)
+        PARTICLES[i] = particle
+    end
+    cyl = Cylinder(Point3f0(0,0,-0.5), Point3f0(0,0,0.5), Float32(0.035 * SCALE))        
+    meshscatter!(scene, positions, marker=cyl, rotations=rotations, markersize=markersizes, color=:yellow)
+end
+
 # draw the kite power system, consisting of the tether and the kite
 function draw_system(scene, state)
-    # loop over the particles of the main tether and render them as spheres
-    if create_particles[1]
-        for i in range(1, length=length(state.X))
-            particle = mesh!(scene, Sphere(Point3f0(0, 0, 0), 0.07 * SCALE), color=:yellow)
-            PARTICLES[i] = particle
-        end
-        create_particles[1] = false
-    end
+
+    # move the particles to the correct position
     i=1
     for particle in PARTICLES
         translate!(particle, state.X[i], state.Y[i], state.Z[i])
+        points[i] = Point3f0(state.X[i], state.Y[i], state.Z[i])
         i += 1
     end
 
-    # loop over the springs of the main tether and render them as cylinders
-    end_point = Point3f0(0,0,0)
-    for i in range(1, length=length(state.X) - 1)
-        if init[1] 
-            delete!(scene.scene, SEGS[i])
-        end
-        start_point = Point3f0(state.X[i], state.Y[i], state.Z[i])
-        end_point  = Point3f0(state.X[i+1], state.Y[i+1], state.Z[i+1])
-        segment = mesh!(scene, Cylinder(start_point, end_point, Float32(0.035 * SCALE)), color=:yellow)
-        SEGS[i] = segment
-    end
+    # move, scale and turn the cylinder correctly
+    positions[] = [(points[k] + points[k+1])/2 for k in 1:SEGMENTS]
+    markersizes[] = [Point3f0(1, 1, norm(points[k+1] - points[k])) for k in 1:SEGMENTS]
+    rotations[] = [normalize(points[k+1] - points[k]) for k in 1:SEGMENTS]
 
     # rotate the kite by applying state.orient(ation)
     q0 = UnitQuaternion(state.orient)
@@ -171,6 +173,7 @@ function main(gl_wait=true)
     sl_label = Label(scene, "set_height", textsize = 18)
     slidergrid[1, 1:2] = [sl_label, sl_height]
 
+    init_tether(scene3D)
     draw_system(scene3D, demo_state(INITIAL_HEIGHT, 0))
     on(sl_height.value) do val
         draw_system(scene3D, demo_state(val, 0))
