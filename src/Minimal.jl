@@ -38,10 +38,11 @@ function main()
 
     display(scene)
 
-    particles = Vector{AbstractPlotting.Mesh}(undef, SEGMENTS+1)
-    positions = Node(Point3f0(0,0,0))
-    markersizes = Node(Point3f0(1,1,1))
-    rotations = Node(Point3f0(1,0,0))
+    particles   = Vector{AbstractPlotting.Mesh}(undef, SEGMENTS+1)
+    points      = Vector{Point3f0}(undef, SEGMENTS+1)
+    positions   = Node([Point3f0(x,0,0) for x in 1:SEGMENTS])
+    markersizes = Node([Point3f0(1,1,1) for x in 1:SEGMENTS])
+    rotations   = Node([Point3f0(1,0,0) for x in 1:SEGMENTS])
 
 
     for i = 0:4
@@ -60,17 +61,18 @@ function main()
         j=1
         for particle in particles
             translate!(particle, X[j], Y[j], Z[j])
+            if j <= SEGMENTS + 1
+                points[j] = Point3f0(X[j], Y[j], Z[j])
+            end
             j += 1
         end
 
         # loop over the springs of the main tether and render them as cylinders
         if i == 1
-            # end_point = Point3f0(0,0,0)
-            # for j in range(1, length=length(X) - 1)
             #     start_point = Point3f0(X[j], Y[j], Z[j])
             #     end_point  = Point3f0(X[j+1], Y[j+1], Z[j+1])
             #     segment = mesh!(scene3D, Cylinder(start_point, end_point, Float32(0.035 * SCALE)), color=:yellow)
-            #     # SEGS[i] = segment
+            #     # SEGMENTS[i] = segment
             # end
             start_point = Point3f0(0,0,0)
             end_point = Point3f0(X[2], Y[2], Z[2])
@@ -78,11 +80,10 @@ function main()
             
             meshscatter!(scene3D, positions, marker=cyl, rotations=rotations, markersize=markersizes, color=:yellow)
         end
-        start_point = Point3f0(0,0,0)
-        end_point = Point3f0(X[2], Y[2], Z[2])
-        positions[] = (start_point+end_point)/2
-        markersizes[] = Point3f0(1, 1, norm(end_point-start_point))
-        rotations[] = normalize(end_point - start_point)
+  
+        positions[] = [(points[k] + points[k+1])/2 for k in 1:SEGMENTS]
+        markersizes[] = [Point3f0(1, 1, norm(points[k+1] - points[k])) for k in 1:SEGMENTS]
+        rotations[] = [normalize(points[k+1] - points[k]) for k in 1:SEGMENTS]
 
         sleep(0.5)
     end
