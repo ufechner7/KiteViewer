@@ -36,7 +36,6 @@ const PARTICLES = Vector{AbstractPlotting.Mesh}(undef, SEGMENTS+1)
 const SEGS      = Vector{AbstractPlotting.Mesh}(undef, SEGMENTS)
 const KITE_MESH = Vector{MeshScatter{Tuple{Vector{Point{3, Float32}}}}}(undef, 1)
 const init      = [false]
-const create_particles = [true]
 const FLYING    = [false]
 const PLAYING    = [false]
 const GUI_ACTIVE = [false]
