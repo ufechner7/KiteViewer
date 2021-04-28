@@ -32,8 +32,6 @@ const TIME_LAPSE = 2       # time lapse factor, must be integer
 const INITIAL_HEIGHT = 2.0 # meter, for demo
 const MAX_HEIGHT     = 6.0 # meter, for demo
 const KITE = FileIO.load("data/kite.obj")
-const PARTICLES = Vector{AbstractPlotting.Mesh}(undef, SEGMENTS+1)
-const SEGS      = Vector{AbstractPlotting.Mesh}(undef, SEGMENTS)
 const KITE_MESH = Vector{MeshScatter{Tuple{Vector{Point{3, Float32}}}}}(undef, 1)
 const init      = [false]
 const FLYING    = [false]
@@ -41,9 +39,11 @@ const PLAYING    = [false]
 const GUI_ACTIVE = [false]
 
 const points      = Vector{Point3f0}(undef, SEGMENTS+1)
-const positions   = Node([Point3f0(x,0,0) for x in 1:SEGMENTS])
-const markersizes = Node([Point3f0(1,1,1) for x in 1:SEGMENTS])
-const rotations   = Node([Point3f0(1,0,0) for x in 1:SEGMENTS])
+const positions   = Node([Point3f0(x,0,0) for x in 1:SEGMENTS])        # positions of the tether segments
+const part_positions   = Node([Point3f0(x,0,0) for x in 1:SEGMENTS+1]) # positions of the tether particles
+const markersizes = Node([Point3f0(1,1,1) for x in 1:SEGMENTS])        # includes the segment length
+const rotations   = Node([Point3f0(1,0,0) for x in 1:SEGMENTS])        # unit vectors corresponding with
+                                                                       #   the orientation of the segments 
 
 function create_coordinate_system(scene, points = 10, max_x = 15.0)
     # create origin
@@ -90,10 +90,8 @@ function create_coordinate_system(scene, points = 10, max_x = 15.0)
 end
 
 function init_tether(scene)
-    for i in range(1, length=SEGMENTS+1)
-        particle = mesh!(scene, Sphere(Point3f0(0, 0, 0), 0.07 * SCALE), color=:yellow)
-        PARTICLES[i] = particle
-    end
+    sphere = Sphere(Point3f0(0, 0, 0), Float32(0.07 * SCALE))
+    meshscatter!(scene, part_positions, marker=sphere, markersize=1.0, color=:yellow)
     cyl = Cylinder(Point3f0(0,0,-0.5), Point3f0(0,0,0.5), Float32(0.035 * SCALE))        
     meshscatter!(scene, positions, marker=cyl, rotations=rotations, markersize=markersizes, color=:yellow)
 end
@@ -102,12 +100,10 @@ end
 function draw_system(scene, state)
 
     # move the particles to the correct position
-    i=1
-    for particle in PARTICLES
-        translate!(particle, state.X[i], state.Y[i], state.Z[i])
+    for i in range(1, length=SEGMENTS+1)
         points[i] = Point3f0(state.X[i], state.Y[i], state.Z[i])
-        i += 1
     end
+    part_positions[] = [(points[k]) for k in 1:SEGMENTS+1]
 
     # move, scale and turn the cylinder correctly
     positions[] = [(points[k] + points[k+1])/2 for k in 1:SEGMENTS]
@@ -220,7 +216,6 @@ function main(gl_wait=true)
 
     # launch the kite on button click
     delta_t = 1.0 / SAMPLE_FREQ
-
     active = false
     simulation = @async begin
         while GUI_ACTIVE[1]
