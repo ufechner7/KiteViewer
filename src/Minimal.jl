@@ -61,23 +61,13 @@ function main()
         j=1
         for particle in particles
             translate!(particle, X[j], Y[j], Z[j])
-            if j <= SEGMENTS + 1
-                points[j] = Point3f0(X[j], Y[j], Z[j])
-            end
+            points[j] = Point3f0(X[j], Y[j], Z[j])
             j += 1
         end
 
-        # loop over the springs of the main tether and render them as cylinders
+        # create a unit cylinders and render it multiple times
         if i == 1
-            #     start_point = Point3f0(X[j], Y[j], Z[j])
-            #     end_point  = Point3f0(X[j+1], Y[j+1], Z[j+1])
-            #     segment = mesh!(scene3D, Cylinder(start_point, end_point, Float32(0.035 * SCALE)), color=:yellow)
-            #     # SEGMENTS[i] = segment
-            # end
-            start_point = Point3f0(0,0,0)
-            end_point = Point3f0(X[2], Y[2], Z[2])
-            cyl = Cylinder(Point3f0(0,0,-0.5), Point3f0(0,0,0.5), Float32(0.035 * SCALE))
-            
+            cyl = Cylinder(Point3f0(0,0,-0.5), Point3f0(0,0,0.5), Float32(0.035 * SCALE))          
             meshscatter!(scene3D, positions, marker=cyl, rotations=rotations, markersize=markersizes, color=:yellow)
         end
   
