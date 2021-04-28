@@ -1,4 +1,4 @@
-using GeometryBasics, GLMakie
+using GeometryBasics, GLMakie, LinearAlgebra
 
 const SCALE = 1.2
 const SEGMENTS = 7                    # number of tether segments
@@ -39,6 +39,10 @@ function main()
     display(scene)
 
     particles = Vector{AbstractPlotting.Mesh}(undef, SEGMENTS+1)
+    positions = Node(Point3f0(0,0,0))
+    markersizes = Node(Point3f0(1,1,1))
+    rotations = Node(Point3f0(1,0,0))
+
 
     for i = 0:4
         # calculate a vector of 3D coordinates
@@ -70,15 +74,16 @@ function main()
             # end
             start_point = Point3f0(0,0,0)
             end_point = Point3f0(X[2], Y[2], Z[2])
-            pos = Node((start_point+end_point)/2)
-            m = Cylinder(-end_point/2, end_point/2, Float32(0.035 * SCALE))
-            q  = Quaternionf0(0,0,0,1.0)
-            rots = Node(q)
-            ms = Node(1.0)
-            meshscatter!(scene3D, pos, marker=m, rotations=rots, markersize=ms, color=:yellow)
+            cyl = Cylinder(Point3f0(0,0,-0.5), Point3f0(0,0,0.5), Float32(0.035 * SCALE))
+            
+            meshscatter!(scene3D, positions, marker=cyl, rotations=rotations, markersize=markersizes, color=:yellow)
         end
+        start_point = Point3f0(0,0,0)
+        end_point = Point3f0(X[2], Y[2], Z[2])
+        positions[] = (start_point+end_point)/2
+        markersizes[] = Point3f0(1, 1, norm(end_point-start_point))
+        rotations[] = normalize(end_point - start_point)
 
-        # m = Cylinder(Point3f0(0), Point3f0(0, 0, 1), 0.1)
         sleep(0.5)
     end
     
