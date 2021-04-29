@@ -177,11 +177,13 @@ function main(gl_wait=true)
     on(btn_LAUNCH.clicks) do c
         FLYING[1] = true
         PLAYING[1] = false
+        GC.enable(false)
     end
 
     on(btn_PLAY.clicks) do c
         FLYING[1] = true
         PLAYING[1] = true
+        GC.enable(false)
     end
 
     on(btn_RESET.clicks) do c
@@ -196,6 +198,7 @@ function main(gl_wait=true)
         zoom_scene(camera, scene3D.scene, 1.13f0)
         FLYING[1] = false
         PLAYING[1] = false
+        GC.enable(true)
     end
 
     on(btn_ZOOM_in.clicks) do c    
@@ -211,6 +214,7 @@ function main(gl_wait=true)
     # launch the kite on button click
     delta_t = 1.0 / se().sample_freq
     active = false
+    GC.enable(false)
     simulation = @async begin
         while GUI_ACTIVE[1]
             # wait for launch command
@@ -238,6 +242,7 @@ function main(gl_wait=true)
                 if i >= steps
                     FLYING[1] = false
                     PLAYING[1] = false
+                    GC.enable(true)
                 end
             end
         end
