@@ -28,7 +28,6 @@ includet("./Utils.jl")
 using .Utils
 
 const SCALE = 1.2 
-const TIME_LAPSE = 2       # time lapse factor
 const INITIAL_HEIGHT = 2.0 # meter, for demo
 const MAX_HEIGHT     = 6.0 # meter, for demo
 const KITE = FileIO.load("data/kite.obj")
@@ -36,14 +35,14 @@ const FLYING    = [false]
 const PLAYING    = [false]
 const GUI_ACTIVE = [false]
 
-const points      = Vector{Point3f0}(undef, se().segments+1)
-const quat        = Node(Quaternionf0(0,0,0,1))                        # orientation of the kite
-const kite_pos    = Node(Point3f0(1,0,0))                              # position of the kite
-const positions   = Node([Point3f0(x,0,0) for x in 1:se().segments])        # positions of the tether segments
-const part_positions   = Node([Point3f0(x,0,0) for x in 1:se().segments+1]) # positions of the tether particles
-const markersizes = Node([Point3f0(1,1,1) for x in 1:se().segments])        # includes the segment length
-const rotations   = Node([Point3f0(1,0,0) for x in 1:se().segments])        # unit vectors corresponding with
-                                                                       #   the orientation of the segments 
+const points          = Vector{Point3f0}(undef, se().segments+1)
+const quat            = Node(Quaternionf0(0,0,0,1))                        # orientation of the kite
+const kite_pos        = Node(Point3f0(1,0,0))                              # position of the kite
+const positions       = Node([Point3f0(x,0,0) for x in 1:se().segments])   # positions of the tether segments
+const part_positions  = Node([Point3f0(x,0,0) for x in 1:se().segments+1]) # positions of the tether particles
+const markersizes     = Node([Point3f0(1,1,1) for x in 1:se().segments])   # includes the segment length
+const rotations       = Node([Point3f0(1,0,0) for x in 1:se().segments])   # unit vectors corresponding with
+                                                                           #   the orientation of the segments 
 
 function create_coordinate_system(scene, points = 10, max_x = 15.0)
     # create origin
@@ -134,7 +133,6 @@ function main(gl_wait=true)
     scene3D = LScene(scene, scenekw = (show_axis=false, limits = Rect(-7,-10.0,0, 11,10,11), resolution = (800, 800)), raw=false)
     create_coordinate_system(scene3D)
     cam = cameracontrols(scene3D.scene)
-    init[1] = false
     FLYING[1] = false
     PLAYING[1] = false
     GUI_ACTIVE[1] = true
@@ -237,7 +235,7 @@ function main(gl_wait=true)
             while FLYING[1]
                 state = log[i+1]
                 update_system(scene3D, state)
-                sleep(delta_t / TIME_LAPSE)
+                sleep(delta_t / se().time_lapse)
                 i += 1
                 if i >= steps
                     FLYING[1] = false
