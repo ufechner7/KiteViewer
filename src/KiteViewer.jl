@@ -28,7 +28,7 @@ includet("./Utils.jl")
 using .Utils
 
 const SCALE = 1.2 
-const TIME_LAPSE = 2       # time lapse factor, must be integer
+const TIME_LAPSE = 2       # time lapse factor
 const INITIAL_HEIGHT = 2.0 # meter, for demo
 const MAX_HEIGHT     = 6.0 # meter, for demo
 const KITE = FileIO.load("data/kite.obj")
@@ -167,7 +167,7 @@ function main(gl_wait=true)
     sl_height = Slider(scene, range = 0:0.01:MAX_HEIGHT, startvalue = INITIAL_HEIGHT)
     sl_label = Label(scene, "set_height", textsize = 18)
     slidergrid[1, 1:2] = [sl_label, sl_height]
-
+    
     init_tether(scene3D)
     draw_system(scene3D, demo_state(INITIAL_HEIGHT, 0))
     on(sl_height.value) do val
@@ -239,9 +239,9 @@ function main(gl_wait=true)
             while FLYING[1]
                 state = log[i+1]
                 draw_system(scene3D, state)
-                sleep(delta_t)
-                i += TIME_LAPSE
-                if i>=steps
+                sleep(delta_t / TIME_LAPSE)
+                i += 1
+                if i >= steps
                     FLYING[1] = false
                     PLAYING[1] = false
                 end
