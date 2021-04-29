@@ -32,13 +32,14 @@ const TIME_LAPSE = 2       # time lapse factor
 const INITIAL_HEIGHT = 2.0 # meter, for demo
 const MAX_HEIGHT     = 6.0 # meter, for demo
 const KITE = FileIO.load("data/kite.obj")
-const KITE_MESH = Vector{MeshScatter{Tuple{Vector{Point{3, Float32}}}}}(undef, 1)
 const init      = [false]
 const FLYING    = [false]
 const PLAYING    = [false]
 const GUI_ACTIVE = [false]
 
 const points      = Vector{Point3f0}(undef, SEGMENTS+1)
+const quat        = Node(Quaternionf0(0,0,0,1))                        # orientation of the kite
+const kite_pos    = Node(Point3f0(1,0,0))                              # position of the kite
 const positions   = Node([Point3f0(x,0,0) for x in 1:SEGMENTS])        # positions of the tether segments
 const part_positions   = Node([Point3f0(x,0,0) for x in 1:SEGMENTS+1]) # positions of the tether particles
 const markersizes = Node([Point3f0(1,1,1) for x in 1:SEGMENTS])        # includes the segment length
@@ -53,7 +54,6 @@ function create_coordinate_system(scene, points = 10, max_x = 15.0)
     points += 2
     for x in range(1, length=points)
         mesh!(scene, Sphere(Point3f0(x * max_x/points, 0, 0), 0.1 * SCALE), color=:red)
-        # println(x * max_x/points)
     end
     mesh!(scene, Cylinder(Point3f0(-max_x/points, 0, 0), Point3f0(points * max_x/points, 0, 0), Float32(0.05 * SCALE)), color=:red)
     for i in range(0, length=points)
@@ -89,15 +89,17 @@ function create_coordinate_system(scene, points = 10, max_x = 15.0)
     end 
 end
 
-function init_tether(scene)
+# draw the kite power system, consisting of the tether and the kite
+function init_system(scene)
     sphere = Sphere(Point3f0(0, 0, 0), Float32(0.07 * SCALE))
     meshscatter!(scene, part_positions, marker=sphere, markersize=1.0, color=:yellow)
     cyl = Cylinder(Point3f0(0,0,-0.5), Point3f0(0,0,0.5), Float32(0.035 * SCALE))        
     meshscatter!(scene, positions, marker=cyl, rotations=rotations, markersize=markersizes, color=:yellow)
+    meshscatter!(scene, kite_pos, marker=KITE, markersize = 0.25, rotations=quat, color=:blue)
 end
 
-# draw the kite power system, consisting of the tether and the kite
-function draw_system(scene, state)
+# update the kite power system, consisting of the tether and the kite
+function update_system(scene, state)
 
     # move the particles to the correct position
     for i in range(1, length=SEGMENTS+1)
@@ -110,17 +112,10 @@ function draw_system(scene, state)
     markersizes[] = [Point3f0(1, 1, norm(points[k+1] - points[k])) for k in 1:SEGMENTS]
     rotations[] = [normalize(points[k+1] - points[k]) for k in 1:SEGMENTS]
 
-    # rotate the kite by applying state.orient(ation)
+    # move and turn the kite to the new position
     q0 = UnitQuaternion(state.orient)
-    q  = Quaternionf0(q0.x, q0.y, q0.z, q0.w)
-    end_point  = Point3f0(state.X[end], state.Y[end], state.Z[end])
-
-    # delete and render the kite
-    if init[1]
-        delete!(scene.scene,  KITE_MESH[1])
-    end
-    KITE_MESH[1] = meshscatter!(scene, end_point, marker=KITE, markersize = 0.25, rotations=q, color=:blue)
-    init[1] = true
+    quat[]     = Quaternionf0(q0.x, q0.y, q0.z, q0.w)
+    kite_pos[] = points[end]
 end
 
 function reset_view(cam, scene3D)
@@ -168,10 +163,10 @@ function main(gl_wait=true)
     sl_label = Label(scene, "set_height", textsize = 18)
     slidergrid[1, 1:2] = [sl_label, sl_height]
     
-    init_tether(scene3D)
-    draw_system(scene3D, demo_state(INITIAL_HEIGHT, 0))
+    init_system(scene3D)
+    update_system(scene3D, demo_state(INITIAL_HEIGHT, 0))
     on(sl_height.value) do val
-        draw_system(scene3D, demo_state(val, 0))
+        update_system(scene3D, demo_state(val, 0))
     end
 
     gl_screen = display(scene)
@@ -238,7 +233,7 @@ function main(gl_wait=true)
             # fly...
             while FLYING[1]
                 state = log[i+1]
-                draw_system(scene3D, state)
+                update_system(scene3D, state)
                 sleep(delta_t / TIME_LAPSE)
                 i += 1
                 if i >= steps
