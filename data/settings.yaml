@@ -1,8 +1,9 @@
 system:
-    time_lapse:   2.0 # relative replay speed
-    segments:       6 # number of tether segments
-    sample_freq:   20 # sample frequency in Hz
-    zoom:        0.03 # zoom factor for the system view
+    log_file: "data/log_8700W_8ms" # filename without extension
+    time_lapse:   2.0              # relative replay speed
+    segments:       6              # number of tether segments
+    sample_freq:   20              # sample frequency in Hz
+    zoom:        0.03              # zoom factor for the system view
     
 kite:
     mass:  6.0 # kg

@@ -10,8 +10,7 @@ include("./Utils.jl")
 using .Utils
 
 # Constants
-const FILENAME = "data/log_8700W_8ms.csv.xz"
-const CSV_FILE = FILENAME[1:end-3]
+const CSV_FILE = se().log_file * ".csv"
 
 # Functions
 function decompress(in, out)
@@ -68,7 +67,7 @@ function df2syslog(df)
 end
 
 # Main program
-decompress(FILENAME, CSV_FILE)
+decompress(se().log_file * ".csv.xz", CSV_FILE)
 
 # convert to DataFrame, cleanup, transform
 data = DataFrame(CSV.File(CSV_FILE))

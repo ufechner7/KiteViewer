@@ -221,7 +221,7 @@ function main(gl_wait=true)
             end
             if ! active && GUI_ACTIVE[1]
                 if PLAYING[1]
-                    log = (load_log("log_8700W_8ms")).syslog 
+                    log = (load_log(basename(se().log_file))).syslog 
                 else
                     log = demo_syslog("Launch test!")
                 end
