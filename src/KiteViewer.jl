@@ -32,7 +32,6 @@ const TIME_LAPSE = 2       # time lapse factor
 const INITIAL_HEIGHT = 2.0 # meter, for demo
 const MAX_HEIGHT     = 6.0 # meter, for demo
 const KITE = FileIO.load("data/kite.obj")
-const init      = [false]
 const FLYING    = [false]
 const PLAYING    = [false]
 const GUI_ACTIVE = [false]
