@@ -26,32 +26,49 @@ module Utils
 # functions for creating a demo flight state, demo flight log, loading and saving flight logs
 # in addition helper functions for working with rotations
 
-using Rotations, StaticArrays, StructArrays, RecursiveArrayTools, Arrow
+using Rotations, StaticArrays, StructArrays, RecursiveArrayTools, Arrow, YAML
 export SysState, ExtSysState, SysLog, MyFloat
 
-export demo_state, demo_syslog, demo_log, load_log, syslog2extlog, save_log, rot3d, SEGMENTS, SAMPLE_FREQ
+export demo_state, demo_syslog, demo_log, load_log, syslog2extlog, save_log, rot3d, se
 
 const MyFloat = Float32               # type to use for postions
-const SEGMENTS = 6                    # number of tether segments
-const SAMPLE_FREQ = 20                # sample frequency in Hz
 const DATA_PATH = "./data"            # path for log files and other data
+
+mutable struct Settings
+    segments::Int64       # number of tether segments
+    sample_freq::Int64
+    time_lapse::Float64
+end
+const SETTINGS = [Settings(0,0,0)]
+
+# getter function for the Settings struct
+function se()
+    if SETTINGS[1].segments == 0
+        # load settings from YAML
+        dict = YAML.load_file(joinpath(DATA_PATH, "settings.yaml"))
+        SETTINGS[1].segments=dict["system"]["segments"]
+        SETTINGS[1].sample_freq=dict["system"]["sample_freq"]
+        SETTINGS[1].time_lapse=dict["system"]["time_lapse"]
+    end
+    return SETTINGS[1]
+end
 
 # basic system state; one of these will be saved per time step
 struct SysState
     time::Float64                     # time since launch in seconds
     orient::MVector{4, Float32}       # orientation of the kite (quaternion)
-    X::MVector{SEGMENTS+1, MyFloat}   # vector of particle positions in x
-    Y::MVector{SEGMENTS+1, MyFloat}   # vector of particle positions in y
-    Z::MVector{SEGMENTS+1, MyFloat}   # vector of particle positions in z
+    X::MVector{se().segments+1, MyFloat}   # vector of particle positions in x
+    Y::MVector{se().segments+1, MyFloat}   # vector of particle positions in y
+    Z::MVector{se().segments+1, MyFloat}   # vector of particle positions in z
 end 
 
 # extended SysState containing derived values for plotting
 struct ExtSysState
     time::Float64                     # time since launch in seconds
     orient::UnitQuaternion{Float32}   # orientation of the kite
-    X::MVector{SEGMENTS+1, MyFloat}   # vector of particle positions in x
-    Y::MVector{SEGMENTS+1, MyFloat}   # vector of particle positions in y
-    Z::MVector{SEGMENTS+1, MyFloat}   # vector of particle positions in z
+    X::MVector{se().segments+1, MyFloat}   # vector of particle positions in x
+    Y::MVector{se().segments+1, MyFloat}   # vector of particle positions in y
+    Z::MVector{se().segments+1, MyFloat}   # vector of particle positions in z
     x::MyFloat                        # kite position in x
     y::MyFloat                        # kite position in y
     z::MyFloat                        # kite position in z
@@ -82,7 +99,7 @@ end
 # create a demo state with a given height and time
 function demo_state(height=6.0, time=0.0)
     a = 10
-    X = range(0, stop=10, length=SEGMENTS+1)
+    X = range(0, stop=10, length=(se().segments)+1)
     Y = zeros(length(X))
     Z = (a .* cosh.(X./a) .- a) * height/ 5.430806 
     r_xyz = RotXYZ(pi/2, -pi/2, 0)
@@ -94,14 +111,14 @@ end
 # create a demo flight log with given name [String] and duration [s]
 function demo_syslog(name="Test flight"; duration=10)
     max_height = 6.0
-    steps   = Int(duration * SAMPLE_FREQ) + 1
+    steps   = Int(duration * se().sample_freq) + 1
     time_vec = Vector{Float64}(undef, steps)
     orient_vec = Vector{MVector{4, Float32}}(undef, steps)
-    X_vec = Vector{MVector{SEGMENTS+1, MyFloat}}(undef, steps)
-    Y_vec = Vector{MVector{SEGMENTS+1, MyFloat}}(undef, steps)
-    Z_vec = Vector{MVector{SEGMENTS+1, MyFloat}}(undef, steps)
+    X_vec = Vector{MVector{se().segments+1, MyFloat}}(undef, steps)
+    Y_vec = Vector{MVector{se().segments+1, MyFloat}}(undef, steps)
+    Z_vec = Vector{MVector{se().segments+1, MyFloat}}(undef, steps)
     for i in range(0, length=steps)
-        state = demo_state(max_height * i/steps, i/SAMPLE_FREQ)
+        state = demo_state(max_height * i/steps, i/se().sample_freq)
         time_vec[i+1] = state.time
         orient_vec[i+1] = state.orient
         X_vec[i+1] = state.X

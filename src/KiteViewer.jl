@@ -37,13 +37,13 @@ const FLYING    = [false]
 const PLAYING    = [false]
 const GUI_ACTIVE = [false]
 
-const points      = Vector{Point3f0}(undef, SEGMENTS+1)
+const points      = Vector{Point3f0}(undef, se().segments+1)
 const quat        = Node(Quaternionf0(0,0,0,1))                        # orientation of the kite
 const kite_pos    = Node(Point3f0(1,0,0))                              # position of the kite
-const positions   = Node([Point3f0(x,0,0) for x in 1:SEGMENTS])        # positions of the tether segments
-const part_positions   = Node([Point3f0(x,0,0) for x in 1:SEGMENTS+1]) # positions of the tether particles
-const markersizes = Node([Point3f0(1,1,1) for x in 1:SEGMENTS])        # includes the segment length
-const rotations   = Node([Point3f0(1,0,0) for x in 1:SEGMENTS])        # unit vectors corresponding with
+const positions   = Node([Point3f0(x,0,0) for x in 1:se().segments])        # positions of the tether segments
+const part_positions   = Node([Point3f0(x,0,0) for x in 1:se().segments+1]) # positions of the tether particles
+const markersizes = Node([Point3f0(1,1,1) for x in 1:se().segments])        # includes the segment length
+const rotations   = Node([Point3f0(1,0,0) for x in 1:se().segments])        # unit vectors corresponding with
                                                                        #   the orientation of the segments 
 
 function create_coordinate_system(scene, points = 10, max_x = 15.0)
@@ -102,15 +102,15 @@ end
 function update_system(scene, state)
 
     # move the particles to the correct position
-    for i in range(1, length=SEGMENTS+1)
+    for i in range(1, length=se().segments+1)
         points[i] = Point3f0(state.X[i], state.Y[i], state.Z[i])
     end
-    part_positions[] = [(points[k]) for k in 1:SEGMENTS+1]
+    part_positions[] = [(points[k]) for k in 1:se().segments+1]
 
     # move, scale and turn the cylinder correctly
-    positions[] = [(points[k] + points[k+1])/2 for k in 1:SEGMENTS]
-    markersizes[] = [Point3f0(1, 1, norm(points[k+1] - points[k])) for k in 1:SEGMENTS]
-    rotations[] = [normalize(points[k+1] - points[k]) for k in 1:SEGMENTS]
+    positions[] = [(points[k] + points[k+1])/2 for k in 1:se().segments]
+    markersizes[] = [Point3f0(1, 1, norm(points[k+1] - points[k])) for k in 1:se().segments]
+    rotations[] = [normalize(points[k+1] - points[k]) for k in 1:se().segments]
 
     # move and turn the kite to the new position
     q0 = UnitQuaternion(state.orient)
@@ -210,7 +210,7 @@ function main(gl_wait=true)
     end
 
     # launch the kite on button click
-    delta_t = 1.0 / SAMPLE_FREQ
+    delta_t = 1.0 / se().sample_freq
     active = false
     simulation = @async begin
         while GUI_ACTIVE[1]

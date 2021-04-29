@@ -1,0 +1,13 @@
+system:
+    time_lapse:  2.0 # relative replay speed
+    segments:      6 # number of tether segments
+    sample_freq:  20 # sample frequency in Hz
+    
+kite:
+    mass:  6.0 # kg
+    size: 20.0 # m^2
+    lod:   5.0 # lift over drag
+
+tether:
+    diameter: 4 # mm
+    
