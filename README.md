@@ -12,7 +12,7 @@ On Linux or MAC you can install the latest Julia version with the following comm
 bash -ci "$(curl -fsSL https://raw.githubusercontent.com/abelsiqueira/jill/master/jill.sh)"
 ```
 
-A fast PC with 8 GB RAM (min. 4 GB) is recommended. 
+At least a dual core PC or MAC with 4 GB RAM is required. 
 OpenGL, version 3.3 or higher must be working.
 
 It should work on Windows, Linux and Mac, but until now only tested on Linux
