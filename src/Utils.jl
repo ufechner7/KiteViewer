@@ -37,12 +37,13 @@ const DATA_PATH = "./data"            # path for log files and other data
 
 mutable struct Settings
     log_file::String
+    model::String
     segments::Int64       # number of tether segments
     sample_freq::Int64
     time_lapse::Float64
     zoom::Float64
 end
-const SETTINGS = [Settings("",0,0,0,0)]
+const SETTINGS = [Settings("","",0,0,0,0)]
 
 # getter function for the Settings struct
 function se()
@@ -50,6 +51,7 @@ function se()
         # load settings from YAML
         dict = YAML.load_file(joinpath(DATA_PATH, "settings.yaml"))
         SETTINGS[1].log_file=dict["system"]["log_file"]
+        SETTINGS[1].model=dict["kite"]["model"]
         SETTINGS[1].segments=dict["system"]["segments"]
         SETTINGS[1].sample_freq=dict["system"]["sample_freq"]
         SETTINGS[1].time_lapse=dict["system"]["time_lapse"]
@@ -60,8 +62,8 @@ end
 
 # basic system state; one of these will be saved per time step
 struct SysState
-    time::Float64                     # time since launch in seconds
-    orient::MVector{4, Float32}       # orientation of the kite (quaternion)
+    time::Float64                          # time since launch in seconds
+    orient::MVector{4, Float32}            # orientation of the kite (quaternion)
     X::MVector{se().segments+1, MyFloat}   # vector of particle positions in x
     Y::MVector{se().segments+1, MyFloat}   # vector of particle positions in y
     Z::MVector{se().segments+1, MyFloat}   # vector of particle positions in z
@@ -69,14 +71,14 @@ end
 
 # extended SysState containing derived values for plotting
 struct ExtSysState
-    time::Float64                     # time since launch in seconds
-    orient::UnitQuaternion{Float32}   # orientation of the kite
+    time::Float64                          # time since launch in seconds
+    orient::UnitQuaternion{Float32}        # orientation of the kite
     X::MVector{se().segments+1, MyFloat}   # vector of particle positions in x
     Y::MVector{se().segments+1, MyFloat}   # vector of particle positions in y
     Z::MVector{se().segments+1, MyFloat}   # vector of particle positions in z
-    x::MyFloat                        # kite position in x
-    y::MyFloat                        # kite position in y
-    z::MyFloat                        # kite position in z
+    x::MyFloat                             # kite position in x
+    y::MyFloat                             # kite position in y
+    z::MyFloat                             # kite position in z
 end
 
 # flight log, containing the basic data as struct of arrays 

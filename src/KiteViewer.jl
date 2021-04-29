@@ -30,7 +30,7 @@ using .Utils
 const SCALE = 1.2 
 const INITIAL_HEIGHT = 2.0 # meter, for demo
 const MAX_HEIGHT     = 6.0 # meter, for demo
-const KITE = FileIO.load("data/kite.obj")
+const KITE = FileIO.load(se().model)
 const FLYING    = [false]
 const PLAYING    = [false]
 const GUI_ACTIVE = [false]

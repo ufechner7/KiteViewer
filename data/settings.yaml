@@ -6,9 +6,10 @@ system:
     zoom:        0.03              # zoom factor for the system view
     
 kite:
-    mass:  6.0 # kg
-    size: 20.0 # m^2
-    lod:   5.0 # lift over drag
+    model: "data/kite.obj" # 3D model of the kite
+    mass:  6.0             # kg
+    size: 20.0             # m^2
+    lod:   5.0             # max lift over drag
 
 tether:
     diameter: 4 # mm
