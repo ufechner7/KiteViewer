@@ -38,8 +38,9 @@ mutable struct Settings
     segments::Int64       # number of tether segments
     sample_freq::Int64
     time_lapse::Float64
+    zoom::Float64
 end
-const SETTINGS = [Settings(0,0,0)]
+const SETTINGS = [Settings(0,0,0,0)]
 
 # getter function for the Settings struct
 function se()
@@ -49,6 +50,7 @@ function se()
         SETTINGS[1].segments=dict["system"]["segments"]
         SETTINGS[1].sample_freq=dict["system"]["sample_freq"]
         SETTINGS[1].time_lapse=dict["system"]["time_lapse"]
+        SETTINGS[1].zoom=dict["system"]["zoom"]
     end
     return SETTINGS[1]
 end

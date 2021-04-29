@@ -1,7 +1,8 @@
 system:
-    time_lapse:  2.0 # relative replay speed
-    segments:      6 # number of tether segments
-    sample_freq:  20 # sample frequency in Hz
+    time_lapse:   2.0 # relative replay speed
+    segments:       6 # number of tether segments
+    sample_freq:   20 # sample frequency in Hz
+    zoom:        0.03 # zoom factor for the system view
     
 kite:
     mass:  6.0 # kg
