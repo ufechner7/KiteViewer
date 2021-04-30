@@ -88,3 +88,4 @@ select!(df, Not(:v_app_str))
 syslog = df2syslog(df)
 name = basename(CSV_FILE)[1:end-4]
 save_log(SysLog(name, syslog, syslog2extlog(syslog)))
+
