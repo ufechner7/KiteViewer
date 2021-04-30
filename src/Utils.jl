@@ -119,7 +119,8 @@ function demo_state(height=6.0, time=0.0)
     r_xyz = RotXYZ(pi/2, -pi/2, 0)
     q = UnitQuaternion(r_xyz)
     orient = MVector{4, Float32}(q.w, q.x, q.y, q.z)
-    return SysState(time, orient, 0.,0.,0.,0.,0.,0.,0.,X, Y, Z)
+    elevation = asin(Z[end]/X[end])
+    return SysState(time, orient, elevation,0.,0.,0.,0.,0.,0.,X, Y, Z)
 end
 
 # create a demo flight log with given name [String] and duration [s]
@@ -128,6 +129,7 @@ function demo_syslog(name="Test flight"; duration=10)
     steps   = Int(duration * se().sample_freq) + 1
     time_vec = Vector{Float64}(undef, steps)
     myzeros = zeros(MyFloat, steps)
+    elevation = Vector{Float64}(undef, steps)
     orient_vec = Vector{MVector{4, Float32}}(undef, steps)
     X_vec = Vector{MVector{se().segments+1, MyFloat}}(undef, steps)
     Y_vec = Vector{MVector{se().segments+1, MyFloat}}(undef, steps)
@@ -136,11 +138,12 @@ function demo_syslog(name="Test flight"; duration=10)
         state = demo_state(max_height * i/steps, i/se().sample_freq)
         time_vec[i+1] = state.time
         orient_vec[i+1] = state.orient
+        elevation[i+1] = asin(state.Z[end]/state.X[end])
         X_vec[i+1] = state.X
         Y_vec[i+1] = state.Y
         Z_vec[i+1] = state.Z
     end
-    return StructArray{SysState}((time_vec, orient_vec, myzeros,myzeros,myzeros,myzeros,myzeros,myzeros,myzeros, X_vec, Y_vec, Z_vec))
+    return StructArray{SysState}((time_vec, orient_vec, elevation, myzeros,myzeros,myzeros,myzeros,myzeros,myzeros, X_vec, Y_vec, Z_vec))
 end
 
 # extend a flight systom log with the fieds x, y, and z (kite positions) and convert the orientation to the type UnitQuaternion
