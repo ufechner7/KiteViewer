@@ -62,10 +62,10 @@ end
 
 # basic system state; one of these will be saved per time step
 struct SysState
-    time::Float64                          # time since launch in seconds
+    time::Float64                          # time since start of simulation in seconds
     orient::MVector{4, Float32}            # orientation of the kite (quaternion)
-    elevation::MyFloat                     # degrees
-    azimuth::MyFloat                       # degrees
+    elevation::MyFloat                     # elevation angle in radians
+    azimuth::MyFloat                       # azimuth angle in radians
     l_tether::MyFloat                      # tether length [m]
     v_reelout::MyFloat                     # reel out velocity [m/s]
     force::MyFloat                         # tether force [N]
@@ -178,7 +178,7 @@ function load_log(filename::String)
     end
     table = Arrow.Table(fullname)
     myzeros = zeros(MyFloat, length(table.time))
-    syslog = StructArray{SysState}((table.time, table.orient, myzeros,myzeros,myzeros,myzeros,myzeros,myzeros,myzeros, table.X, table.Y, table.Z))
+    syslog = StructArray{SysState}((table.time, table.orient, table.elevation, table.azimuth, myzeros,myzeros,myzeros,myzeros,myzeros, table.X, table.Y, table.Z))
     return SysLog(basename(fullname[1:end-6]), syslog, syslog2extlog(syslog))
 end
 
