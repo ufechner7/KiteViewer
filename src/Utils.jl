@@ -117,7 +117,7 @@ end
 
 # create a demo flight log with given name [String] and duration [s]
 function demo_syslog(name="Test flight"; duration=10)
-    max_height = 6.0
+    max_height = 6.03
     steps   = Int(duration * se().sample_freq) + 1
     time_vec = Vector{Float64}(undef, steps)
     orient_vec = Vector{MVector{4, Float32}}(undef, steps)

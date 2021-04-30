@@ -20,7 +20,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE. =#
 
-using GeometryBasics, Rotations, GLMakie, FileIO, LinearAlgebra
+using GeometryBasics, Rotations, GLMakie, FileIO, LinearAlgebra, Printf
 AbstractPlotting.__init__()
 
 using Revise
@@ -28,8 +28,8 @@ includet("./Utils.jl")
 using .Utils
 
 const SCALE = 1.2 
-const INITIAL_HEIGHT = 2.0 # meter, for demo
-const MAX_HEIGHT     = 6.0 # meter, for demo
+const INITIAL_HEIGHT =  80.0*se().zoom # meter, for demo
+const MAX_HEIGHT     = 200.0*se().zoom # meter, for demo
 const KITE = FileIO.load(se().model)
 const FLYING    = [false]
 const PLAYING    = [false]
@@ -43,6 +43,8 @@ const part_positions  = Node([Point3f0(x,0,0) for x in 1:se().segments+1]) # pos
 const markersizes     = Node([Point3f0(1,1,1) for x in 1:se().segments])   # includes the segment length
 const rotations       = Node([Point3f0(1,0,0) for x in 1:se().segments])   # unit vectors corresponding with
                                                                            #   the orientation of the segments 
+
+const text = [undef, 1]
 
 function create_coordinate_system(scene, points = 10, max_x = 15.0)
     # create origin
@@ -97,7 +99,7 @@ function init_system(scene)
 end
 
 # update the kite power system, consisting of the tether and the kite
-function update_system(scene, state)
+function update_system(scene, state, step=0)
 
     # move the particles to the correct position
     for i in range(1, length=se().segments+1)
@@ -114,6 +116,22 @@ function update_system(scene, state)
     q0 = UnitQuaternion(state.orient)
     quat[]     = Quaternionf0(q0.x, q0.y, q0.z, q0.w)
     kite_pos[] = points[end]
+
+    # print rel_time and height
+    height = points[end][3]/se().zoom
+    msg = "time:   $(@sprintf("%6.2f", state.time)) s\n" *
+          "height: $(@sprintf("%6.2f", height)) m"
+    if iseven(step)
+        if typeof(text[1]) == AbstractPlotting.Text{Tuple{String}}
+            delete!(scene.scene, text[1])
+        end
+        if Sys.islinux()
+            font="/usr/share/fonts/truetype/ttf-bitstream-vera/VeraMono.ttf"
+        else
+            font="Courier New"
+        end
+        text[1] = text!(scene, msg , position = Point3f0(-6, 4, -1), textsize = 16, font=font, align = (:left, :top))
+    end
 end
 
 function reset_view(cam, scene3D)
@@ -216,21 +234,22 @@ function main(gl_wait=true)
                 active = false
                 sleep(0.10)
             end
+            # load log file
             if ! active && GUI_ACTIVE[1]
                 if PLAYING[1]
-                    log = load_log(basename(se().log_file)).syslog 
+                    log = load_log(basename(se().log_file)) 
                 else
-                    log = demo_syslog("Launch test!")
+                    log = demo_log("Launch test!")
                 end
-                steps = length(log)            
+                steps = length(log.syslog)            
                 println("Steps: $steps")
                 active = true
             end
             i=0
             # fly...
             while FLYING[1]
-                state = log[i+1]
-                update_system(scene3D, state)
+                state = log.syslog[i+1]
+                update_system(scene3D, state, i)
                 sleep(delta_t / se().time_lapse)
                 i += 1
                 if i >= steps
@@ -248,5 +267,6 @@ function main(gl_wait=true)
     # terminate the simulation
     FLYING[1] = false
     GUI_ACTIVE[1] = false
+    text[1] = undef
     return nothing
 end
