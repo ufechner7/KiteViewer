@@ -64,6 +64,13 @@ end
 struct SysState
     time::Float64                          # time since launch in seconds
     orient::MVector{4, Float32}            # orientation of the kite (quaternion)
+    elevation::MyFloat                     # degrees
+    azimuth::MyFloat                       # degrees
+    l_tether::MyFloat                      # tether length [m]
+    v_reelout::MyFloat                     # reel out velocity [m/s]
+    force::MyFloat                         # tether force [N]
+    depower::MyFloat                       # depower settings 
+    v_app::MyFloat                         # apparent wind speed [m/s]
     X::MVector{se().segments+1, MyFloat}   # vector of particle positions in x
     Y::MVector{se().segments+1, MyFloat}   # vector of particle positions in y
     Z::MVector{se().segments+1, MyFloat}   # vector of particle positions in z
@@ -112,7 +119,7 @@ function demo_state(height=6.0, time=0.0)
     r_xyz = RotXYZ(pi/2, -pi/2, 0)
     q = UnitQuaternion(r_xyz)
     orient = MVector{4, Float32}(q.w, q.x, q.y, q.z)
-    return SysState(time, orient, X, Y, Z)
+    return SysState(time, orient, 0.,0.,0.,0.,0.,0.,0.,X, Y, Z)
 end
 
 # create a demo flight log with given name [String] and duration [s]
@@ -120,6 +127,7 @@ function demo_syslog(name="Test flight"; duration=10)
     max_height = 6.03
     steps   = Int(duration * se().sample_freq) + 1
     time_vec = Vector{Float64}(undef, steps)
+    myzeros = zeros(MyFloat, steps)
     orient_vec = Vector{MVector{4, Float32}}(undef, steps)
     X_vec = Vector{MVector{se().segments+1, MyFloat}}(undef, steps)
     Y_vec = Vector{MVector{se().segments+1, MyFloat}}(undef, steps)
@@ -132,7 +140,7 @@ function demo_syslog(name="Test flight"; duration=10)
         Y_vec[i+1] = state.Y
         Z_vec[i+1] = state.Z
     end
-    return StructArray{SysState}((time_vec, orient_vec, X_vec, Y_vec, Z_vec))
+    return StructArray{SysState}((time_vec, orient_vec, myzeros,myzeros,myzeros,myzeros,myzeros,myzeros,myzeros, X_vec, Y_vec, Z_vec))
 end
 
 # extend a flight systom log with the fieds x, y, and z (kite positions) and convert the orientation to the type UnitQuaternion
@@ -160,6 +168,7 @@ function save_log(flight_log::SysLog)
 end
 
 function load_log(filename::String)
+    
     Arrow.ArrowTypes.registertype!(SysState, SysState)
     Arrow.ArrowTypes.registertype!(MVector{4, Float32}, MVector{4, Float32})
     if isnothing(findlast(isequal('.'), filename))
@@ -168,7 +177,8 @@ function load_log(filename::String)
         fullname = joinpath(DATA_PATH, filename) 
     end
     table = Arrow.Table(fullname)
-    syslog = StructArray{SysState}((table.time, table.orient, table.X, table.Y, table.Z))
+    myzeros = zeros(MyFloat, length(table.time))
+    syslog = StructArray{SysState}((table.time, table.orient, myzeros,myzeros,myzeros,myzeros,myzeros,myzeros,myzeros, table.X, table.Y, table.Z))
     return SysLog(basename(fullname[1:end-6]), syslog, syslog2extlog(syslog))
 end
 
