@@ -54,6 +54,7 @@ function df2syslog(df)
     orient = MVector(1.0f0, 0, 0, 0)
     steps = size(df)[1]
     orient_vec = Vector{MVector{4, Float32}}(undef, steps)
+    myzeros = zeros(MyFloat, steps)
     V_app = df.v_app
     for i in range(1, length=steps)
         pos_kite = [df.X[i][end], df.Y[i][end], df.Z[i][end]]
@@ -63,7 +64,7 @@ function df2syslog(df)
         q = UnitQuaternion(rotation)
         orient_vec[i] = MVector{4, Float32}(q.w, q.x, q.y, q.z)
     end
-    return StructArray{SysState}((df.time_rel, orient_vec, df.X*se().zoom, df.Y*se().zoom, df.Z*se().zoom))
+    return StructArray{SysState}((df.time_rel, orient_vec, myzeros,myzeros,myzeros,myzeros,myzeros,myzeros,myzeros, df.X*se().zoom, df.Y*se().zoom, df.Z*se().zoom))
 end
 
 # Main program
