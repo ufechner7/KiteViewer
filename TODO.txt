@@ -1,6 +1,5 @@
 TODO
 - print force and v_reelout on the screen
-- print azimuth and elevation on the screen
 - toggle between PAUSE and PLAY
 
 DONE (master)
@@ -8,6 +7,7 @@ DONE (master)
 2. increased default update rate to 40 Hz
 3. all settings in settings.yaml now
 4. print time and height on the screen
+5. print azimuth and elevation on the screen
 
 DONE (Version 0.2)
 1. Add a button to restore the default view and zoom buttons
