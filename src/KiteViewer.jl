@@ -119,8 +119,10 @@ function update_system(scene, state, step=0)
 
     # print rel_time and height
     height = points[end][3]/se().zoom
-    msg = "time:   $(@sprintf("%6.2f", state.time)) s\n" *
-          "height: $(@sprintf("%6.2f", height)) m"
+    msg = "time:      $(@sprintf("%6.2f", state.time)) s\n" *
+          "height:    $(@sprintf("%6.2f", height)) m\n" *
+          "elevation: $(@sprintf("%6.2f", state.elevation/pi*180.0)) °\n" *
+          "azimuth:   $(@sprintf("%6.2f", state.azimuth/pi*180.0)) °"
     if iseven(step)
         if typeof(text[1]) == AbstractPlotting.Text{Tuple{String}}
             delete!(scene.scene, text[1])
