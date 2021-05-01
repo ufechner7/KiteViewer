@@ -74,22 +74,29 @@ function df2syslog(df)
                                   myzeros, df.X*se().zoom, df.Y*se().zoom, df.Z*se().zoom))
 end
 
-# Main program
-decompress(se().log_file * ".csv.xz", CSV_FILE)
+function import_log()
+    input_file = se().log_file * ".csv.xz"
+    println("Importing file \"$input_file\" ...")
+    decompress(input_file, CSV_FILE)
 
-# convert to DataFrame, cleanup, transform
-data = DataFrame(CSV.File(CSV_FILE))
-df = select(data, :time_rel, :position, :v_app => :v_app_str, :azimuth, :elevation, :force, :v_reelout)
-df[!, :X] = getX.(df.position)
-df[!, :Y] = getY.(df.position)
-df[!, :Z] = getZ.(df.position)
-df[!, :v_app] = parse_vector.(df.v_app_str)
-select!(df, Not(:position))
-select!(df, Not(:v_app_str))
+    # convert to DataFrame, cleanup, transform
+    data = DataFrame(CSV.File(CSV_FILE))
+    df = select(data, :time_rel, :position, :v_app => :v_app_str, :azimuth, :elevation, :force, :v_reelout)
+    df[!, :X] = getX.(df.position)
+    df[!, :Y] = getY.(df.position)
+    df[!, :Z] = getZ.(df.position)
+    df[!, :v_app] = parse_vector.(df.v_app_str)
+    select!(df, Not(:position))
+    select!(df, Not(:v_app_str))
 
-# convert to arrow format and save
-syslog = df2syslog(df)
-name = basename(CSV_FILE)[1:end-4]
-save_log(SysLog(name, syslog, syslog2extlog(syslog)))
+    # convert to arrow format and save
+    syslog = df2syslog(df)
+    name = basename(CSV_FILE)[1:end-4]
+    save_log(SysLog(name, syslog, syslog2extlog(syslog)))
+    println("Saved file:    \"data/$name.arrow\" .")
+end
+
+import_log()
 
 end
+nothing
