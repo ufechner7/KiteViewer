@@ -56,10 +56,6 @@ function df2syslog(df)
     orient = MVector(1.0f0, 0, 0, 0)
     steps = size(df)[1]
     orient_vec = Vector{MVector{4, Float32}}(undef, steps)
-    elevation=[Float32(x) for x in df.elevation]
-    azimuth=[Float32(x) for x in df.azimuth]
-    v_reelout = [Float32(x) for x in df.v_reelout]
-    force     = [Float32(x) for x in df.force]
     myzeros = zeros(MyFloat, steps)
     V_app = df.v_app
     for i in range(1, length=steps)
@@ -70,7 +66,7 @@ function df2syslog(df)
         q = UnitQuaternion(rotation)
         orient_vec[i] = MVector{4, Float32}(q.w, q.x, q.y, q.z)
     end
-    return StructArray{SysState}((df.time_rel, orient_vec, elevation, azimuth, myzeros, v_reelout, force, myzeros, 
+    return StructArray{SysState}((df.time_rel, orient_vec, df.elevation, df.azimuth, myzeros, df.v_reelout, df.force, myzeros, 
                                   myzeros, df.X*se().zoom, df.Y*se().zoom, df.Z*se().zoom))
 end
 
@@ -80,7 +76,7 @@ function import_log()
     decompress(input_file, CSV_FILE)
 
     # convert to DataFrame, cleanup, transform
-    data = DataFrame(CSV.File(CSV_FILE))
+    data = DataFrame(CSV.File(CSV_FILE, types=Dict(2=>Float32, 5=>Float32, 6=>Float32, 22=>Float32)))
     df = select(data, :time_rel, :position, :v_app => :v_app_str, :azimuth, :elevation, :force, :v_reelout)
     df[!, :X] = getX.(df.position)
     df[!, :Y] = getY.(df.position)
@@ -94,8 +90,10 @@ function import_log()
     name = basename(CSV_FILE)[1:end-4]
     save_log(SysLog(name, syslog, syslog2extlog(syslog)))
     println("Saved file:    \"data/$name.arrow\" .")
+    return data
 end
 
+# main program
 import_log()
 
 end
