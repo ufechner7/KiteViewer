@@ -12,6 +12,7 @@ DONE (master)
 6. print force and v_reelout on the screen
 7. calculate and print p_mech and energy
 8. removed slider
+9. add button PLOT2D and related script (experimental)
 
 DONE (Version 0.2)
 1. Add a button to restore the default view and zoom buttons
