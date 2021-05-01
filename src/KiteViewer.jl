@@ -205,19 +205,24 @@ function main(gl_wait=true)
     end
 
     on(btn_PLAY_PAUSE.clicks) do c
-        logfile=se().log_file * ".arrow"
-        camera = cameracontrols(scene3D.scene)
-        if ! isfile(logfile)
-            println("The logfile $logfile is missing!")
-            include("src/Importer.jl")
+        if !running[]
+            logfile=se().log_file * ".arrow"
+            camera = cameracontrols(scene3D.scene)
+            if ! isfile(logfile)
+                println("The logfile $logfile is missing!")
+                include("src/Importer.jl")
+            end
+            if isfile(logfile)
+                running[] = true
+                FLYING[1] = true
+                PLAYING[1] = true
+                sleep(0.1)
+            end
+            zoom_scene(camera, scene3D.scene, 1.13f0)
+        else
+            running[] = false
+            zoom_scene(camera, scene3D.scene, 1.13f0)
         end
-        if isfile(logfile)
-            running[] = !running[]
-            FLYING[1] = true
-            PLAYING[1] = true
-            sleep(0.1)
-        end
-        zoom_scene(camera, scene3D.scene, 1.13f0)
     end
 
     on(btn_RESET.clicks) do c
@@ -248,6 +253,7 @@ function main(gl_wait=true)
     # launch the kite on button click
     delta_t = 1.0 / se().sample_freq
     active = false
+    log = demo_log("Launch test!")
     simulation = @async begin
         while GUI_ACTIVE[1]
             # wait for launch command
@@ -258,13 +264,15 @@ function main(gl_wait=true)
             # load log file
             if ! active && GUI_ACTIVE[1]
                 if PLAYING[1]
-                    log = load_log(basename(se().log_file)) 
+                    logfile=basename(se().log_file)
+                    if log.name != logfile
+                        log = load_log(logfile) 
+                    end
                 else
                     log = demo_log("Launch test!")
                 end
                 steps = length(log.syslog)            
                 println("Steps: $steps")
-                GC.gc()
                 active = true
             end
             i=0
@@ -280,6 +288,7 @@ function main(gl_wait=true)
                 if i >= steps
                     FLYING[1] = false
                     PLAYING[1] = false
+                    running[] = false
                 end
             end
         end
