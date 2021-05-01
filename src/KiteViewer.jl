@@ -119,18 +119,18 @@ function update_system(scene, state, step=0)
     quat[]     = Quaternionf0(q0.x, q0.y, q0.z, q0.w)
     kite_pos[] = points[end]
 
-    # print rel_time and height
-    height = points[end][3]/se().zoom
+    # print state values
     power = state.force * state.v_reelout
     energy[1] += (power / se().sample_freq * 2)
-    msg = "time:      $(@sprintf("%7.2f", state.time)) s\n" *
-          "height:    $(@sprintf("%7.2f", height)) m\n" *
-          "elevation: $(@sprintf("%7.2f", state.elevation/pi*180.0)) °\n" *
-          "azimuth:   $(@sprintf("%7.2f", state.azimuth/pi*180.0)) °\n" *
-          "v_reelout: $(@sprintf("%7.2f", state.v_reelout)) m/s   " * "p_mech:  $(@sprintf("%8.2f", state.force*state.v_reelout)) W\n" *
-          "force:     $(@sprintf("%7.2f", state.force    )) N     " * "energy:  $(@sprintf("%8.2f", energy[1]/3600)) Wh\n"
-          
-    if iseven(step)
+    if mod(step, 4) == 0
+        height = points[end][3]/se().zoom
+        msg = "time:      $(@sprintf("%7.2f", state.time)) s\n" *
+            "height:    $(@sprintf("%7.2f", height)) m\n" *
+            "elevation: $(@sprintf("%7.2f", state.elevation/pi*180.0)) °\n" *
+            "azimuth:   $(@sprintf("%7.2f", state.azimuth/pi*180.0)) °\n" *
+            "v_reelout: $(@sprintf("%7.2f", state.v_reelout)) m/s   " * "p_mech:  $(@sprintf("%8.2f", state.force*state.v_reelout)) W\n" *
+            "force:     $(@sprintf("%7.2f", state.force    )) N     " * "energy:  $(@sprintf("%8.2f", energy[1]/3600)) Wh\n"
+
         if typeof(text[1]) == AbstractPlotting.Text{Tuple{String}}
             delete!(scene.scene, text[1])
         end
