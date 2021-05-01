@@ -25,7 +25,7 @@ Finally, use the following command to launch Julia:
 or the following command to launch the GUI without julia command line:
 ```./kiteviewer.sh```
 
-On my computer (i7-7700K) this reduced the startup time from 41s to 4s.
+On my computer (i7-7700K) this reduced the startup time from 41s to 6s.
 
 ## Troubleshooting
 ### Preparation
