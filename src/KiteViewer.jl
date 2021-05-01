@@ -242,6 +242,7 @@ function main(gl_wait=true)
                 end
                 steps = length(log.syslog)            
                 println("Steps: $steps")
+                GC.gc()
                 active = true
             end
             i=0
