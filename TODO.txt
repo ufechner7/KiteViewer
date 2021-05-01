@@ -1,5 +1,4 @@
 TODO
-- import depower and l_tether
 - add font to settings.yaml
 
 DONE (master)
@@ -13,6 +12,7 @@ DONE (master)
 8. removed slider
 9. add button PLOT2D and related script (6 plots available)
 10. toggle between PAUSE and PLAY
+11. import and plot depower, v_app and l_tether
 
 DONE (Version 0.2)
 1. Add a button to restore the default view and zoom buttons

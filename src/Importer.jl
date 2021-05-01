@@ -56,7 +56,6 @@ function df2syslog(df)
     orient = MVector(1.0f0, 0, 0, 0)
     steps = size(df)[1]
     orient_vec = Vector{MVector{4, Float32}}(undef, steps)
-    myzeros = zeros(MyFloat, steps)
     V_app = df.v_app
     for i in range(1, length=steps)
         pos_kite = [df.X[i][end], df.Y[i][end], df.Z[i][end]]
@@ -66,8 +65,8 @@ function df2syslog(df)
         q = UnitQuaternion(rotation)
         orient_vec[i] = MVector{4, Float32}(q.w, q.x, q.y, q.z)
     end
-    return StructArray{SysState}((df.time_rel, orient_vec, df.elevation, df.azimuth, myzeros, df.v_reelout, df.force, myzeros, 
-                                  myzeros, df.X*se().zoom, df.Y*se().zoom, df.Z*se().zoom))
+    return StructArray{SysState}((df.time_rel, orient_vec, df.elevation, df.azimuth, df.l_tether, df.v_reelout, df.force, df.depower, 
+                                  df.v_app_norm, df.X*se().zoom, df.Y*se().zoom, df.Z*se().zoom))
 end
 
 function import_log()
@@ -76,8 +75,8 @@ function import_log()
     decompress(input_file, CSV_FILE)
 
     # convert to DataFrame, cleanup, transform
-    data = DataFrame(CSV.File(CSV_FILE, types=Dict(2=>Float32, 5=>Float32, 6=>Float32, 22=>Float32)))
-    df = select(data, :time_rel, :position, :v_app => :v_app_str, :azimuth, :elevation, :force, :v_reelout)
+    data = DataFrame(CSV.File(CSV_FILE, types=Dict(2=>Float32, 4=>Float32, 5=>Float32, 6=>Float32, 10=>Float32, 21=>Float32, 22=>Float32)))
+    df = select(data, :time_rel, :position, :v_app => :v_app_str, :azimuth, :elevation, :force, :v_reelout, :depower, :v_app_norm, :l_tether)
     df[!, :X] = getX.(df.position)
     df[!, :Y] = getY.(df.position)
     df[!, :Z] = getZ.(df.position)

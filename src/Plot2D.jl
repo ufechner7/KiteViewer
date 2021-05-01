@@ -72,17 +72,54 @@ function plot_power(fig, log)
     push!(objects, ax) 
 end
 
+function plot_depower(fig, log)
+    if length(objects) > 0
+        delete!(objects[end])
+    end
+    ax=Axis(fig[1, 1], xlabel = "time [s]", ylabel = "depower [%]")
+    x=log.extlog.time
+    y=log.syslog.depower .* 100.0
+    po=lines!(x,y)   
+    push!(objects, ax) 
+end
+
+function plot_v_app(fig, log)
+    if length(objects) > 0
+        delete!(objects[end])
+    end
+    ax=Axis(fig[1, 1], xlabel = "time [s]", ylabel = "v_app [m/s]")
+    x=log.extlog.time
+    y=log.syslog.v_app
+    po=lines!(x,y)   
+    push!(objects, ax) 
+end
+
+function plot_l_tether(fig, log)
+    if length(objects) > 0
+        delete!(objects[end])
+    end
+    ax=Axis(fig[1, 1], xlabel = "time [s]", ylabel = "tether length [m]")
+    x=log.extlog.time
+    y=log.syslog.l_tether
+    po=lines!(x,y)   
+    push!(objects, ax) 
+end
+
 function main(gl_wait=true)
     fig=Figure()
 
-    fig[2, 1] = buttongrid = GridLayout(tellwidth = false)
-    btn_height         = Button(fig, label = "height")
-    btn_elevation      = Button(fig, label = "elevation")
-    btn_azimuth        = Button(fig, label = "azimuth")
-    btn_v_reelout      = Button(fig, label = "v_reelout")
-    btn_force          = Button(fig, label = "force")
-    btn_power          = Button(fig, label = "power")
-    buttongrid[1, 1:6] = [btn_height, btn_elevation, btn_azimuth, btn_v_reelout, btn_force, btn_power]
+    fig[2, 1] = buttongrid = GridLayout(tellwidth = false, default_colgap=10)
+    textsize=14
+    btn_height         = Button(fig, label = "height", textsize=textsize)
+    btn_elevation      = Button(fig, label = "elevation", textsize=textsize)
+    btn_azimuth        = Button(fig, label = "azimuth", textsize=textsize)
+    btn_v_reelout      = Button(fig, label = "v_reelout", textsize=textsize)
+    btn_force          = Button(fig, label = "force", textsize=textsize)
+    btn_depower        = Button(fig, label = "depower", textsize=textsize)
+    btn_v_app          = Button(fig, label = "v_app", textsize=textsize)
+    btn_l_tether        = Button(fig, label = "l_tether", textsize=textsize)
+    btn_power          = Button(fig, label = "power", textsize=textsize)
+    buttongrid[1, 1:9] = [btn_height, btn_elevation, btn_azimuth, btn_v_reelout, btn_force, btn_depower, btn_v_app, btn_l_tether, btn_power]
 
     if gl_wait
         log=load_log(basename(se().log_file))
@@ -104,6 +141,15 @@ function main(gl_wait=true)
     end
     on(btn_force.clicks) do c
         plot_force(fig, log)
+    end
+    on(btn_depower.clicks) do c
+        plot_depower(fig, log)
+    end
+    on(btn_v_app.clicks) do c
+        plot_v_app(fig, log)
+    end
+    on(btn_l_tether.clicks) do c
+        plot_l_tether(fig, log)
     end
     on(btn_power.clicks) do c
         plot_power(fig, log)
