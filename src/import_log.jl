@@ -56,6 +56,8 @@ function df2syslog(df)
     orient_vec = Vector{MVector{4, Float32}}(undef, steps)
     elevation=Vector{Float32}(undef, steps)
     azimuth=Vector{Float32}(undef, steps)
+    v_reelout=Vector{Float32}(undef, steps)
+    force=Vector{Float32}(undef, steps)
     myzeros = zeros(MyFloat, steps)
     V_app = df.v_app
     for i in range(1, length=steps)
@@ -67,8 +69,10 @@ function df2syslog(df)
         orient_vec[i] = MVector{4, Float32}(q.w, q.x, q.y, q.z)
         elevation[i] = df.elevation[i]
         azimuth[i] = df.azimuth[i]
+        force[i] = df.force[i]
+        v_reelout[i] = df.v_reelout[i]
     end
-    return StructArray{SysState}((df.time_rel, orient_vec, elevation, azimuth, myzeros,myzeros,myzeros,myzeros,myzeros, df.X*se().zoom, df.Y*se().zoom, df.Z*se().zoom))
+    return StructArray{SysState}((df.time_rel, orient_vec, elevation, azimuth, myzeros, v_reelout, force, myzeros, myzeros, df.X*se().zoom, df.Y*se().zoom, df.Z*se().zoom))
 end
 
 # Main program
@@ -76,7 +80,7 @@ decompress(se().log_file * ".csv.xz", CSV_FILE)
 
 # convert to DataFrame, cleanup, transform
 data = DataFrame(CSV.File(CSV_FILE))
-df = select(data, :time_rel, :position, :v_app => :v_app_str, :azimuth, :elevation)
+df = select(data, :time_rel, :position, :v_app => :v_app_str, :azimuth, :elevation, :force, :v_reelout)
 df[!, :X] = getX.(df.position)
 df[!, :Y] = getY.(df.position)
 df[!, :Z] = getZ.(df.position)

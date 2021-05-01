@@ -1,6 +1,7 @@
 TODO
-- print force and v_reelout on the screen
 - toggle between PAUSE and PLAY
+- import depower and l_tether
+- add font to settings.yaml
 
 DONE (master)
 1. reduced memory requirement to 2 GB, much lower CPU load
@@ -8,6 +9,9 @@ DONE (master)
 3. all settings in settings.yaml now
 4. print time and height on the screen
 5. print azimuth and elevation on the screen
+6. print force and v_reelout on the screen
+7. calculate and print p_mech and energy
+8. removed slider
 
 DONE (Version 0.2)
 1. Add a button to restore the default view and zoom buttons

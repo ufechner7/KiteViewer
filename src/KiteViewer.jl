@@ -43,7 +43,7 @@ const part_positions  = Node([Point3f0(x,0,0) for x in 1:se().segments+1]) # pos
 const markersizes     = Node([Point3f0(1,1,1) for x in 1:se().segments])   # includes the segment length
 const rotations       = Node([Point3f0(1,0,0) for x in 1:se().segments])   # unit vectors corresponding with
                                                                            #   the orientation of the segments 
-
+const energy = [0.0]                                                                           
 const text = [undef, 1]
 
 function create_coordinate_system(scene, points = 10, max_x = 15.0)
@@ -119,10 +119,15 @@ function update_system(scene, state, step=0)
 
     # print rel_time and height
     height = points[end][3]/se().zoom
-    msg = "time:      $(@sprintf("%6.2f", state.time)) s\n" *
-          "height:    $(@sprintf("%6.2f", height)) m\n" *
-          "elevation: $(@sprintf("%6.2f", state.elevation/pi*180.0)) °\n" *
-          "azimuth:   $(@sprintf("%6.2f", state.azimuth/pi*180.0)) °"
+    power = state.force * state.v_reelout
+    energy[1] += (power / se().sample_freq * 2)
+    msg = "time:      $(@sprintf("%7.2f", state.time)) s\n" *
+          "height:    $(@sprintf("%7.2f", height)) m\n" *
+          "elevation: $(@sprintf("%7.2f", state.elevation/pi*180.0)) °\n" *
+          "azimuth:   $(@sprintf("%7.2f", state.azimuth/pi*180.0)) °\n" *
+          "v_reelout: $(@sprintf("%7.2f", state.v_reelout)) m/s   " * "p_mech:  $(@sprintf("%8.2f", state.force*state.v_reelout)) W\n" *
+          "force:     $(@sprintf("%7.2f", state.force    )) N     " * "energy:  $(@sprintf("%8.2f", energy[1]/3600)) Wh\n"
+          
     if iseven(step)
         if typeof(text[1]) == AbstractPlotting.Text{Tuple{String}}
             delete!(scene.scene, text[1])
@@ -132,7 +137,7 @@ function update_system(scene, state, step=0)
         else
             font="Courier New"
         end
-        text[1] = text!(scene, msg , position = Point3f0(-6, 4, -1), textsize = 16, font=font, align = (:left, :top))
+        text[1] = text!(scene, msg , position = Point3f0(-5.2, 3.5, -1), textsize = 16, font=font, align = (:left, :top))
     end
 end
 
@@ -165,7 +170,6 @@ function main(gl_wait=true)
 
     layout[1, 1] = scene3D
     layout[2, 1] = buttongrid = GridLayout(tellwidth = false)
-    layout[3, 1] = slidergrid = GridLayout(tellwidth = false)
 
     btn_RESET    = Button(scene, label = "RESET")
     btn_ZOOM_in  = Button(scene, label = "Zoom +")
@@ -173,20 +177,13 @@ function main(gl_wait=true)
     btn_LAUNCH   = Button(scene, label = "LAUNCH")
     btn_PLAY     = Button(scene, label = "PLAY")
     btn_STOP     = Button(scene, label = "STOP")
-
+    
     buttongrid[1, 1:6] = [btn_PLAY, btn_LAUNCH, btn_ZOOM_in, btn_ZOOM_out, btn_RESET, btn_STOP]
 
-    sl_height = Slider(scene, range = 0:0.01:MAX_HEIGHT, startvalue = INITIAL_HEIGHT)
-    sl_label = Label(scene, "set_height", textsize = 18)
-    slidergrid[1, 1:2] = [sl_label, sl_height]
+    gl_screen = display(scene)
     
     init_system(scene3D)
     update_system(scene3D, demo_state(INITIAL_HEIGHT, 0))
-    on(sl_height.value) do val
-        update_system(scene3D, demo_state(val, 0))
-    end
-
-    gl_screen = display(scene)
 
     camera = cameracontrols(scene3D.scene)
     update_cam!(scene3D.scene,  Float32[-17.505877, -21.005878, 5.5000005], Float32[-1.5, -5.0000005, 5.5000005])
@@ -248,6 +245,7 @@ function main(gl_wait=true)
                 active = true
             end
             i=0
+            energy[1] = 0.0
             # fly...
             while FLYING[1]
                 state = log.syslog[i+1]
@@ -270,5 +268,6 @@ function main(gl_wait=true)
     FLYING[1] = false
     GUI_ACTIVE[1] = false
     text[1] = undef
+    energy[1] = 0.0
     return nothing
 end
