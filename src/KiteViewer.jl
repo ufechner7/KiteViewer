@@ -147,8 +147,7 @@ function update_system(scene, state, step=0)
 end
 
 function reset_view(cam, scene3D)
-    update_cam!(scene3D.scene, [-15,-15,5], [0,0,5])
-    zoom_scene(cam, scene3D.scene, 1.4f0)
+    update_cam!(scene3D.scene, [-15.425113, -18.925116, 5.5000005], [-1.5, -5.0000005, 5.5000005])
 end
 
 function zoom_scene(camera, scene, zoom=1.0f0)
@@ -192,8 +191,7 @@ function main(gl_wait=true)
     update_system(scene3D, demo_state(INITIAL_HEIGHT, 0))
 
     camera = cameracontrols(scene3D.scene)
-    update_cam!(scene3D.scene,  Float32[-17.505877, -21.005878, 5.5000005], Float32[-1.5, -5.0000005, 5.5000005])
-    zoom_scene(camera, scene3D.scene, 1.13f0)
+    reset_view(camera, scene3D)
 
     on(btn_LAUNCH.clicks) do c
         FLYING[1] = true
@@ -205,49 +203,56 @@ function main(gl_wait=true)
     end
 
     on(btn_PLAY_PAUSE.clicks) do c
-        if !running[]
-            logfile=se().log_file * ".arrow"
+        @sync begin
+            if !running[]
+                logfile=se().log_file * ".arrow"                
+                if ! isfile(logfile)
+                    println("The logfile $logfile is missing!")
+                    include("src/Importer.jl")
+                end
+                if isfile(logfile)
+                    running[] = true
+                    FLYING[1] = true
+                    PLAYING[1] = true
+                end
+            else
+                running[] = false
+            end
             camera = cameracontrols(scene3D.scene)
-            if ! isfile(logfile)
-                println("The logfile $logfile is missing!")
-                include("src/Importer.jl")
-            end
-            if isfile(logfile)
-                running[] = true
-                FLYING[1] = true
-                PLAYING[1] = true
-                sleep(0.1)
-            end
-            zoom_scene(camera, scene3D.scene, 1.13f0)
-        else
+            reset_view(camera, scene3D)
+        end
+    end
+
+    on(btn_RESET.clicks) do c
+        @sync begin
+            camera = cameracontrols(scene)
+            reset_view(camera, scene3D)
+        end
+    end
+
+    on(btn_STOP.clicks) do c
+        @sync begin
+            camera = cameracontrols(scene3D.scene)
+            update_cam!(scene3D.scene,  Float32[-17.505877, -21.005878, 5.5000005], Float32[-1.5, -5.0000005, 5.5000005])
+            FLYING[1] = false
+            PLAYING[1] = false
             running[] = false
             zoom_scene(camera, scene3D.scene, 1.13f0)
         end
     end
 
-    on(btn_RESET.clicks) do c
-        camera = cameracontrols(scene3D.scene)
-        update_cam!(scene3D.scene,  Float32[-17.505877, -21.005878, 5.5000005], Float32[-1.5, -5.0000005, 5.5000005])
-        zoom_scene(camera, scene3D.scene, 1.13f0)
-    end
-
-    on(btn_STOP.clicks) do c
-        camera = cameracontrols(scene3D.scene)
-        update_cam!(scene3D.scene,  Float32[-17.505877, -21.005878, 5.5000005], Float32[-1.5, -5.0000005, 5.5000005])
-        FLYING[1] = false
-        PLAYING[1] = false
-        running[] = false
-        zoom_scene(camera, scene3D.scene, 1.13f0)
-    end
-
     on(btn_ZOOM_in.clicks) do c    
-        camera = cameracontrols(scene3D.scene)
-        zoom_scene(camera, scene3D.scene, 1.2f0)
+        @sync begin
+            camera = cameracontrols(scene3D.scene)
+            zoom_scene(camera, scene3D.scene, 1.2f0)
+        end
     end
 
     on(btn_ZOOM_out.clicks) do c
-        camera = cameracontrols(scene3D.scene)
-        zoom_scene(camera, scene3D.scene, 0.75f0)
+        @sync begin
+            camera = cameracontrols(scene3D.scene)
+            zoom_scene(camera, scene3D.scene, 0.75f0)
+        end
     end
 
     # launch the kite on button click
@@ -259,13 +264,14 @@ function main(gl_wait=true)
             # wait for launch command
             while ! FLYING[1] && GUI_ACTIVE[1]
                 active = false
-                sleep(0.10)
+                sleep(0.05)
             end
             # load log file
             if ! active && GUI_ACTIVE[1]
                 if PLAYING[1]
                     logfile=basename(se().log_file)
                     if log.name != logfile
+                        println("Loading log file...")
                         log = load_log(logfile) 
                     end
                 else
@@ -281,7 +287,7 @@ function main(gl_wait=true)
             while FLYING[1]
                 state = log.syslog[i+1]
                 if running[] || ! PLAYING[1]
-                    update_system(scene3D, state, i)
+                    @sync update_system(scene3D, state, i)
                     i += 1
                 end
                 sleep(delta_t / se().time_lapse)
@@ -289,6 +295,7 @@ function main(gl_wait=true)
                     FLYING[1] = false
                     PLAYING[1] = false
                     running[] = false
+                    reset_view(camera, scene3D)
                 end
             end
         end
