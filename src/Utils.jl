@@ -42,8 +42,9 @@ mutable struct Settings
     sample_freq::Int64
     time_lapse::Float64
     zoom::Float64
+    fixed_font::String
 end
-const SETTINGS = [Settings("","",0,0,0,0)]
+const SETTINGS = [Settings("","",0,0,0,0,"")]
 
 # getter function for the Settings struct
 function se()
@@ -56,6 +57,7 @@ function se()
         SETTINGS[1].sample_freq=dict["system"]["sample_freq"]
         SETTINGS[1].time_lapse=dict["system"]["time_lapse"]
         SETTINGS[1].zoom=dict["system"]["zoom"]
+        SETTINGS[1].fixed_font=dict["system"]["fixed_font"]
     end
     return SETTINGS[1]
 end

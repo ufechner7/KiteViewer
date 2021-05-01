@@ -4,6 +4,7 @@ system:
     segments:       6              # number of tether segments
     sample_freq:   20              # sample frequency in Hz
     zoom:        0.03              # zoom factor for the system view
+    fixed_font: ""                 # name or filepath+filename of alternative fixed pitch font
     
 kite:
     model: "data/kite.obj" # 3D model of the kite

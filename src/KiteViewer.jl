@@ -139,6 +139,9 @@ function update_system(scene, state, step=0)
         else
             font="Courier New"
         end
+        if se().fixed_font != ""
+            font=se().fixed_font
+        end
         text[1] = text!(scene, msg , position = Point3f0(-5.2, 3.5, -1), textsize = 16, font=font, align = (:left, :top))
     end
 end
