@@ -5,6 +5,8 @@
 # time,azimuth,course,depower,elevation,force,heading,height,kite_distance,l_tether,position,prediction,set_force,steering,
 #      sync_speed,system_state,time,time_rel,turn_rate,v_app,v_app_norm,v_reelout,vel_kite,yaw_angle
 
+module Importer
+
 using CodecXz, CSV, DataFrames, StaticArrays, StructArrays, Rotations, LinearAlgebra
 include("./Utils.jl")
 using .Utils
@@ -54,10 +56,10 @@ function df2syslog(df)
     orient = MVector(1.0f0, 0, 0, 0)
     steps = size(df)[1]
     orient_vec = Vector{MVector{4, Float32}}(undef, steps)
-    elevation=Vector{Float32}(undef, steps)
-    azimuth=Vector{Float32}(undef, steps)
-    v_reelout=Vector{Float32}(undef, steps)
-    force=Vector{Float32}(undef, steps)
+    elevation=[Float32(x) for x in df.elevation]
+    azimuth=[Float32(x) for x in df.azimuth]
+    v_reelout = [Float32(x) for x in df.v_reelout]
+    force     = [Float32(x) for x in df.force]
     myzeros = zeros(MyFloat, steps)
     V_app = df.v_app
     for i in range(1, length=steps)
@@ -67,12 +69,9 @@ function df2syslog(df)
         rotation = rot(pos_kite, pos_before, v_app)
         q = UnitQuaternion(rotation)
         orient_vec[i] = MVector{4, Float32}(q.w, q.x, q.y, q.z)
-        elevation[i] = df.elevation[i]
-        azimuth[i] = df.azimuth[i]
-        force[i] = df.force[i]
-        v_reelout[i] = df.v_reelout[i]
     end
-    return StructArray{SysState}((df.time_rel, orient_vec, elevation, azimuth, myzeros, v_reelout, force, myzeros, myzeros, df.X*se().zoom, df.Y*se().zoom, df.Z*se().zoom))
+    return StructArray{SysState}((df.time_rel, orient_vec, elevation, azimuth, myzeros, v_reelout, force, myzeros, 
+                                  myzeros, df.X*se().zoom, df.Y*se().zoom, df.Z*se().zoom))
 end
 
 # Main program
@@ -93,3 +92,4 @@ syslog = df2syslog(df)
 name = basename(CSV_FILE)[1:end-4]
 save_log(SysLog(name, syslog, syslog2extlog(syslog)))
 
+end
