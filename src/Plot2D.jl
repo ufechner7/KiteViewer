@@ -11,7 +11,7 @@ function plot_height(fig, log)
     end
     ax=Axis(fig[1, 1], xlabel = "time [s]", ylabel = "height [m]")
     x=log.extlog.time
-    y=log.extlog.z
+    y=log.extlog.z ./ se().zoom
     po=lines!(x,y)
     object=(ax, po)
     push!(objects, ax)   
