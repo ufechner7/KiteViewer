@@ -35,6 +35,7 @@ const PLOT_CMD = `./plot2d.sh`
 const FLYING    = [false]
 const PLAYING    = [false]
 const GUI_ACTIVE = [false]
+const running = Node(false)
 
 const points          = Vector{Point3f0}(undef, se().segments+1)
 const quat            = Node(Quaternionf0(0,0,0,1))                        # orientation of the kite
@@ -172,15 +173,15 @@ function main(gl_wait=true)
     layout[1, 1] = scene3D
     layout[2, 1] = buttongrid = GridLayout(tellwidth = false)
 
-    btn_RESET    = Button(scene, label = "RESET")
-    btn_ZOOM_in  = Button(scene, label = "Zoom +")
-    btn_ZOOM_out = Button(scene, label = "Zoom -")
-    btn_LAUNCH   = Button(scene, label = "LAUNCH")
-    btn_PLAY     = Button(scene, label = "PLAY")
-    btn_STOP     = Button(scene, label = "STOP")
-    btn_PLOT     = Button(scene, label = "PLOT2D")
+    btn_RESET       = Button(scene, label = "RESET")
+    btn_ZOOM_in     = Button(scene, label = "Zoom +")
+    btn_ZOOM_out    = Button(scene, label = "Zoom -")
+    btn_LAUNCH      = Button(scene, label = "LAUNCH")
+    btn_PLAY_PAUSE  = Button(scene, label = @lift($running ? "PAUSE" : " PLAY  "))
+    btn_STOP        = Button(scene, label = "STOP")
+    btn_PLOT        = Button(scene, label = "PLOT2D")
     
-    buttongrid[1, 1:7] = [btn_PLAY, btn_LAUNCH, btn_PLOT, btn_ZOOM_in, btn_ZOOM_out, btn_RESET, btn_STOP]
+    buttongrid[1, 1:7] = [btn_PLAY_PAUSE, btn_LAUNCH, btn_PLOT, btn_ZOOM_in, btn_ZOOM_out, btn_RESET, btn_STOP]
 
     gl_screen = display(scene)
     
@@ -200,9 +201,11 @@ function main(gl_wait=true)
         run(PLOT_CMD, wait=false)
     end
 
-    on(btn_PLAY.clicks) do c
+    on(btn_PLAY_PAUSE.clicks) do c
+        running[] = !running[]
         FLYING[1] = true
         PLAYING[1] = true
+        zoom_scene(camera, scene3D.scene, 1.13f0)
     end
 
     on(btn_RESET.clicks) do c
@@ -214,9 +217,10 @@ function main(gl_wait=true)
     on(btn_STOP.clicks) do c
         camera = cameracontrols(scene3D.scene)
         update_cam!(scene3D.scene,  Float32[-17.505877, -21.005878, 5.5000005], Float32[-1.5, -5.0000005, 5.5000005])
-        zoom_scene(camera, scene3D.scene, 1.13f0)
         FLYING[1] = false
         PLAYING[1] = false
+        running[] = false
+        zoom_scene(camera, scene3D.scene, 1.13f0)
     end
 
     on(btn_ZOOM_in.clicks) do c    
@@ -256,9 +260,11 @@ function main(gl_wait=true)
             # fly...
             while FLYING[1]
                 state = log.syslog[i+1]
-                update_system(scene3D, state, i)
+                if running[] || ! PLAYING[1]
+                    update_system(scene3D, state, i)
+                    i += 1
+                end
                 sleep(delta_t / se().time_lapse)
-                i += 1
                 if i >= steps
                     FLYING[1] = false
                     PLAYING[1] = false
@@ -274,6 +280,7 @@ function main(gl_wait=true)
     # terminate the simulation
     FLYING[1] = false
     GUI_ACTIVE[1] = false
+    running[] = false
     text[1] = undef
     energy[1] = 0.0
     return nothing

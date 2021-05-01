@@ -1,5 +1,4 @@
 TODO
-- toggle between PAUSE and PLAY
 - import depower and l_tether
 - add font to settings.yaml
 
@@ -12,7 +11,8 @@ DONE (master)
 6. print force and v_reelout on the screen
 7. calculate and print p_mech and energy
 8. removed slider
-9. add button PLOT2D and related script (experimental)
+9. add button PLOT2D and related script (6 plots available)
+10. toggle between PAUSE and PLAY
 
 DONE (Version 0.2)
 1. Add a button to restore the default view and zoom buttons
