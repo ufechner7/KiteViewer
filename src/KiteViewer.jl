@@ -31,6 +31,7 @@ const SCALE = 1.2
 const INITIAL_HEIGHT =  80.0*se().zoom # meter, for demo
 const MAX_HEIGHT     = 200.0*se().zoom # meter, for demo
 const KITE = FileIO.load(se().model)
+const PLOT_CMD = `./plot2d.sh`
 const FLYING    = [false]
 const PLAYING    = [false]
 const GUI_ACTIVE = [false]
@@ -177,8 +178,9 @@ function main(gl_wait=true)
     btn_LAUNCH   = Button(scene, label = "LAUNCH")
     btn_PLAY     = Button(scene, label = "PLAY")
     btn_STOP     = Button(scene, label = "STOP")
+    btn_PLOT     = Button(scene, label = "PLOT2D")
     
-    buttongrid[1, 1:6] = [btn_PLAY, btn_LAUNCH, btn_ZOOM_in, btn_ZOOM_out, btn_RESET, btn_STOP]
+    buttongrid[1, 1:7] = [btn_PLAY, btn_LAUNCH, btn_PLOT, btn_ZOOM_in, btn_ZOOM_out, btn_RESET, btn_STOP]
 
     gl_screen = display(scene)
     
@@ -192,6 +194,10 @@ function main(gl_wait=true)
     on(btn_LAUNCH.clicks) do c
         FLYING[1] = true
         PLAYING[1] = false
+    end
+
+    on(btn_PLOT.clicks) do c
+        run(PLOT_CMD, wait=false)
     end
 
     on(btn_PLAY.clicks) do c
