@@ -205,9 +205,18 @@ function main(gl_wait=true)
     end
 
     on(btn_PLAY_PAUSE.clicks) do c
-        running[] = !running[]
-        FLYING[1] = true
-        PLAYING[1] = true
+        logfile=se().log_file * ".arrow"
+        camera = cameracontrols(scene3D.scene)
+        if ! isfile(logfile)
+            println("The logfile $logfile is missing!")
+            include("src/Importer.jl")
+        end
+        if isfile(logfile)
+            running[] = !running[]
+            FLYING[1] = true
+            PLAYING[1] = true
+            sleep(0.1)
+        end
         zoom_scene(camera, scene3D.scene, 1.13f0)
     end
 

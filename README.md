@@ -57,12 +57,16 @@ Use the right mouse button to zoom and the left mouse button to pan
 the 3D view. 
 
 ## Import flight data
-With the following command you can import one simulation flight data set:
+When you click on "PLAY" for the first time the flight data is imported
+and converted to the .arrow format.
+
+With the following commands you can import csv flight data manually:
 ```
+./runjulia
 include("src/Importer.jl")
 ```
-After doing that run the main function of KiteViewer. If you now click on "Play" the log file
-is replayed.
+If you have your own .csv log files you need to extend the importer
+for your data format.
 
 ## Fixing OpenGL problems
 On a computer with Ubuntu 20.04 and Intel integrated graphics the following steps were needed to make OpenGL work:
