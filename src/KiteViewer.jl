@@ -291,7 +291,8 @@ function main(gl_wait=true)
     delta_t = 1.0 / se().sample_freq
     active = false
     log = demo_log("Launch test!")
-
+    reset_view(camera, scene3D)
+    
     simulation = @async begin
         while GUI_ACTIVE[1]
             # wait for launch command
