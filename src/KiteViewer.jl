@@ -36,7 +36,9 @@ const FLYING    = [false]
 const PLAYING    = [false]
 const GUI_ACTIVE = [false]
 const running = Node(false)
+const starting = [0]
 const textnode = Node("")
+const status = Node("")
 
 const points          = Vector{Point3f0}(undef, se().segments+1)
 const quat            = Node(Quaternionf0(0,0,0,1))                        # orientation of the kite
@@ -169,6 +171,9 @@ function main(gl_wait=true)
     text!(scene3D, "x", position = Point3f0(17, 0,0), textsize = 30, align = (:center, :center), show_axis = false)
     text!(scene3D, "y", position = Point3f0( 0, 14.5, 0), textsize = 30, align = (:center, :center), show_axis = false)
 
+    text!(scene, status, position = Point2f0( 20, 0), textsize = 16, align = (:left, :bottom), show_axis = false)
+    status[]="Stopped"
+
     layout[1, 1] = scene3D
     layout[2, 1] = buttongrid = GridLayout(tellwidth = false)
 
@@ -191,29 +196,60 @@ function main(gl_wait=true)
     reset_view(camera, scene3D)
 
     on(btn_LAUNCH.clicks) do c
-        FLYING[1] = true
-        PLAYING[1] = false
+        if ! PLAYING[1]
+            FLYING[1] = true
+            PLAYING[1] = false
+            status[] = "Launching..."
+        end
     end
 
     on(btn_PLOT.clicks) do c
+        starting[1] = 1
         run(PLOT_CMD, wait=false)
     end
 
-    on(btn_PLAY_PAUSE.clicks) do c
-        @sync begin
-            if !running[]
+    @async begin
+        while true
+            if starting[1] == 1
+                old=status[]
+                status[] = "Starting plot2d.."
+                starting[1] = 0
+                sleep(8)
+                status[] = old
+            else
+                sleep(0.1)
+            end
+        end
+    end
+
+    @async begin
+        logfile=se().log_file * ".arrow"  
+        if ! isfile(logfile)
+            status[] = "The logfile $logfile is missing! Importing..."; sleep(0.1)
+            include("src/Importer.jl"); sleep(0.1)
+            if isfile(logfile)
+                status[] = "Success!"
+            end
+        else
+            sleep(0.1)
+        end
+    end
+
+    on(btn_PLAY_PAUSE.clicks) do c     
+        if status[] != "Launching..."
+            if ! running[]
                 logfile=se().log_file * ".arrow"                
-                if ! isfile(logfile)
-                    println("The logfile $logfile is missing!")
-                    include("src/Importer.jl")
-                end
                 if isfile(logfile)
                     running[] = true
+                    status[]="Running"
                     FLYING[1] = true
                     PLAYING[1] = true
+                else
+                    status[] = "Failed to import $logfile !"
                 end
             else
                 running[] = false
+                status[] = "Paused"
             end
             camera = cameracontrols(scene3D.scene)
             reset_view(camera, scene3D)
@@ -228,13 +264,13 @@ function main(gl_wait=true)
     end
 
     on(btn_STOP.clicks) do c
+        FLYING[1] = false
+        PLAYING[1] = false
+        running[] = false
+        status[] = "Stopped"
         @sync begin
-            camera = cameracontrols(scene3D.scene)
-            update_cam!(scene3D.scene,  Float32[-17.505877, -21.005878, 5.5000005], Float32[-1.5, -5.0000005, 5.5000005])
-            FLYING[1] = false
-            PLAYING[1] = false
-            running[] = false
-            zoom_scene(camera, scene3D.scene, 1.13f0)
+            camera = cameracontrols(scene)
+            reset_view(camera, scene3D)
         end
     end
 
@@ -292,11 +328,13 @@ function main(gl_wait=true)
                     FLYING[1] = false
                     PLAYING[1] = false
                     running[] = false
+                    status[] = "Stopped"
                     reset_view(camera, scene3D)
                 end
             end
+            yield()
         end
-     end
+    end
 
     if gl_wait
         wait(gl_screen)
