@@ -37,6 +37,7 @@ const PLAYING    = [false]
 const GUI_ACTIVE = [false]
 const running = Node(false)
 const starting = [0]
+const zoom = [1.0]
 const textnode = Node("")
 const status = Node("")
 
@@ -253,6 +254,7 @@ function main(gl_wait=true)
             end
             camera = cameracontrols(scene3D.scene)
             reset_view(camera, scene3D)
+            zoom_scene(camera, scene3D.scene, zoom[1])
         end
     end
 
@@ -260,6 +262,7 @@ function main(gl_wait=true)
         @sync begin
             camera = cameracontrols(scene)
             reset_view(camera, scene3D)
+            zoom[1] = 1.0
         end
     end
 
@@ -271,20 +274,25 @@ function main(gl_wait=true)
         @sync begin
             camera = cameracontrols(scene)
             reset_view(camera, scene3D)
+            zoom[1] = 1.0
         end
     end
 
     on(btn_ZOOM_in.clicks) do c    
         @sync begin
+            zoom[1] *= 1.2
             camera = cameracontrols(scene3D.scene)
-            zoom_scene(camera, scene3D.scene, 1.2f0)
+            reset_view(camera, scene3D)
+            zoom_scene(camera, scene3D.scene, zoom[1])
         end
     end
 
     on(btn_ZOOM_out.clicks) do c
         @sync begin
+            zoom[1] /= 1.2
             camera = cameracontrols(scene3D.scene)
-            zoom_scene(camera, scene3D.scene, 0.75f0)
+            reset_view(camera, scene3D)
+            zoom_scene(camera, scene3D.scene, zoom[1])
         end
     end
 
@@ -329,10 +337,8 @@ function main(gl_wait=true)
                     PLAYING[1] = false
                     running[] = false
                     status[] = "Stopped"
-                    reset_view(camera, scene3D)
                 end
             end
-            yield()
         end
     end
 
