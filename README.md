@@ -57,7 +57,7 @@ Use the right mouse button to zoom and the left mouse button to pan
 the 3D view. 
 
 ## Import flight data
-When you click on "PLAY" for the first time the flight data is imported
+When you run KiteViewer for the first time the flight data is imported
 and converted to the .arrow format.
 
 With the following commands you can import csv flight data manually:
