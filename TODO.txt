@@ -1,3 +1,7 @@
+TODO
+1. add importer for the TU Delft kite power flight data set
+2. add simulator from FreeKiteSim
+
 DONE (Version 0.3)
 1. reduced memory requirement to 2 GB, much lower CPU load
 2. increased default update rate to 40 Hz
@@ -11,6 +15,8 @@ DONE (Version 0.3)
 10. toggle between PAUSE and PLAY
 11. import and plot depower, v_app and l_tether (9 plots available)
 12. alternate fixed_font can be defined in settings.yaml
+13. add status line
+14. fixed zoom edge cases
 
 DONE (Version 0.2)
 1. Add a button to restore the default view and zoom buttons
