@@ -39,6 +39,8 @@ const running = Node(false)
 const starting = [0]
 const zoom = [1.0]
 const textnode = Node("")
+const textsize = Node(16)
+const textsize2 = Node(30)
 const status = Node("")
 
 const points          = Vector{Point3f0}(undef, se().segments+1)
@@ -109,7 +111,7 @@ function init_system(scene)
     if se().fixed_font != ""
         font=se().fixed_font
     end
-    text!(scene, textnode, position = Point3f0(-5.2, 3.5, -1), textsize = 16, font=font, align = (:left, :top))
+    text!(scene, textnode, position = Point3f0(-5.2, 3.5, -1), textsize = textsize, font=font, align = (:left, :top))
 end
 
 # update the kite power system, consisting of the tether, the kite and the state (text and numbers)
@@ -177,9 +179,11 @@ function main(gl_wait=true)
 
     reset_view(cam, scene3D)
 
-    text!(scene3D, "z", position = Point3f0(0, 0, 14.6), textsize = 30, align = (:center, :center), show_axis = false)
-    text!(scene3D, "x", position = Point3f0(17, 0,0), textsize = 30, align = (:center, :center), show_axis = false)
-    text!(scene3D, "y", position = Point3f0( 0, 14.5, 0), textsize = 30, align = (:center, :center), show_axis = false)
+    textsize[]  = 16
+    textsize2[] = 30
+    text!(scene3D, "z", position = Point3f0(0, 0, 14.6), textsize = textsize2, align = (:center, :center), show_axis = false)
+    text!(scene3D, "x", position = Point3f0(17, 0,0), textsize = textsize2, align = (:center, :center), show_axis = false)
+    text!(scene3D, "y", position = Point3f0( 0, 14.5, 0), textsize = textsize2, align = (:center, :center), show_axis = false)
 
     text!(scene, status, position = Point2f0( 20, 0), textsize = 16, align = (:left, :bottom), show_axis = false)
     status[]="Stopped"
@@ -279,6 +283,13 @@ function main(gl_wait=true)
             status[] = "Stopped"
             reset_and_zoom(camera, scene3D, zoom[1])
         end
+    end
+
+    on(scene.px_area) do x
+        textsize[] = round(x.widths[2]/900.0 * 16)
+        textsize2[] = round(x.widths[2]/900.0 * 30)
+        reset_view(camera, scene3D)
+        zoom[1] = 1.0
     end
 
     on(btn_ZOOM_in.clicks) do c    
