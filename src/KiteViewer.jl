@@ -158,8 +158,12 @@ function zoom_scene(camera, scene, zoom=1.0f0)
 end
 
 function reset_and_zoom(camera, scene3D, zoom)
-    reset_view(camera, scene3D)
-    zoom_scene(camera, scene3D.scene, zoom)
+    if zoom[1] ≈ 1.0
+        reset_view(camera, scene3D)
+    else
+        reset_view(camera, scene3D)
+        zoom_scene(camera, scene3D.scene, zoom)  
+    end
 end
 
 function main(gl_wait=true)
@@ -206,6 +210,7 @@ function main(gl_wait=true)
             FLYING[1] = true
             PLAYING[1] = false
             status[] = "Launching..."
+            reset_and_zoom(camera, scene3D, zoom[1])   
         end
     end
 
@@ -257,7 +262,6 @@ function main(gl_wait=true)
                 running[] = false
                 status[] = "Paused"
             end
-            println(typeof(camera))
             reset_and_zoom(camera, scene3D, zoom[1])    
         end
     end
