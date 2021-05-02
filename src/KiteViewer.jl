@@ -157,6 +157,11 @@ function zoom_scene(camera, scene, zoom=1.0f0)
     update_cam!(scene, new_eyeposition, lookat)
 end
 
+function reset_and_zoom(camera, scene3D, zoom)
+    reset_view(camera, scene3D)
+    zoom_scene(camera, scene3D.scene, zoom)
+end
+
 function main(gl_wait=true)
     scene, layout = layoutscene(resolution = (840, 900), backgroundcolor = RGBf0(0.7, 0.8, 1))
     scene3D = LScene(scene, scenekw = (show_axis=false, limits = Rect(-7,-10.0,0, 11,10,11), resolution = (800, 800)), raw=false)
@@ -252,54 +257,41 @@ function main(gl_wait=true)
                 running[] = false
                 status[] = "Paused"
             end
-            camera = cameracontrols(scene3D.scene)
-            reset_view(camera, scene3D)
-            zoom_scene(camera, scene3D.scene, zoom[1])
+            println(typeof(camera))
+            reset_and_zoom(camera, scene3D, zoom[1])    
         end
     end
 
     on(btn_RESET.clicks) do c
-        @sync begin
-            camera = cameracontrols(scene)
-            reset_view(camera, scene3D)
-            zoom[1] = 1.0
-        end
+        reset_view(camera, scene3D)
+        zoom[1] = 1.0
     end
 
     on(btn_STOP.clicks) do c
-        FLYING[1] = false
-        PLAYING[1] = false
-        running[] = false
-        status[] = "Stopped"
-        @sync begin
-            camera = cameracontrols(scene)
-            reset_view(camera, scene3D)
-            zoom[1] = 1.0
+        if status[] != "Stopped"
+            FLYING[1] = false
+            PLAYING[1] = false
+            running[] = false
+            status[] = "Stopped"
+            reset_and_zoom(camera, scene3D, zoom[1])
         end
     end
 
     on(btn_ZOOM_in.clicks) do c    
-        @sync begin
-            zoom[1] *= 1.2
-            camera = cameracontrols(scene3D.scene)
-            reset_view(camera, scene3D)
-            zoom_scene(camera, scene3D.scene, zoom[1])
-        end
+        zoom[1] *= 1.2
+        reset_and_zoom(camera, scene3D, zoom[1])
     end
 
     on(btn_ZOOM_out.clicks) do c
-        @sync begin
-            zoom[1] /= 1.2
-            camera = cameracontrols(scene3D.scene)
-            reset_view(camera, scene3D)
-            zoom_scene(camera, scene3D.scene, zoom[1])
-        end
+        zoom[1] /= 1.2
+        reset_and_zoom(camera, scene3D, zoom[1])
     end
 
     # launch the kite on button click
     delta_t = 1.0 / se().sample_freq
     active = false
     log = demo_log("Launch test!")
+
     simulation = @async begin
         while GUI_ACTIVE[1]
             # wait for launch command
@@ -318,8 +310,9 @@ function main(gl_wait=true)
                 else
                     log = demo_log("Launch test!")
                 end
-                steps = length(log.syslog)            
+                steps = length(log.syslog)        
                 println("Steps: $steps")
+
                 active = true
             end
             i=0
@@ -337,6 +330,7 @@ function main(gl_wait=true)
                     PLAYING[1] = false
                     running[] = false
                     status[] = "Stopped"
+                    reset_and_zoom(camera, scene3D, zoom[1])
                 end
             end
         end
