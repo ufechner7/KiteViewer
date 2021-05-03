@@ -35,12 +35,14 @@ const PLOT_CMD = `./plot2d.sh`
 const FLYING    = [false]
 const PLAYING    = [false]
 const GUI_ACTIVE = [false]
+const AXIS_LABEL_SIZE = 30
+const TEXT_SIZE = 16
 const running = Node(false)
 const starting = [0]
 const zoom = [1.0]
 const textnode = Node("")
-const textsize = Node(16)
-const textsize2 = Node(30)
+const textsize = Node(TEXT_SIZE)
+const textsize2 = Node(AXIS_LABEL_SIZE)
 const status = Node("")
 
 const points          = Vector{Point3f0}(undef, se().segments+1)
@@ -161,7 +163,7 @@ end
 
 function reset_and_zoom(camera, scene3D, zoom)
     reset_view(camera, scene3D)
-    if zoom ≈ 1.0 ≆
+    if ! (zoom ≈ 1.0) 
         zoom_scene(camera, scene3D.scene, zoom)  
     end
 end
@@ -177,13 +179,13 @@ function main(gl_wait=true)
 
     reset_view(cam, scene3D)
 
-    textsize[]  = 16
-    textsize2[] = 30
+    textsize[]  = TEXT_SIZE
+    textsize2[] = AXIS_LABEL_SIZE
     text!(scene3D, "z", position = Point3f0(0, 0, 14.6), textsize = textsize2, align = (:center, :center), show_axis = false)
     text!(scene3D, "x", position = Point3f0(17, 0,0), textsize = textsize2, align = (:center, :center), show_axis = false)
     text!(scene3D, "y", position = Point3f0( 0, 14.5, 0), textsize = textsize2, align = (:center, :center), show_axis = false)
 
-    text!(scene, status, position = Point2f0( 20, 0), textsize = 16, align = (:left, :bottom), show_axis = false)
+    text!(scene, status, position = Point2f0( 20, 0), textsize = TEXT_SIZE, align = (:left, :bottom), show_axis = false)
     status[]="Stopped"
 
     layout[1, 1] = scene3D
@@ -212,7 +214,7 @@ function main(gl_wait=true)
             FLYING[1] = true
             PLAYING[1] = false
             status[] = "Launching..."
-            reset_and_zoom(camera, scene3D, zoom[1])   
+            @sync reset_and_zoom(camera, scene3D, zoom[1])   
         end
     end
 
@@ -284,8 +286,8 @@ function main(gl_wait=true)
     end
 
     on(scene.px_area) do x
-        textsize[] = round(x.widths[2]/900.0 * 16)
-        textsize2[] = round(x.widths[2]/900.0 * 30)
+        textsize[] = round(x.widths[2]/900.0 * TEXT_SIZE)
+        textsize2[] = round(x.widths[2]/900.0 * AXIS_LABEL_SIZE)
         reset_view(camera, scene3D)
         zoom[1] = 1.0
     end
@@ -326,7 +328,6 @@ function main(gl_wait=true)
                 end
                 steps = length(log.syslog)        
                 println("Steps: $steps")
-
                 active = true
             end
             i=0
