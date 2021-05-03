@@ -149,7 +149,7 @@ function update_system(scene, state, step=0)
 end
 
 function reset_view(cam, scene3D)
-    update_cam!(scene3D.scene, [-15.425113, -18.925116, 5.5000005], [-1.5, -5.0000005, 5.5000005])
+    update_cam!(scene3D.scene, [-15.425113, -18.925116, 5.5], [-1.5, -5.0, 5.5])
 end
 
 function zoom_scene(camera, scene, zoom=1.0f0)
@@ -160,10 +160,8 @@ function zoom_scene(camera, scene, zoom=1.0f0)
 end
 
 function reset_and_zoom(camera, scene3D, zoom)
-    if zoom[1] ≈ 1.0
-        reset_view(camera, scene3D)
-    else
-        reset_view(camera, scene3D)
+    reset_view(camera, scene3D)
+    if zoom ≈ 1.0 ≆
         zoom_scene(camera, scene3D.scene, zoom)  
     end
 end
