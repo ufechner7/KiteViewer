@@ -243,12 +243,9 @@ function main(gl_wait=true)
     @async begin
         while true
             if starting[1] == 1
-                println(1)
                 starting[1] = 0
                 plot2d(ax, y_label, log, p1, :height)
-                sleep(0.2)
                 reset_and_zoom(camera, scene3D, zoom[1])  
-                println(2)
             else
                 sleep(0.1)
             end
@@ -277,7 +274,6 @@ function main(gl_wait=true)
                     status[]="Running"
                     FLYING[1] = true
                     PLAYING[1] = true
-                    # starting[1] = 1
                 else
                     status[] = "Failed to import $logfile !"
                 end
@@ -346,9 +342,7 @@ function main(gl_wait=true)
                     log = demo_log("Launch test!")
                 end
                 steps = length(log.syslog)        
-                println("Steps: $steps")
-
-                # starting[1] = 1
+                starting[1] = 1
                 active = true
             end
             i=0
