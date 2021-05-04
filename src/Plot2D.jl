@@ -1,20 +1,32 @@
-using Revise,  GLMakie
+module Plot2D
 
-includet("./Utils.jl")
+using GLMakie
+export plot2d
+
+include("./Utils.jl")
 using .Utils
 
 const objects = []
 
-function plot_height(fig, log)
-    if length(objects) > 0
-        delete!(objects[end])
+function autoscale(ax, x, y)
+    xlims!(ax, x[1], x[end])
+    ylims!(ax, 0, maximum(y)*1.05)
+end
+
+function plot2d(ax, label, log, p1, field)
+    unit = ""
+    factor = 1.0
+    if field == :height
+        unit = "[m]"
+    elseif field == :elevation
+        unit = "[°]"
+        factor = 180.0/pi
     end
-    ax=Axis(fig[1, 1], xlabel = "time [s]", ylabel = "height [m]")
-    x=log.extlog.time
-    y=log.extlog.z ./ se().zoom
-    po=lines!(x,y)
-    object=(ax, po)
-    push!(objects, ax)   
+    x       = log.extlog.time
+    y       = log.extlog.z ./ se().zoom * factor
+    label[] = string(field) * " " * unit
+    p1[]    =  Point2f0.(x, y)
+    autoscale(ax, x, y)
 end
 
 function plot_elevation(fig, log)
@@ -162,4 +174,6 @@ function main(gl_wait=true)
         wait(gl_screen)
     end
     return nothing
+end
+
 end
