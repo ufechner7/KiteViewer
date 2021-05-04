@@ -27,7 +27,11 @@ using Revise
 includet("./Utils.jl")
 using .Utils
 
+include("./Plot2D.jl")
+using .Plot2D
+
 const SCALE = 1.2 
+const SHOW2D = true
 const INITIAL_HEIGHT =  80.0*se().zoom # meter, for demo
 const MAX_HEIGHT     = 200.0*se().zoom # meter, for demo
 const KITE = FileIO.load(se().model)
@@ -44,6 +48,8 @@ const textnode = Node("")
 const textsize = Node(TEXT_SIZE)
 const textsize2 = Node(AXIS_LABEL_SIZE)
 const status = Node("")
+const p1 = Node(Vector{Point2f0}(undef, 6000)) # 5 min
+const y_label = Node("")
 
 const points          = Vector{Point3f0}(undef, se().segments+1)
 const quat            = Node(Quaternionf0(0,0,0,1))                        # orientation of the kite
@@ -168,9 +174,19 @@ function reset_and_zoom(camera, scene3D, zoom)
     end
 end
 
+function autoscale(ax, x, y)
+    xlims!(ax, x[1], x[end])
+    ylims!(ax, 0, maximum(y)*1.05)
+end
+
 function main(gl_wait=true)
-    scene, layout = layoutscene(resolution = (840, 900), backgroundcolor = RGBf0(0.7, 0.8, 1))
-    scene3D = LScene(scene, scenekw = (show_axis=false, limits = Rect(-7,-10.0,0, 11,10,11), resolution = (800, 800)), raw=false)
+    if SHOW2D
+        scene, layout = layoutscene(resolution = (840+800, 900), backgroundcolor = RGBf0(0.7, 0.8, 1))
+        scene3D = LScene(scene, scenekw = (show_axis=false, limits = Rect(-7,-10.0,0, 11,10,11), resolution = (800, 800)), raw=false)
+    else
+        scene, layout = layoutscene(resolution = (840, 900), backgroundcolor = RGBf0(0.7, 0.8, 1))
+        scene3D = LScene(scene, scenekw = (show_axis=false, limits = Rect(-7,-10.0,0, 11,10,11), resolution = (800, 800)), raw=false)
+    end
     create_coordinate_system(scene3D)
     cam = cameracontrols(scene3D.scene)
     FLYING[1] = false
@@ -190,6 +206,15 @@ function main(gl_wait=true)
 
     layout[1, 1] = scene3D
     layout[2, 1] = buttongrid = GridLayout(tellwidth = false)
+    fig=Figure()
+    ax = fig[1, 2] = Axis(scene, xlabel = "time [s]", ylabel = "height [m]")
+    layout[1,2] = ax
+    log = demo_log("Launch test!")
+    x=log.extlog.time
+    y=log.extlog.z ./ se().zoom
+    p1[] = [Point2f0(x[i],y[i]) for i in 1:length(x)]
+    po=lines!(ax, p1)
+    autoscale(ax, x, y)
 
     btn_RESET       = Button(scene, label = "RESET")
     btn_ZOOM_in     = Button(scene, label = "Zoom +")
@@ -214,23 +239,28 @@ function main(gl_wait=true)
             FLYING[1] = true
             PLAYING[1] = false
             status[] = "Launching..."
+            # starting[1] = 1
             @sync reset_and_zoom(camera, scene3D, zoom[1])   
         end
     end
 
     on(btn_PLOT.clicks) do c
         starting[1] = 1
-        run(PLOT_CMD, wait=false)
     end
 
     @async begin
         while true
             if starting[1] == 1
-                old=status[]
-                status[] = "Starting plot2d.."
+                println(1)
                 starting[1] = 0
-                sleep(8)
-                status[] = old
+                x=log.extlog.time
+                y=log.extlog.z ./ se().zoom
+                p1[] = [Point2f0(x[i],y[i]) for i in 1:length(x)]
+                println(length(x))
+                sleep(0.2)
+                autoscale(ax, x, y)
+                reset_and_zoom(camera, scene3D, zoom[1])  
+                println(2)
             else
                 sleep(0.1)
             end
@@ -259,6 +289,7 @@ function main(gl_wait=true)
                     status[]="Running"
                     FLYING[1] = true
                     PLAYING[1] = true
+                    # starting[1] = 1
                 else
                     status[] = "Failed to import $logfile !"
                 end
@@ -328,6 +359,8 @@ function main(gl_wait=true)
                 end
                 steps = length(log.syslog)        
                 println("Steps: $steps")
+
+                # starting[1] = 1
                 active = true
             end
             i=0
