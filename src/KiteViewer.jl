@@ -27,7 +27,7 @@ using Revise
 includet("./Utils.jl")
 using .Utils
 
-include("./Plot2D.jl")
+includet("./Plot2D.jl")
 using .Plot2D
 
 const SCALE = 1.2 
@@ -35,7 +35,6 @@ const SHOW2D = true
 const INITIAL_HEIGHT =  80.0*se().zoom # meter, for demo
 const MAX_HEIGHT     = 200.0*se().zoom # meter, for demo
 const KITE = FileIO.load(se().model)
-const PLOT_CMD = `./plot2d.sh`
 const FLYING    = [false]
 const PLAYING    = [false]
 const GUI_ACTIVE = [false]
@@ -205,7 +204,7 @@ function main(gl_wait=true)
     ax = fig[1, 2] = Axis(scene, xlabel = "time [s]", ylabel = y_label)
     layout[1,2] = ax
     log = demo_log("Launch test!")
-    plot2d(ax, y_label, log, p1, :height)
+    plot2d(se, ax, y_label, log, p1, :height)
     po=lines!(ax, p1)
 
     btn_RESET       = Button(scene, label = "RESET")
@@ -226,6 +225,10 @@ function main(gl_wait=true)
     camera = cameracontrols(scene3D.scene)
     reset_view(camera, scene3D)
 
+    reset() = reset_and_zoom(camera, scene3D, zoom[1]) 
+    layout[2, 2] = bg = GridLayout(tellwidth = false, default_colgap=10)
+    buttons(scene, bg, se, ax, y_label, reset)
+
     on(btn_LAUNCH.clicks) do c
         if ! PLAYING[1]
             FLYING[1] = true
@@ -244,7 +247,7 @@ function main(gl_wait=true)
         while true
             if starting[1] == 1
                 starting[1] = 0
-                plot2d(ax, y_label, log, p1, :height)
+                plot2d(se, ax, y_label, log, p1, :height)
                 reset_and_zoom(camera, scene3D, zoom[1])  
             else
                 sleep(0.1)
