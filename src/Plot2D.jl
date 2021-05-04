@@ -26,6 +26,13 @@ function plot2d(se, ax, label, log, p1, field)
         unit = "[°]"
         y    = log.syslog.elevation/pi*180.0
         factor = 180.0/pi
+    elseif field == :azimuth
+        unit = "[°]"
+        y    = log.syslog.azimuth/pi*180.0
+        factor = 180.0/pi
+    elseif field == :v_reelout
+        unit = "[m/s]"
+        y    = log.syslog.v_reelout
     end
     x       = log.extlog.time
     label[] = string(field) * " " * unit
@@ -54,40 +61,15 @@ function buttons(fig, bg, se, ax, label, reset)
         plot2d(se, ax, label, LOG, P1, :elevation)
         reset()
     end
+    on(btn_azimuth.clicks) do c
+        plot2d(se, ax, label, LOG, P1, :azimuth)
+        reset()
+    end
+    on(btn_v_reelout.clicks) do c
+        plot2d(se, ax, label, LOG, P1, :v_reelout)
+        reset()
+    end
 end
-
-# function plot_elevation(fig, log)
-#     if length(objects) > 0
-#         delete!(objects[end])
-#     end
-#     ax=Axis(fig[1, 1], xlabel = "time [s]", ylabel = "elevation [°]")
-#     x=log.extlog.time
-#     y=log.syslog.elevation/pi*180.0
-#     po=lines!(x,y)   
-#     push!(objects, ax) 
-# end
-
-# function plot_azimuth(fig, log)
-#     if length(objects) > 0
-#         delete!(objects[end])
-#     end
-#     ax=Axis(fig[1, 1], xlabel = "time [s]", ylabel = "azimuth [°]")
-#     x=log.extlog.time
-#     y=log.syslog.azimuth/pi*180.0
-#     po=lines!(x,y)   
-#     push!(objects, ax) 
-# end
-
-# function plot_v_reelout(fig, log)
-#     if length(objects) > 0
-#         delete!(objects[end])
-#     end
-#     ax=Axis(fig[1, 1], xlabel = "time [s]", ylabel = "v_reelout [m/s]")
-#     x=log.extlog.time
-#     y=log.syslog.v_reelout
-#     po=lines!(x,y)   
-#     push!(objects, ax) 
-# end
 
 # function plot_force(fig, log)
 #     if length(objects) > 0
