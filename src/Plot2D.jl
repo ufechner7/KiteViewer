@@ -36,6 +36,13 @@ function plot2d(se, ax, label, log, p1, field)
     elseif field == :force
         unit = "[N]"
         y    = log.syslog.force
+    elseif field == :depower
+        unit = "[%]"
+        y    = log.syslog.depower
+        factor = 100.0f0
+    elseif field == :v_app
+        unit = "[m/s]"
+        y    = log.syslog.v_app
     end
     x       = log.extlog.time
     label[] = string(field) * " " * unit
@@ -76,6 +83,14 @@ function buttons(fig, bg, se, ax, label, reset)
         plot2d(se, ax, label, LOG, P1[1], :force)
         reset()
     end
+    on(btn_depower.clicks) do c
+        plot2d(se, ax, label, LOG, P1[1], :depower)
+        reset()
+    end
+    on(btn_v_app.clicks) do c
+        plot2d(se, ax, label, LOG, P1[1], :v_app)
+        reset()
+    end
 end
 
 # function plot_power(fig, log)
@@ -85,17 +100,6 @@ end
 #     ax=Axis(fig[1, 1], xlabel = "time [s]", ylabel = "mechanical power [kW]")
 #     x=log.extlog.time
 #     y=log.syslog.force .* log.syslog.v_reelout./1000.0
-#     po=lines!(x,y)   
-#     push!(objects, ax) 
-# end
-
-# function plot_depower(fig, log)
-#     if length(objects) > 0
-#         delete!(objects[end])
-#     end
-#     ax=Axis(fig[1, 1], xlabel = "time [s]", ylabel = "depower [%]")
-#     x=log.extlog.time
-#     y=log.syslog.depower .* 100.0
 #     po=lines!(x,y)   
 #     push!(objects, ax) 
 # end
