@@ -53,7 +53,7 @@ include("src/KiteViewer.jl")
 main()
 ```
 
-Use the right mouse button to zoom and the left mouse button to pan
+Click on PLAY to play the log file. Use the right mouse button to zoom and the left mouse button to pan
 the 3D view. 
 
 ## Import flight data
