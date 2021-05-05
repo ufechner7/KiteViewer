@@ -61,7 +61,7 @@ function plot2d(se, ax, label, log, p1, field, lower=false)
     autoscale(ax, x, y)
 end
 
-function buttons(fig, bg, se, ax, ax2, label, reset)
+function buttons(fig, bg, se, ax, ax2, label, label2, reset)
     textsize=14
     btn_height         = Button(fig, label = "height", textsize=textsize)
     btn_elevation      = Button(fig, label = "elevation", textsize=textsize)
@@ -72,14 +72,14 @@ function buttons(fig, bg, se, ax, ax2, label, reset)
     btn_v_app          = Button(fig, label = "v_app", textsize=textsize)
     btn_l_tether       = Button(fig, label = "l_tether", textsize=textsize)
     btn_power          = Button(fig, label = "power", textsize=textsize)
-    sw = Toggle(fig, active = true)
+    sw = Toggle(fig, vertical=true, active = false) # active means plot in the upper area
     bg[1, 1:10] = [btn_height, btn_elevation, btn_azimuth, btn_v_reelout, btn_force, btn_depower, btn_v_app, btn_l_tether, btn_power, sw]
 
     on(btn_height.clicks) do c
         if sw.active[]
             plot2d(se, ax, label, LOG, P1[1], :height)
         else
-            plot2d(se, ax2, label, LOG, P2[1], :height, true)
+            plot2d(se, ax2, label2, LOG, P2[1], :height, true)
         end
         println(sw.active[])
         reset()
@@ -88,16 +88,25 @@ function buttons(fig, bg, se, ax, ax2, label, reset)
         if sw.active[]
             plot2d(se, ax, label, LOG, P1[1], :elevation)
         else
-            plot2d(se, ax2, label, LOG, P2[1], :elevation, true)
+            plot2d(se, ax2, label2, LOG, P2[1], :elevation, true)
         end
         reset()
     end
     on(btn_azimuth.clicks) do c
-        plot2d(se, ax, label, LOG, P1[1], :azimuth)
+        if sw.active[]
+            plot2d(se, ax, label, LOG, P1[1], :azimuth)
+        else
+            plot2d(se, ax2, label2, LOG, P2[1], :azimuth, true)
+        end
+        sleep(0.05)
         reset()
     end
     on(btn_v_reelout.clicks) do c
-        plot2d(se, ax, label, LOG, P1[1], :v_reelout)
+        if sw.active[]
+            plot2d(se, ax, label, LOG, P1[1], :v_reelout)
+        else
+            plot2d(se, ax2, label2, LOG, P2[1], :v_reelout, true)
+        end
         reset()
     end
     on(btn_force.clicks) do c
