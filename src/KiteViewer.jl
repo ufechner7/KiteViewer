@@ -48,6 +48,7 @@ const textsize = Node(TEXT_SIZE)
 const textsize2 = Node(AXIS_LABEL_SIZE)
 const status = Node("")
 const p1 = Node(Vector{Point2f0}(undef, 6000)) # 5 min
+const p2 = Node(Vector{Point2f0}(undef, 6000)) # 5 min
 const pos_x = Node(0.0f0)
 const y_label = Node("")
 
@@ -201,13 +202,21 @@ function main(gl_wait=true)
 
     layout[1, 1] = scene3D
     layout[2, 1] = buttongrid = GridLayout(tellwidth = false)
-    fig=Figure()
-    ax = fig[1, 2] = Axis(scene, xlabel = "time [s]", ylabel = y_label)
-    layout[1,2] = ax
+    layout[1, 2] = ax = Axis(scene, xlabel = "time [s]", ylabel = y_label)
+    layout[2, 2] = ax2 = Axis(scene, xlabel = "time [s]", ylabel = y_label)
+
+    l_sublayout = GridLayout()
+    layout[1:3, 1] = l_sublayout
+    l_sublayout[:v] = [scene3D, buttongrid]
+
     log = demo_log("Launch test!")
-    plot2d(se, ax, y_label, log, p1, :height)
-    po=lines!(ax, p1)
+    plot2d(se, ax, y_label, log, p1, :height, true)
+    lines!(ax, p1)
     vlines!(ax, pos_x, color = :red)
+
+    plot2d(se, ax2, y_label, log, p2, :height)
+    lines!(ax2, p2)
+    vlines!(ax2, pos_x, color = :red)
 
     btn_RESET       = Button(scene, label = "RESET")
     btn_ZOOM_in     = Button(scene, label = "Zoom +")
@@ -227,8 +236,8 @@ function main(gl_wait=true)
     reset_view(camera, scene3D)
 
     reset() = reset_and_zoom(camera, scene3D, zoom[1]) 
-    layout[2, 2] = bg = GridLayout(tellwidth = false, default_colgap=10)
-    buttons(scene, bg, se, ax, y_label, reset)
+    layout[3, 2] = bg = GridLayout(tellwidth = false, default_colgap=10)
+    buttons(scene, bg, se, ax, ax2, y_label, reset)
 
     on(btn_LAUNCH.clicks) do c
         if ! PLAYING[1]
@@ -245,6 +254,9 @@ function main(gl_wait=true)
             if starting[1] == 1
                 starting[1] = 0
                 plot2d(se, ax, y_label, log, p1, :height)
+                plot2d(se, ax2, y_label, log, p2, :height, true)
+                x2=log.extlog.time
+                xlims!(ax2, x2[1], x2[end])
                 reset_and_zoom(camera, scene3D, zoom[1])  
             else
                 sleep(0.1)
