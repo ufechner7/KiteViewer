@@ -81,7 +81,6 @@ function buttons(fig, bg, se, ax, ax2, label, label2, reset)
         else
             plot2d(se, ax2, label2, LOG, P2[1], :height, true)
         end
-        println(sw.active[])
         reset()
     end
     on(btn_elevation.clicks) do c
@@ -110,23 +109,43 @@ function buttons(fig, bg, se, ax, ax2, label, label2, reset)
         reset()
     end
     on(btn_force.clicks) do c
-        plot2d(se, ax, label, LOG, P1[1], :force)
+        if sw.active[]
+            plot2d(se, ax, label, LOG, P1[1], :force)
+        else
+            plot2d(se, ax2, label2, LOG, P2[1], :force, true)
+        end
         reset()
     end
     on(btn_depower.clicks) do c
-        plot2d(se, ax, label, LOG, P1[1], :depower)
+        if sw.active[]
+            plot2d(se, ax, label, LOG, P1[1], :depower)
+        else
+            plot2d(se, ax2, label2, LOG, P2[1], :depower, true)
+        end
         reset()
     end
     on(btn_v_app.clicks) do c
-        plot2d(se, ax, label, LOG, P1[1], :v_app)
+        if sw.active[]
+            plot2d(se, ax, label, LOG, P1[1], :v_app)
+        else
+            plot2d(se, ax2, label2, LOG, P2[1], :v_app, true)
+        end
         reset()
     end
     on(btn_l_tether.clicks) do c
-        plot2d(se, ax, label, LOG, P1[1], :l_tether)
+        if sw.active[]
+            plot2d(se, ax, label, LOG, P1[1], :l_tether)
+        else
+            plot2d(se, ax2, label2, LOG, P2[1], :l_tether, true)
+        end
         reset()
     end
     on(btn_power.clicks) do c
-        plot2d(se, ax, label, LOG, P1[1], :power)
+        if sw.active[]
+            plot2d(se, ax, label, LOG, P1[1], :power)
+        else
+            plot2d(se, ax2, label2, LOG, P2[1], :power)
+        end
         reset()
     end
 end

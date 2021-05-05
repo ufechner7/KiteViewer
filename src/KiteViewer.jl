@@ -198,19 +198,20 @@ function main(gl_wait=true)
 
     layout[1, 1] = scene3D
     layout[2, 1] = buttongrid = GridLayout(tellwidth = false)
-    layout[1, 2] = ax = Axis(scene, xlabel = "time [s]", ylabel = y_label)
+    layout[1, 2] = ax1 = Axis(scene, xlabel = "time [s]", ylabel = y_label)
     layout[2, 2] = ax2 = Axis(scene, xlabel = "time [s]", ylabel = y_label2)
+    linkxaxes!(ax1, ax2)
 
     l_sublayout = GridLayout()
     layout[1:3, 1] = l_sublayout
     l_sublayout[:v] = [scene3D, buttongrid]
 
     log = demo_log("Launch test!")
-    plot2d(se, ax, y_label, log, p1, :height)
-    lines!(ax, p1)
-    vlines!(ax, pos_x, color = :red)
+    plot2d(se, ax1, y_label, log, p1, :height)
+    lines!(ax1, p1)
+    vlines!(ax1, pos_x, color = :red)
 
-    plot2d(se, ax2, y_label2, log, p2, :height, true)
+    plot2d(se, ax2, y_label2, log, p2, :elevation, true)
     lines!(ax2, p2)
     vlines!(ax2, pos_x, color = :red)
 
@@ -233,7 +234,7 @@ function main(gl_wait=true)
 
     reset() = reset_and_zoom(camera, scene3D, zoom[1]) 
     layout[3, 2] = bg = GridLayout(tellwidth = false, default_colgap=10)
-    buttons(scene, bg, se, ax, ax2, y_label, y_label2, reset)
+    buttons(scene, bg, se, ax1, ax2, y_label, y_label2, reset)
 
     on(btn_LAUNCH.clicks) do c
         if ! PLAYING[1]
@@ -249,8 +250,8 @@ function main(gl_wait=true)
         while true
             if starting[1] == 1
                 starting[1] = 0
-                plot2d(se, ax, y_label, log, p1, :height)
-                plot2d(se, ax2, y_label2, log, p2, :height, true)
+                plot2d(se, ax1, y_label, log, p1, :height)
+                plot2d(se, ax2, y_label2, log, p2, :elevation, true)
                 x2=log.extlog.time
                 xlims!(ax2, x2[1], x2[end])
                 reset_and_zoom(camera, scene3D, zoom[1])  
