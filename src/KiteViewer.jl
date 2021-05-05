@@ -48,6 +48,7 @@ const textsize = Node(TEXT_SIZE)
 const textsize2 = Node(AXIS_LABEL_SIZE)
 const status = Node("")
 const p1 = Node(Vector{Point2f0}(undef, 6000)) # 5 min
+const pos_x = Node(0.0f0)
 const y_label = Node("")
 
 const points          = Vector{Point3f0}(undef, se().segments+1)
@@ -206,6 +207,7 @@ function main(gl_wait=true)
     log = demo_log("Launch test!")
     plot2d(se, ax, y_label, log, p1, :height)
     po=lines!(ax, p1)
+    vlines!(ax, pos_x, color = :red)
 
     btn_RESET       = Button(scene, label = "RESET")
     btn_ZOOM_in     = Button(scene, label = "Zoom +")
@@ -213,9 +215,8 @@ function main(gl_wait=true)
     btn_LAUNCH      = Button(scene, label = "LAUNCH")
     btn_PLAY_PAUSE  = Button(scene, label = @lift($running ? "PAUSE" : " PLAY  "))
     btn_STOP        = Button(scene, label = "STOP")
-    btn_PLOT        = Button(scene, label = "PLOT2D")
     
-    buttongrid[1, 1:7] = [btn_PLAY_PAUSE, btn_LAUNCH, btn_PLOT, btn_ZOOM_in, btn_ZOOM_out, btn_RESET, btn_STOP]
+    buttongrid[1, 1:6] = [btn_PLAY_PAUSE, btn_LAUNCH, btn_ZOOM_in, btn_ZOOM_out, btn_RESET, btn_STOP]
 
     gl_screen = display(scene)
     
@@ -237,10 +238,6 @@ function main(gl_wait=true)
             # starting[1] = 1
             @sync reset_and_zoom(camera, scene3D, zoom[1])   
         end
-    end
-
-    on(btn_PLOT.clicks) do c
-        starting[1] = 1
     end
 
     @async begin
@@ -355,6 +352,7 @@ function main(gl_wait=true)
                 state = log.syslog[i+1]
                 if running[] || ! PLAYING[1]
                     @sync update_system(scene3D, state, i)
+                    pos_x[] = i*delta_t
                     i += 1
                 end
                 sleep(delta_t / se().time_lapse)

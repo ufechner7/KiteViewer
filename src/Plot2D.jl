@@ -4,7 +4,7 @@ using GLMakie
 export plot2d, buttons
 
 LOG=nothing
-P1= Node(Vector{Point2f0}(undef, 6000))
+const P1= [Node(Vector{Point2f0}(undef, 6000))]
 
 function autoscale(ax, x, y)
     xlims!(ax, x[1], x[end])
@@ -15,7 +15,7 @@ end
 function plot2d(se, ax, label, log, p1, field)
     global LOG, P1
     LOG=log
-    P1=p1
+    P1[1]=p1
     unit = ""
     factor = 1.0
     y = [1f0]
@@ -33,6 +33,9 @@ function plot2d(se, ax, label, log, p1, field)
     elseif field == :v_reelout
         unit = "[m/s]"
         y    = log.syslog.v_reelout
+    elseif field == :force
+        unit = "[N]"
+        y    = log.syslog.force
     end
     x       = log.extlog.time
     label[] = string(field) * " " * unit
@@ -54,33 +57,26 @@ function buttons(fig, bg, se, ax, label, reset)
     bg[1, 1:9] = [btn_height, btn_elevation, btn_azimuth, btn_v_reelout, btn_force, btn_depower, btn_v_app, btn_l_tether, btn_power]
 
     on(btn_height.clicks) do c
-        plot2d(se, ax, label, LOG, P1, :height)
+        plot2d(se, ax, label, LOG, P1[1], :height)
         reset()
     end
     on(btn_elevation.clicks) do c
-        plot2d(se, ax, label, LOG, P1, :elevation)
+        plot2d(se, ax, label, LOG, P1[1], :elevation)
         reset()
     end
     on(btn_azimuth.clicks) do c
-        plot2d(se, ax, label, LOG, P1, :azimuth)
+        plot2d(se, ax, label, LOG, P1[1], :azimuth)
         reset()
     end
     on(btn_v_reelout.clicks) do c
-        plot2d(se, ax, label, LOG, P1, :v_reelout)
+        plot2d(se, ax, label, LOG, P1[1], :v_reelout)
+        reset()
+    end
+    on(btn_force.clicks) do c
+        plot2d(se, ax, label, LOG, P1[1], :force)
         reset()
     end
 end
-
-# function plot_force(fig, log)
-#     if length(objects) > 0
-#         delete!(objects[end])
-#     end
-#     ax=Axis(fig[1, 1], xlabel = "time [s]", ylabel = "force [N]")
-#     x=log.extlog.time
-#     y=log.syslog.force
-#     po=lines!(x,y)   
-#     push!(objects, ax) 
-# end
 
 # function plot_power(fig, log)
 #     if length(objects) > 0
