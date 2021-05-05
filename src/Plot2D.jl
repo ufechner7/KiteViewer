@@ -3,9 +3,9 @@ module Plot2D
 using GLMakie
 export plot2d, buttons
 
-LOG=nothing
-const P1= [Node(Vector{Point2f0}(undef, 6000))]
-const P2= [Node(Vector{Point2f0}(undef, 6000))]
+LOG = nothing
+const P1 = [Node(Vector{Point2f0}(undef, 6000))]
+const P2 = [Node(Vector{Point2f0}(undef, 6000))]
 
 function autoscale(ax, x, y)
     xlims!(ax, x[1], x[end])
@@ -13,13 +13,13 @@ function autoscale(ax, x, y)
     ylims!(ax, minimum(y)-0.05*range, maximum(y)+0.05*range)
 end
 
-function plot2d(se, ax, label, log, p1, field, lower=false)
+function plot2d(se, ax, label1, log, points, field, lower=false)
     global LOG, P1, P2
     LOG=log
     if lower
-        P2[1]=p1
+        P2[1]=points
     else
-        P1[1]=p1
+        P1[1]=points
     end
     unit = ""
     y = [1f0]
@@ -53,15 +53,15 @@ function plot2d(se, ax, label, log, p1, field, lower=false)
     end
     x       = log.extlog.time
     if field == :power
-        label[] = "mechanical " * string(field) * " " * unit
+        label1[] = "mechanical " * string(field) * " " * unit
     else
-        label[] = string(field) * " " * unit
+        label1[] = string(field) * " " * unit
     end
-    p1[]    =  Point2f0.(x, y)
+    points[]    =  Point2f0.(x, y)
     autoscale(ax, x, y)
 end
 
-function buttons(fig, bg, se, ax, ax2, label, label2, reset)
+function buttons(fig, bg, se, ax1, ax2, label1, label2, reset)
     textsize=14
     btn_height         = Button(fig, label = "height", textsize=textsize)
     btn_elevation      = Button(fig, label = "elevation", textsize=textsize)
@@ -77,7 +77,7 @@ function buttons(fig, bg, se, ax, ax2, label, label2, reset)
 
     on(btn_height.clicks) do c
         if sw.active[]
-            plot2d(se, ax, label, LOG, P1[1], :height)
+            plot2d(se, ax1, label1, LOG, P1[1], :height)
         else
             plot2d(se, ax2, label2, LOG, P2[1], :height, true)
         end
@@ -85,7 +85,7 @@ function buttons(fig, bg, se, ax, ax2, label, label2, reset)
     end
     on(btn_elevation.clicks) do c
         if sw.active[]
-            plot2d(se, ax, label, LOG, P1[1], :elevation)
+            plot2d(se, ax1, label1, LOG, P1[1], :elevation)
         else
             plot2d(se, ax2, label2, LOG, P2[1], :elevation, true)
         end
@@ -93,7 +93,7 @@ function buttons(fig, bg, se, ax, ax2, label, label2, reset)
     end
     on(btn_azimuth.clicks) do c
         if sw.active[]
-            plot2d(se, ax, label, LOG, P1[1], :azimuth)
+            plot2d(se, ax1, label1, LOG, P1[1], :azimuth)
         else
             plot2d(se, ax2, label2, LOG, P2[1], :azimuth, true)
         end
@@ -102,7 +102,7 @@ function buttons(fig, bg, se, ax, ax2, label, label2, reset)
     end
     on(btn_v_reelout.clicks) do c
         if sw.active[]
-            plot2d(se, ax, label, LOG, P1[1], :v_reelout)
+            plot2d(se, ax1, label1, LOG, P1[1], :v_reelout)
         else
             plot2d(se, ax2, label2, LOG, P2[1], :v_reelout, true)
         end
@@ -110,7 +110,7 @@ function buttons(fig, bg, se, ax, ax2, label, label2, reset)
     end
     on(btn_force.clicks) do c
         if sw.active[]
-            plot2d(se, ax, label, LOG, P1[1], :force)
+            plot2d(se, ax1, label1, LOG, P1[1], :force)
         else
             plot2d(se, ax2, label2, LOG, P2[1], :force, true)
         end
@@ -118,7 +118,7 @@ function buttons(fig, bg, se, ax, ax2, label, label2, reset)
     end
     on(btn_depower.clicks) do c
         if sw.active[]
-            plot2d(se, ax, label, LOG, P1[1], :depower)
+            plot2d(se, ax1, label1, LOG, P1[1], :depower)
         else
             plot2d(se, ax2, label2, LOG, P2[1], :depower, true)
         end
@@ -126,7 +126,7 @@ function buttons(fig, bg, se, ax, ax2, label, label2, reset)
     end
     on(btn_v_app.clicks) do c
         if sw.active[]
-            plot2d(se, ax, label, LOG, P1[1], :v_app)
+            plot2d(se, ax1, label1, LOG, P1[1], :v_app)
         else
             plot2d(se, ax2, label2, LOG, P2[1], :v_app, true)
         end
@@ -134,7 +134,7 @@ function buttons(fig, bg, se, ax, ax2, label, label2, reset)
     end
     on(btn_l_tether.clicks) do c
         if sw.active[]
-            plot2d(se, ax, label, LOG, P1[1], :l_tether)
+            plot2d(se, ax1, label1, LOG, P1[1], :l_tether)
         else
             plot2d(se, ax2, label2, LOG, P2[1], :l_tether, true)
         end
@@ -142,7 +142,7 @@ function buttons(fig, bg, se, ax, ax2, label, label2, reset)
     end
     on(btn_power.clicks) do c
         if sw.active[]
-            plot2d(se, ax, label, LOG, P1[1], :power)
+            plot2d(se, ax1, label1, LOG, P1[1], :power)
         else
             plot2d(se, ax2, label2, LOG, P2[1], :power)
         end
