@@ -50,7 +50,7 @@ const status = Node("")
 const p1 = Node(Vector{Point2f0}(undef, 6000)) # 5 min
 const p2 = Node(Vector{Point2f0}(undef, 6000)) # 5 min
 const pos_x = Node(0.0f0)
-const y_label = Node("")
+const y_label1 = Node("")
 const y_label2 = Node("")
 
 const points          = Vector{Point3f0}(undef, se().segments+1)
@@ -198,7 +198,7 @@ function main(gl_wait=true)
 
     layout[1, 1] = scene3D
     layout[2, 1] = buttongrid = GridLayout(tellwidth = false)
-    layout[1, 2] = ax1 = Axis(scene, xlabel = "time [s]", ylabel = y_label)
+    layout[1, 2] = ax1 = Axis(scene, xlabel = "time [s]", ylabel = y_label1)
     layout[2, 2] = ax2 = Axis(scene, xlabel = "time [s]", ylabel = y_label2)
     linkxaxes!(ax1, ax2)
 
@@ -207,7 +207,7 @@ function main(gl_wait=true)
     l_sublayout[:v] = [scene3D, buttongrid]
 
     log = demo_log("Launch test!")
-    plot2d(se, ax1, y_label, log, p1, :height)
+    plot2d(se, ax1, y_label1, log, p1, :height)
     lines!(ax1, p1)
     vlines!(ax1, pos_x, color = :red)
 
@@ -234,7 +234,7 @@ function main(gl_wait=true)
 
     reset() = reset_and_zoom(camera, scene3D, zoom[1]) 
     layout[3, 2] = bg = GridLayout(tellwidth = false, default_colgap=10)
-    buttons(scene, bg, se, ax1, ax2, y_label, y_label2, reset)
+    buttons(scene, bg, se, ax1, ax2, y_label1, y_label2, reset)
 
     on(btn_LAUNCH.clicks) do c
         if ! PLAYING[1]
@@ -250,7 +250,7 @@ function main(gl_wait=true)
         while true
             if starting[1] == 1
                 starting[1] = 0
-                plot2d(se, ax1, y_label, log, p1, :height)
+                plot2d(se, ax1, y_label1, log, p1, :height)
                 plot2d(se, ax2, y_label2, log, p2, :elevation, true)
                 x2=log.extlog.time
                 xlims!(ax2, x2[1], x2[end])
