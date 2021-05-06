@@ -10,7 +10,9 @@ const P2 = [Node(Vector{Point2f0}(undef, 6000))]
 function autoscale(ax, x, y)
     xlims!(ax, x[1], x[end])
     range = maximum(y) - minimum(y)
-    ylims!(ax, minimum(y)-0.05*range, maximum(y)+0.05*range)
+    if range > 0.0f0
+        ylims!(ax, minimum(y)-0.05*range, maximum(y)+0.05*range)
+    end
 end
 
 function plot2d(se, ax, label1, log, points, field, lower=false)
@@ -51,7 +53,7 @@ function plot2d(se, ax, label1, log, points, field, lower=false)
         unit = "[kW]"
         y    = log.syslog.v_reelout .* log.syslog.force * 0.001f0
     end
-    x       = log.extlog.time
+    x       = log.syslog.time
     if field == :power
         label1[] = "mechanical " * string(field) * " " * unit
     else

@@ -241,8 +241,7 @@ function main(gl_wait=true)
             FLYING[1] = true
             PLAYING[1] = false
             status[] = "Launching..."
-            # starting[1] = 1
-            @sync reset_and_zoom(camera, scene3D, zoom[1])   
+            reset_and_zoom(camera, scene3D, zoom[1])   
         end
     end
 
@@ -252,7 +251,7 @@ function main(gl_wait=true)
                 starting[1] = 0
                 plot2d(se, ax1, y_label1, log, p1, :height)
                 plot2d(se, ax2, y_label2, log, p2, :power, true)
-                x2=log.extlog.time
+                x2 = log.extlog.time
                 xlims!(ax2, x2[1], x2[end])
                 reset_and_zoom(camera, scene3D, zoom[1])  
             else
@@ -280,7 +279,7 @@ function main(gl_wait=true)
                 logfile=se().log_file * ".arrow"                
                 if isfile(logfile)
                     running[] = true
-                    status[]="Running"
+                    status[] = "Running"
                     FLYING[1] = true
                     PLAYING[1] = true
                 else
@@ -300,13 +299,13 @@ function main(gl_wait=true)
     end
 
     on(btn_STOP.clicks) do c
-        if status[] != "Stopped"
+        # if status[] != "Stopped"
             FLYING[1] = false
             PLAYING[1] = false
             running[] = false
             status[] = "Stopped"
             reset_and_zoom(camera, scene3D, zoom[1])
-        end
+        # end
     end
 
     on(scene.px_area) do x
@@ -344,8 +343,11 @@ function main(gl_wait=true)
                 if PLAYING[1]
                     logfile=basename(se().log_file)
                     if log.name != logfile
-                        println("Loading log file...")
-                        log = load_log(logfile) 
+                        old =  status[]
+                        status[] = "Loading log file..."
+                        reset_and_zoom(camera, scene3D, zoom[1])   
+                        log = load_log(logfile)
+                        status[] = old  
                     end
                 else
                     log = demo_log("Launch test!")
