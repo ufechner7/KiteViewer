@@ -1,114 +1,67 @@
-using Revise,  GLMakie
+module Plot2D
 
-includet("./Utils.jl")
-using .Utils
+using GLMakie
+export plot2d, buttons
 
-const objects = []
+LOG = nothing
+const P1 = [Node(Vector{Point2f0}(undef, 6000))]
+const P2 = [Node(Vector{Point2f0}(undef, 6000))]
 
-function plot_height(fig, log)
-    if length(objects) > 0
-        delete!(objects[end])
-    end
-    ax=Axis(fig[1, 1], xlabel = "time [s]", ylabel = "height [m]")
-    x=log.extlog.time
-    y=log.extlog.z ./ se().zoom
-    po=lines!(x,y)
-    object=(ax, po)
-    push!(objects, ax)   
+function autoscale(ax, x, y)
+    xlims!(ax, x[1], x[end])
+    range = maximum(y) - minimum(y)
+    ylims!(ax, minimum(y)-0.05*range, maximum(y)+0.05*range)
 end
 
-function plot_elevation(fig, log)
-    if length(objects) > 0
-        delete!(objects[end])
+function plot2d(se, ax, label1, log, points, field, lower=false)
+    global LOG, P1, P2
+    LOG=log
+    if lower
+        P2[1]=points
+    else
+        P1[1]=points
     end
-    ax=Axis(fig[1, 1], xlabel = "time [s]", ylabel = "elevation [°]")
-    x=log.extlog.time
-    y=log.syslog.elevation/pi*180.0
-    po=lines!(x,y)   
-    push!(objects, ax) 
+    unit = ""
+    y = [1f0]
+    if field == :height
+        unit = "[m]"
+        y    = log.extlog.z ./ se().zoom
+    elseif field == :elevation
+        unit = "[°]"
+        y    = log.syslog.elevation/pi*180.0
+    elseif field == :azimuth
+        unit = "[°]"
+        y    = log.syslog.azimuth/pi*180.0
+    elseif field == :v_reelout
+        unit = "[m/s]"
+        y    = log.syslog.v_reelout
+    elseif field == :force
+        unit = "[N]"
+        y    = log.syslog.force
+    elseif field == :depower
+        unit = "[%]"
+        y    = log.syslog.depower * 100.0f0
+    elseif field == :v_app
+        unit = "[m/s]"
+        y    = log.syslog.v_app
+    elseif field == :l_tether
+        unit = "[m]"
+        y    = log.syslog.l_tether
+    elseif field == :power
+        unit = "[kW]"
+        y    = log.syslog.v_reelout .* log.syslog.force * 0.001f0
+    end
+    x       = log.extlog.time
+    if field == :power
+        label1[] = "mechanical " * string(field) * " " * unit
+    else
+        label1[] = string(field) * " " * unit
+    end
+    points[]    =  Point2f0.(x, y)
+    autoscale(ax, x, y)
 end
 
-function plot_azimuth(fig, log)
-    if length(objects) > 0
-        delete!(objects[end])
-    end
-    ax=Axis(fig[1, 1], xlabel = "time [s]", ylabel = "azimuth [°]")
-    x=log.extlog.time
-    y=log.syslog.azimuth/pi*180.0
-    po=lines!(x,y)   
-    push!(objects, ax) 
-end
-
-function plot_v_reelout(fig, log)
-    if length(objects) > 0
-        delete!(objects[end])
-    end
-    ax=Axis(fig[1, 1], xlabel = "time [s]", ylabel = "v_reelout [m/s]")
-    x=log.extlog.time
-    y=log.syslog.v_reelout
-    po=lines!(x,y)   
-    push!(objects, ax) 
-end
-
-function plot_force(fig, log)
-    if length(objects) > 0
-        delete!(objects[end])
-    end
-    ax=Axis(fig[1, 1], xlabel = "time [s]", ylabel = "force [N]")
-    x=log.extlog.time
-    y=log.syslog.force
-    po=lines!(x,y)   
-    push!(objects, ax) 
-end
-
-function plot_power(fig, log)
-    if length(objects) > 0
-        delete!(objects[end])
-    end
-    ax=Axis(fig[1, 1], xlabel = "time [s]", ylabel = "mechanical power [kW]")
-    x=log.extlog.time
-    y=log.syslog.force .* log.syslog.v_reelout./1000.0
-    po=lines!(x,y)   
-    push!(objects, ax) 
-end
-
-function plot_depower(fig, log)
-    if length(objects) > 0
-        delete!(objects[end])
-    end
-    ax=Axis(fig[1, 1], xlabel = "time [s]", ylabel = "depower [%]")
-    x=log.extlog.time
-    y=log.syslog.depower .* 100.0
-    po=lines!(x,y)   
-    push!(objects, ax) 
-end
-
-function plot_v_app(fig, log)
-    if length(objects) > 0
-        delete!(objects[end])
-    end
-    ax=Axis(fig[1, 1], xlabel = "time [s]", ylabel = "v_app [m/s]")
-    x=log.extlog.time
-    y=log.syslog.v_app
-    po=lines!(x,y)   
-    push!(objects, ax) 
-end
-
-function plot_l_tether(fig, log)
-    if length(objects) > 0
-        delete!(objects[end])
-    end
-    ax=Axis(fig[1, 1], xlabel = "time [s]", ylabel = "tether length [m]")
-    x=log.extlog.time
-    y=log.syslog.l_tether
-    po=lines!(x,y)   
-    push!(objects, ax) 
-end
-
-function main(gl_wait=true)
-    fig=Figure()
-
-    fig[2, 1] = buttongrid = GridLayout(tellwidth = false, default_colgap=10)
+function buttons(fig, bg, se, ax1, ax2, label1, label2, reset)
     textsize=14
     btn_height         = Button(fig, label = "height", textsize=textsize)
     btn_elevation      = Button(fig, label = "elevation", textsize=textsize)
@@ -117,49 +70,84 @@ function main(gl_wait=true)
     btn_force          = Button(fig, label = "force", textsize=textsize)
     btn_depower        = Button(fig, label = "depower", textsize=textsize)
     btn_v_app          = Button(fig, label = "v_app", textsize=textsize)
-    btn_l_tether        = Button(fig, label = "l_tether", textsize=textsize)
+    btn_l_tether       = Button(fig, label = "l_tether", textsize=textsize)
     btn_power          = Button(fig, label = "power", textsize=textsize)
-    buttongrid[1, 1:9] = [btn_height, btn_elevation, btn_azimuth, btn_v_reelout, btn_force, btn_depower, btn_v_app, btn_l_tether, btn_power]
-
-    if gl_wait
-        log=load_log(basename(se().log_file))
-    else
-        log = demo_log("Launch test!")
-    end
+    sw = Toggle(fig, vertical=true, active = false) # active means plot in the upper area
+    bg[1, 1:10] = [btn_height, btn_elevation, btn_azimuth, btn_v_reelout, btn_force, btn_depower, btn_v_app, btn_l_tether, btn_power, sw]
 
     on(btn_height.clicks) do c
-        plot_height(fig, log)
+        if sw.active[]
+            plot2d(se, ax1, label1, LOG, P1[1], :height)
+        else
+            plot2d(se, ax2, label2, LOG, P2[1], :height, true)
+        end
+        reset()
     end
     on(btn_elevation.clicks) do c
-        plot_elevation(fig, log)
+        if sw.active[]
+            plot2d(se, ax1, label1, LOG, P1[1], :elevation)
+        else
+            plot2d(se, ax2, label2, LOG, P2[1], :elevation, true)
+        end
+        reset()
     end
     on(btn_azimuth.clicks) do c
-        plot_azimuth(fig, log)
+        if sw.active[]
+            plot2d(se, ax1, label1, LOG, P1[1], :azimuth)
+        else
+            plot2d(se, ax2, label2, LOG, P2[1], :azimuth, true)
+        end
+        sleep(0.05)
+        reset()
     end
     on(btn_v_reelout.clicks) do c
-        plot_v_reelout(fig, log)
+        if sw.active[]
+            plot2d(se, ax1, label1, LOG, P1[1], :v_reelout)
+        else
+            plot2d(se, ax2, label2, LOG, P2[1], :v_reelout, true)
+        end
+        reset()
     end
     on(btn_force.clicks) do c
-        plot_force(fig, log)
+        if sw.active[]
+            plot2d(se, ax1, label1, LOG, P1[1], :force)
+        else
+            plot2d(se, ax2, label2, LOG, P2[1], :force, true)
+        end
+        reset()
     end
     on(btn_depower.clicks) do c
-        plot_depower(fig, log)
+        if sw.active[]
+            plot2d(se, ax1, label1, LOG, P1[1], :depower)
+        else
+            plot2d(se, ax2, label2, LOG, P2[1], :depower, true)
+        end
+        reset()
     end
     on(btn_v_app.clicks) do c
-        plot_v_app(fig, log)
+        if sw.active[]
+            plot2d(se, ax1, label1, LOG, P1[1], :v_app)
+        else
+            plot2d(se, ax2, label2, LOG, P2[1], :v_app, true)
+        end
+        reset()
     end
     on(btn_l_tether.clicks) do c
-        plot_l_tether(fig, log)
+        if sw.active[]
+            plot2d(se, ax1, label1, LOG, P1[1], :l_tether)
+        else
+            plot2d(se, ax2, label2, LOG, P2[1], :l_tether, true)
+        end
+        reset()
     end
     on(btn_power.clicks) do c
-        plot_power(fig, log)
+        if sw.active[]
+            plot2d(se, ax1, label1, LOG, P1[1], :power)
+        else
+            plot2d(se, ax2, label2, LOG, P2[1], :power)
+        end
+        reset()
     end
+end
 
-    plot_height(fig, log)
-
-    gl_screen = display(fig)
-    if gl_wait
-        wait(gl_screen)
-    end
-    return nothing
 end

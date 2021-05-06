@@ -27,11 +27,14 @@ using Revise
 includet("./Utils.jl")
 using .Utils
 
+includet("./Plot2D.jl")
+using .Plot2D
+
 const SCALE = 1.2 
+const SHOW2D = true
 const INITIAL_HEIGHT =  80.0*se().zoom # meter, for demo
 const MAX_HEIGHT     = 200.0*se().zoom # meter, for demo
 const KITE = FileIO.load(se().model)
-const PLOT_CMD = `./plot2d.sh`
 const FLYING    = [false]
 const PLAYING    = [false]
 const GUI_ACTIVE = [false]
@@ -44,6 +47,11 @@ const textnode = Node("")
 const textsize = Node(TEXT_SIZE)
 const textsize2 = Node(AXIS_LABEL_SIZE)
 const status = Node("")
+const p1 = Node(Vector{Point2f0}(undef, 6000)) # 5 min
+const p2 = Node(Vector{Point2f0}(undef, 6000)) # 5 min
+const pos_x = Node(0.0f0)
+const y_label1 = Node("")
+const y_label2 = Node("")
 
 const points          = Vector{Point3f0}(undef, se().segments+1)
 const quat            = Node(Quaternionf0(0,0,0,1))                        # orientation of the kite
@@ -169,7 +177,7 @@ function reset_and_zoom(camera, scene3D, zoom)
 end
 
 function main(gl_wait=true)
-    scene, layout = layoutscene(resolution = (840, 900), backgroundcolor = RGBf0(0.7, 0.8, 1))
+    scene, layout = layoutscene(resolution = (840+800, 900), backgroundcolor = RGBf0(0.7, 0.8, 1))
     scene3D = LScene(scene, scenekw = (show_axis=false, limits = Rect(-7,-10.0,0, 11,10,11), resolution = (800, 800)), raw=false)
     create_coordinate_system(scene3D)
     cam = cameracontrols(scene3D.scene)
@@ -190,6 +198,22 @@ function main(gl_wait=true)
 
     layout[1, 1] = scene3D
     layout[2, 1] = buttongrid = GridLayout(tellwidth = false)
+    layout[1, 2] = ax1 = Axis(scene, xlabel = "time [s]", ylabel = y_label1)
+    layout[2, 2] = ax2 = Axis(scene, xlabel = "time [s]", ylabel = y_label2)
+    linkxaxes!(ax1, ax2)
+
+    l_sublayout = GridLayout()
+    layout[1:3, 1] = l_sublayout
+    l_sublayout[:v] = [scene3D, buttongrid]
+
+    log = demo_log("Launch test!")
+    plot2d(se, ax1, y_label1, log, p1, :height)
+    lines!(ax1, p1)
+    vlines!(ax1, pos_x, color = :red)
+
+    plot2d(se, ax2, y_label2, log, p2, :elevation, true)
+    lines!(ax2, p2)
+    vlines!(ax2, pos_x, color = :red)
 
     btn_RESET       = Button(scene, label = "RESET")
     btn_ZOOM_in     = Button(scene, label = "Zoom +")
@@ -197,9 +221,8 @@ function main(gl_wait=true)
     btn_LAUNCH      = Button(scene, label = "LAUNCH")
     btn_PLAY_PAUSE  = Button(scene, label = @lift($running ? "PAUSE" : " PLAY  "))
     btn_STOP        = Button(scene, label = "STOP")
-    btn_PLOT        = Button(scene, label = "PLOT2D")
     
-    buttongrid[1, 1:7] = [btn_PLAY_PAUSE, btn_LAUNCH, btn_PLOT, btn_ZOOM_in, btn_ZOOM_out, btn_RESET, btn_STOP]
+    buttongrid[1, 1:6] = [btn_PLAY_PAUSE, btn_LAUNCH, btn_ZOOM_in, btn_ZOOM_out, btn_RESET, btn_STOP]
 
     gl_screen = display(scene)
     
@@ -209,28 +232,29 @@ function main(gl_wait=true)
     camera = cameracontrols(scene3D.scene)
     reset_view(camera, scene3D)
 
+    reset() = reset_and_zoom(camera, scene3D, zoom[1]) 
+    layout[3, 2] = bg = GridLayout(tellwidth = false, default_colgap=10)
+    buttons(scene, bg, se, ax1, ax2, y_label1, y_label2, reset)
+
     on(btn_LAUNCH.clicks) do c
         if ! PLAYING[1]
             FLYING[1] = true
             PLAYING[1] = false
             status[] = "Launching..."
+            # starting[1] = 1
             @sync reset_and_zoom(camera, scene3D, zoom[1])   
         end
-    end
-
-    on(btn_PLOT.clicks) do c
-        starting[1] = 1
-        run(PLOT_CMD, wait=false)
     end
 
     @async begin
         while true
             if starting[1] == 1
-                old=status[]
-                status[] = "Starting plot2d.."
                 starting[1] = 0
-                sleep(8)
-                status[] = old
+                plot2d(se, ax1, y_label1, log, p1, :height)
+                plot2d(se, ax2, y_label2, log, p2, :elevation, true)
+                x2=log.extlog.time
+                xlims!(ax2, x2[1], x2[end])
+                reset_and_zoom(camera, scene3D, zoom[1])  
             else
                 sleep(0.1)
             end
@@ -327,7 +351,7 @@ function main(gl_wait=true)
                     log = demo_log("Launch test!")
                 end
                 steps = length(log.syslog)        
-                println("Steps: $steps")
+                starting[1] = 1
                 active = true
             end
             i=0
@@ -337,6 +361,7 @@ function main(gl_wait=true)
                 state = log.syslog[i+1]
                 if running[] || ! PLAYING[1]
                     @sync update_system(scene3D, state, i)
+                    pos_x[] = i*delta_t
                     i += 1
                 end
                 sleep(delta_t / se().time_lapse)

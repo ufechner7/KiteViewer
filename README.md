@@ -12,7 +12,7 @@ On Linux or MAC you can install the latest Julia version with the following comm
 bash -ci "$(curl -fsSL https://raw.githubusercontent.com/abelsiqueira/jill/master/jill.sh)"
 ```
 
-At least a dual core PC or MAC with 4 GB RAM is required. 
+At least a dual core PC or MAC with 4 GB RAM (min. 2 GB) is required. 
 OpenGL, version 3.3 or higher must be working.
 
 It should work on Windows, Linux and Mac, but until now only tested on Linux
@@ -53,7 +53,7 @@ include("src/KiteViewer.jl")
 main()
 ```
 
-Use the right mouse button to zoom and the left mouse button to pan
+Click on PLAY to play the log file. Use the right mouse button to zoom and the left mouse button to pan
 the 3D view. 
 
 ## Import flight data
@@ -103,7 +103,7 @@ main()
 Revise is watching the file KiteViewer.jl, and each time a changed version is saved any changed function is recompiled, but only the function that was changed and nothing else, therefore this is much faster than restarting Julia after a change.
 
 ## Reducing the startup time
-Using a Julia system image that contains a precompiled version of the GUI library Makie.jl can drastically reduce the startup time.
+Using a Julia system image that contains a precompiled version of the GUI library GLMakie.jl can drastically reduce the startup time.
 To create a system image just run the script: ```./create_sys_image.sh``` This needs to be done at least once, but also after important
 package updates because it freezes the package versions.
 
