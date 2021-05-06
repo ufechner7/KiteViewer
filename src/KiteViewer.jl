@@ -251,7 +251,7 @@ function main(gl_wait=true)
             if starting[1] == 1
                 starting[1] = 0
                 plot2d(se, ax1, y_label1, log, p1, :height)
-                plot2d(se, ax2, y_label2, log, p2, :elevation, true)
+                plot2d(se, ax2, y_label2, log, p2, :power, true)
                 x2=log.extlog.time
                 xlims!(ax2, x2[1], x2[end])
                 reset_and_zoom(camera, scene3D, zoom[1])  
