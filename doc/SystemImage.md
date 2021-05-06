@@ -7,12 +7,13 @@ First make sure the KiteViewer directory is the current directory. Then execute 
 ./create_sys_image.sh
 ```
 
-Finally, use the following command to launch Julia:
+Finally, use the following command to launch to launch the GUI:
 ```./kiteviewer.sh```
-to launch the GUI.
+or, if you just want to launch Julia:
+```./run_julia.sh```
 
 
-On my computer (i7-7700K) this reduced the startup time from 69s to 9s.
+On my computer (i7-7700K) this reduced the startup time for the application from 69s to 9s.
 
 ## Packages that are included
 The following packages are compiled into the Julia system image:
