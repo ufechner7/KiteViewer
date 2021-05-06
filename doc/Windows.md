@@ -80,4 +80,6 @@ Then open the file src/KiteViewer.jl in the Explorer on the left.
 Use the menu entry "View->Terminal" to open a Terminal. In the terminal launch julia with the command  
 ```julia --project``` or ```./runjulia```.
 
+It is suggested to install the vscode extension "Julia". See: https://www.julia-vscode.org/
+
 
