@@ -31,7 +31,6 @@ includet("./Plot2D.jl")
 using .Plot2D
 
 const SCALE = 1.2 
-const SHOW2D = true
 const INITIAL_HEIGHT =  80.0*se().zoom # meter, for demo
 const MAX_HEIGHT     = 200.0*se().zoom # meter, for demo
 const KITE = FileIO.load(se().model)
@@ -250,7 +249,11 @@ function main(gl_wait=true)
             if starting[1] == 1
                 starting[1] = 0
                 plot2d(se, ax1, y_label1, log, p1, :height)
-                plot2d(se, ax2, y_label2, log, p2, :power, true)
+                if PLAYING[]
+                    plot2d(se, ax2, y_label2, log, p2, :power, true)
+                else
+                    plot2d(se, ax2, y_label2, log, p2, :elevation, true)
+                end
                 x2 = log.extlog.time
                 xlims!(ax2, x2[1], x2[end])
                 reset_and_zoom(camera, scene3D, zoom[1])  
