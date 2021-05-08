@@ -103,8 +103,9 @@ main()
 Revise is watching the file KiteViewer.jl, and each time a changed version is saved any changed function is recompiled, but only the function that was changed and nothing else, therefore this is much faster than restarting Julia after a change.
 
 ## Reducing the startup time
-Using a Julia system image that contains a precompiled version of the GUI library GLMakie.jl can drastically reduce the startup time.
-To create a system image just run the script: ```./create_sys_image.sh``` This needs to be done at least once, but also after important
+On Linux it can help to activate the "performance" governor. This can be done with the command: ``` sudo ./performance.sh```
+
+Using a Julia system image that contains a precompiled version of the GUI library GLMakie.jl can drastically reduce the startup time. To create a system image just run the script: ```./create_sys_image.sh``` This needs to be done at least once, but also after important
 package updates because it freezes the package versions.
 
 If you now use the script ./runjulia.sh the new system image with the precompiled packages will be used.
