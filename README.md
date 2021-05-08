@@ -53,8 +53,7 @@ include("src/KiteViewer.jl")
 main()
 ```
 
-Click on PLAY to play the log file. Use the right mouse button to zoom and the left mouse button to pan
-the 3D view. 
+Click on PLAY to play the log file (and wait until the flight data import is finished when you do it the first time.) Use the right mouse button to zoom and the left mouse button to pan the 3D view. 
 
 ## Import flight data
 When you run KiteViewer for the first time the flight data is imported
@@ -67,6 +66,15 @@ include("src/Importer.jl")
 ```
 If you have your own .csv log files you need to extend the importer
 for your data format.
+
+## Update from version 0.2
+Run the following commands:
+```
+cd repos/KiteViewer
+rm Manifest.toml
+git pull
+./create_sys_image.sh
+```
 
 ## Fixing OpenGL problems
 On a computer with Ubuntu 20.04 and Intel integrated graphics the following steps were needed to make OpenGL work:
@@ -105,8 +113,7 @@ Revise is watching the file KiteViewer.jl, and each time a changed version is sa
 ## Reducing the startup time
 On Linux it can help to activate the "performance" governor. This can be done with the command: ``` sudo ./performance.sh```
 
-Using a Julia system image that contains a precompiled version of the GUI library GLMakie.jl can drastically reduce the startup time. To create a system image just run the script: ```./create_sys_image.sh``` This needs to be done at least once, but also after important
-package updates because it freezes the package versions.
+Using a Julia system image that contains a precompiled version of the GUI library GLMakie.jl can drastically reduce the startup time. To create a system image just run the script: ```./create_sys_image.sh``` This needs to be done at least once, but also after important package updates because it freezes the package versions.
 
 If you now use the script ./runjulia.sh the new system image with the precompiled packages will be used.
 If you do not want to make changes to the code you can also run the app by typing ```./kiteviewer.sh```.
