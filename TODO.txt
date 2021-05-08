@@ -2,6 +2,12 @@ TODO
 1. add importer for the TU Delft kite power flight data set
 2. add simulator from FreeKiteSim
 
+DONE (Version 0.4)
+1. Implemented single window mode, one 3D and two 2D plots
+   in one window
+2. improved the script create_sys_image.sh
+3. improved documentation
+
 DONE (Version 0.3)
 1. reduced memory requirement to 2 GB, much lower CPU load
 2. increased default update rate to 40 Hz
