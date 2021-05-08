@@ -113,7 +113,12 @@ function init_system(scene)
     meshscatter!(scene, positions, marker=cyl, rotations=rotations, markersize=markersizes, color=:yellow)
     meshscatter!(scene, kite_pos, marker=KITE, markersize = 0.25, rotations=quat, color=:blue)
     if Sys.islinux()
-        font="/usr/share/fonts/truetype/ttf-bitstream-vera/VeraMono.ttf"
+        lin_font="/usr/share/fonts/truetype/ttf-bitstream-vera/VeraMono.ttf"
+        if isfile(lin_font)
+            font=lin_font
+        else
+            font="/usr/share/fonts/truetype/freefont/FreeMono.ttf"
+        end
     else
         font="Courier New"
     end
