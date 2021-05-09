@@ -1,6 +1,12 @@
 TODO
-1. add importer for the TU Delft kite power flight data set
-2. add simulator from FreeKiteSim
+1. add button x, y, z and energy
+2. add slider controlling the time
+3. add FPS display
+4. add importer for the TU Delft kite power flight data set
+5. add simulator from FreeKiteSim
+
+DONE (main branch)
+1. add toggle "Repeat" for endless replay
 
 DONE (Version 0.4)
 1. Implemented single window mode, one 3D and two 2D plots
