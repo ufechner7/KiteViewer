@@ -74,7 +74,7 @@ function buttons(fig, bg, se, ax1, ax2, label1, label2, reset)
     btn_v_app          = Button(fig, label = "v_app", textsize=textsize)
     btn_l_tether       = Button(fig, label = "l_tether", textsize=textsize)
     btn_power          = Button(fig, label = "power", textsize=textsize)
-    sw = Toggle(fig, vertical=true, active = false) # active means plot in the upper area
+    sw = Toggle(fig, active = false) # active means plot in the upper area
     bg[1, 1:10] = [btn_height, btn_elevation, btn_azimuth, btn_v_reelout, btn_force, btn_depower, btn_v_app, btn_l_tether, btn_power, sw]
 
     on(btn_height.clicks) do c
