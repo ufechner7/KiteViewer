@@ -225,8 +225,10 @@ function main(gl_wait=true)
     btn_LAUNCH      = Button(scene, label = "LAUNCH")
     btn_PLAY_PAUSE  = Button(scene, label = @lift($running ? "PAUSE" : " PLAY  "))
     btn_STOP        = Button(scene, label = "STOP")
+    sw = Toggle(scene, active = false)
+    label = Label(scene, "repeat")
     
-    buttongrid[1, 1:6] = [btn_PLAY_PAUSE, btn_LAUNCH, btn_ZOOM_in, btn_ZOOM_out, btn_RESET, btn_STOP]
+    buttongrid[1, 1:8] = [btn_PLAY_PAUSE, btn_LAUNCH, btn_ZOOM_in, btn_ZOOM_out, btn_RESET, btn_STOP, sw, label]
 
     gl_screen = display(scene)
     
@@ -376,11 +378,15 @@ function main(gl_wait=true)
                 end
                 sleep(delta_t / se().time_lapse)
                 if i >= steps
-                    FLYING[1] = false
-                    PLAYING[1] = false
-                    running[] = false
-                    status[] = "Stopped"
-                    reset_and_zoom(camera, scene3D, zoom[1])
+                    if ! sw.active[]
+                        FLYING[1] = false
+                        PLAYING[1] = false
+                        running[] = false
+                        status[] = "Stopped"
+                        reset_and_zoom(camera, scene3D, zoom[1])
+                    else
+                        i = 0
+                    end
                 end
             end
         end
