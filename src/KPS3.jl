@@ -3,10 +3,11 @@ using Dierckx, StaticArrays, LinearAlgebra, BenchmarkTools
 
 # settings
 const V_WIND = 8.0f0
-const AREA = 20.0f0
+const AREA   = 20.0f0
 
 # fixed values
 const MyFloat = Float32
+const Vec3    = MVector{3, MyFloat}
 
 const G_EARTH = 9.81       # gravitational acceleration
 const RHO_0 = 1.225f0      # kg / m³
@@ -38,14 +39,15 @@ function calc_wind_factor(height)
 end
 
 mutable struct State
-    v_wind::MVector{3, MyFloat}
-    v_wind_gnd::MVector{3, MyFloat}
-    v_wind_tether::MVector{3, MyFloat}
-    v_apparent::MVector{3, MyFloat}
-    v_app_norm::MyFloat
+    v_wind::Vec3
+    v_wind_gnd::Vec3
+    v_wind_tether::Vec3
+    v_apparent::Vec3
+    param_cl::MyFloat
+    param_cd::MyFloat
 end
 
-const state = State(zeros(3), zeros(3), zeros(3), zeros(3), 0.0)
+const state = State(zeros(3), zeros(3), zeros(3), zeros(3), 0.0, 0.0)
 
 function init()
     state.v_wind[1]        = V_WIND # westwind, downwind direction to the east
@@ -59,17 +61,40 @@ function calc_drag(s, v_segment, unit_vector, rho, last_tether_drag, v_app_perp,
     v_app_norm = norm(s.v_apparent)
     v_app_perp .= dot(s.v_apparent, unit_vector) .* unit_vector
     v_app_perp .= s.v_apparent - v_app_perp
-    last_tether_drag .= -0.5f0 * C_D_TETHER * rho * norm(v_app_perp) * area .* v_app_perp
+    last_tether_drag .= -0.5 * C_D_TETHER * rho * norm(v_app_perp) * area .* v_app_perp
     v_app_norm
 end 
 
+#     pos_kite:     position of the kite
+#     rho:          air density [kg/m^3]
+#     paramCD:      drag coefficient (function of power settings)
+#     paramCL:      lift coefficient (function of power settings)
+#     rel_steering: value between -1.0 and +1.0
+function calcAeroForces(s, pos_kite, v_kite, rho, rel_steering, v_apparent)
+    v_apparent .= s.v_wind - v_app_perp
+    v_app_norm = norm(s.v_apparent)
+#     normalize2(vec3[V_apparent], vec3[Drag_force])
+#     cross3(pos_kite, vec3[Drag_force], vec3[Kite_y])
+#     normalize1(vec3[Kite_y])
+#     K = 0.5 * rho * scalars[V_app_norm]**2 * AREA
+#     cross3(vec3[Drag_force], vec3[Kite_y], vec3[Temp])
+#     normalize1(vec3[Temp])
+#     mul3(K * scalars[ParamCL], vec3[Temp], vec3[Lift_force])
+#     # some additional drag is created while steering
+#     mul2( K * scalars[ParamCD] * BRIDLE_DRAG * (1.0 + 0.6 * abs(rel_steering)), vec3[Drag_force])
+#     scalars[Cor_steering] = C2_COR / scalars[V_app_norm] * math.sin(scalars[Psi]) * math.cos(scalars[Beta])
+#     mul3(- K * REL_SIDE_AREA * STEERING_COEFFICIENT * (rel_steering + scalars[Cor_steering]), vec3[Kite_y], \
+#          vec3[Steering_force])
+#     neg_sum(vec3[Lift_force], vec3[Drag_force], vec3[Steering_force], vec3[Last_force])
+end
+
 function test_calc_drag()
     init()
-    v_segment = MVector{3, MyFloat}(1.0, 2, 3)
-    unit_vector = MVector{3, MyFloat}(2.0, 3.0, 4.0)
+    v_segment = Vec3(1.0, 2, 3)
+    unit_vector = Vec3(2.0, 3.0, 4.0)
     rho = MyFloat(calc_rho(10.0))
-    last_tether_drag = MVector{3, MyFloat}(0.0, 0.0, 0.0)
-    v_app_perp = MVector{3, MyFloat}(0, -3.0, -4.0)
+    last_tether_drag = Vec3(0.0, 0.0, 0.0)
+    v_app_perp = Vec3(0, -3.0, -4.0)
     area=AREA    
     println(state.v_apparent)
     println(state.v_wind_tether)
@@ -78,4 +103,5 @@ function test_calc_drag()
     println(v_app_perp)
 end
 
-@benchmark calc_cl(calc_drag(state, v_segment, unit_vector, rho, last_tether_drag, v_app_perp, area)) setup=(init(); v_segment = MVector{3, MyFloat}(1.0, 2, 3); unit_vector = MVector{3, MyFloat}(2.0, 3.0, 4.0); rho = calc_rho(10.0f0); last_tether_drag = MVector{3, MyFloat}(0.0, 0.0, 0.0); v_app_perp =  MVector{3, MyFloat}(0, -3.0, -4.0); area=AREA)
+@benchmark calc_cl(α) setup=(α=(rand()-0.5) * 360.0)
+@benchmark calc_cl(calc_drag(state, v_segment, unit_vector, rho, last_tether_drag, v_app_perp, area)) setup=(init(); v_segment = Vec3(1.0, 2, 3); unit_vector = Vec3(2.0, 3.0, 4.0); rho = calc_rho(10.0f0); last_tether_drag = Vec3(0.0, 0.0, 0.0); v_app_perp =  Vec3(0, -3.0, -4.0); area=AREA)
