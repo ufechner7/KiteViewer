@@ -3,7 +3,8 @@ TODO
 2. add slider controlling the time
 3. add FPS display
 4. add importer for the TU Delft kite power flight data set
-5. add simulator from FreeKiteSim (work in progress in branch sim)
+5. add receiver for UDP messages to KiteViewer
+6. add simulator from FreeKiteSim (work in progress in branch sim)
 
 DONE (main branch)
 1. add toggle "Repeat" for endless replay
