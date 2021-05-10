@@ -11,9 +11,11 @@ kite:
     mass:  6.0             # [kg]
     area: 20.0             # [m^2]
     lod:   5.0             # max lift over drag
+    l_bridle: 33.4         # sum of the lengths of the bridle lines [m]
 
 tether:
-    diameter: 4 # mm
+    diameter:  4           # [mm]
+    cd_tether: 0.958       # drag coefficient of the tether
 
 environment:
     v_wind: 8.0      # wind speed at reference height      [m/s]

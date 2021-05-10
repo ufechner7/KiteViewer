@@ -10,14 +10,15 @@ end
 
 export State, Vec3, MyFloat, init, calc_cl, calc_rho, calc_wind_factor, calc_drag
 
-# fixed values
+# custom types
 const MyFloat = Float32
 const Vec3    = MVector{3, MyFloat}
 
-const G_EARTH = 9.81       # gravitational acceleration
-const C_0 = -0.0032        # steering offset
-const C_D_TETHER = 0.958f0 # tether drag coefficient
-const L_BRIDLE = 33.4      # sum of the lengths of the bridle lines [m]
+# constants
+const G_EARTH = 9.81                # gravitational acceleration
+const C0 = -0.0032                  # steering offset
+const CD_TETHER = se().cd_tether    # tether drag coefficient
+const L_BRIDLE = se().l_bridle      # sum of the lengths of the bridle lines [m]
 const ALPHA = se().alpha
 
 const K_ds = 1.5 # influence of the depower angle on the steering sensitivity
@@ -65,7 +66,7 @@ function calc_drag(s, v_segment, unit_vector, rho, last_tether_drag, v_app_perp,
     v_app_norm = norm(s.v_apparent)
     v_app_perp .= dot(s.v_apparent, unit_vector) .* unit_vector
     v_app_perp .= s.v_apparent - v_app_perp
-    last_tether_drag .= -0.5 * C_D_TETHER * rho * norm(v_app_perp) * area .* v_app_perp
+    last_tether_drag .= -0.5 * CD_TETHER * rho * norm(v_app_perp) * area .* v_app_perp
     v_app_norm
 end 
 

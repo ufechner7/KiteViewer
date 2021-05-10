@@ -48,8 +48,10 @@ mutable struct Settings
     h_ref::Float64
     rho_0::Float64
     alpha::Float64
+    cd_tether::Float64
+    l_bridle::Float64
 end
-const SETTINGS = [Settings("","",0,0,0,0,"",0,0,0,0,0)]
+const SETTINGS = [Settings("","",0,0,0,0,"",0,0,0,0,0,0,0)]
 
 # getter function for the Settings struct
 function se()
@@ -65,6 +67,9 @@ function se()
 
         SETTINGS[1].model= dict["kite"]["model"]
         SETTINGS[1].area = dict["kite"]["area"]
+        SETTINGS[1].l_bridle = dict["kite"]["l_bridle"]
+
+        SETTINGS[1].cd_tether = dict["tether"]["cd_tether"]
 
         SETTINGS[1].v_wind = dict["environment"]["v_wind"]
         SETTINGS[1].h_ref  = dict["environment"]["h_ref"]
