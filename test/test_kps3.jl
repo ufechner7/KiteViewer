@@ -11,7 +11,7 @@ if ! @isdefined Utils
 end
 
 if ! @isdefined state
-    const state = State(zeros(3), zeros(3), zeros(3), zeros(3), 0.0, 0.0, 0.0)
+    const state = State(zeros(3), zeros(3), zeros(3), zeros(3), zeros(3), 0.0, 0.0, 0.0)
 end
 
 @testset "calc_rho" begin

@@ -44,12 +44,13 @@ mutable struct State
     v_wind_gnd::Vec3    # wind vector at reference height
     v_wind_tether::Vec3
     v_apparent::Vec3
+    drag_force::Vec3
     seg_area::MyFloat   # area of one tether segment
     param_cl::MyFloat
     param_cd::MyFloat
 end
 
-const state = State(zeros(3), zeros(3), zeros(3), zeros(3), 0.0,  0.0, 0.0)
+const state = State(zeros(3), zeros(3), zeros(3), zeros(3), zeros(3), 0.0,  0.0, 0.0)
 
 function init()
     state.v_wind[1]        = se().v_wind # westwind, downwind direction to the east
@@ -74,9 +75,9 @@ end
 #     paramCL:      lift coefficient (function of power settings)
 #     rel_steering: value between -1.0 and +1.0
 function calcAeroForces(s, pos_kite, v_kite, rho, rel_steering, v_apparent)
-    v_apparent .= s.v_wind - v_app_perp
-    v_app_norm = norm(s.v_apparent)
-#     normalize2(vec3[V_apparent], vec3[Drag_force])
+    v_apparent   .= s.v_wind - v_app_perp
+    v_app_norm    = norm(s.v_apparent)
+    s.drag_force .= s.v_apparent ./ v_app_norm
 #     cross3(pos_kite, vec3[Drag_force], vec3[Kite_y])
 #     normalize1(vec3[Kite_y])
 #     K = 0.5 * rho * scalars[V_app_norm]**2 * se().area
