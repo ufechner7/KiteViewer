@@ -1,5 +1,9 @@
 # kitepower system model
-using Dierckx, StaticArrays, LinearAlgebra, BenchmarkTools
+module KPS3
+
+using Dierckx, StaticArrays, LinearAlgebra
+
+export State, Vec3, MyFloat, init, calc_cl, calc_rho, calc_drag, AREA
 
 # settings
 const V_WIND = 8.0f0
@@ -29,14 +33,10 @@ const calc_cl = Spline1D(ALPHA_CL, CL_LIST)
 const calc_cd = Spline1D(ALPHA_CD, CD_LIST)
 
 # Calculate the air densisity as function of height
-function calc_rho(height)
-    return RHO_0 * exp(-height / 8550.0)
-end
+calc_rho(height) = RHO_0 * exp(-height / 8550.0)
 
 # Calculate the wind speed at a given height and reference height.
-function calc_wind_factor(height)
-    (height / 6.0)^ALPHA
-end
+calc_wind_factor(height) = (height / 6.0)^ALPHA
 
 mutable struct State
     v_wind::Vec3
@@ -88,20 +88,8 @@ function calcAeroForces(s, pos_kite, v_kite, rho, rel_steering, v_apparent)
 #     neg_sum(vec3[Lift_force], vec3[Drag_force], vec3[Steering_force], vec3[Last_force])
 end
 
-function test_calc_drag()
-    init()
-    v_segment = Vec3(1.0, 2, 3)
-    unit_vector = Vec3(2.0, 3.0, 4.0)
-    rho = MyFloat(calc_rho(10.0))
-    last_tether_drag = Vec3(0.0, 0.0, 0.0)
-    v_app_perp = Vec3(0, -3.0, -4.0)
-    area=AREA    
-    println(state.v_apparent)
-    println(state.v_wind_tether)
-    println(calc_drag(state, v_segment, unit_vector, rho, last_tether_drag, v_app_perp, area))
-    println(last_tether_drag)
-    println(v_app_perp)
-end
 
-@benchmark calc_cl(α) setup=(α=(rand()-0.5) * 360.0)
-@benchmark calc_cl(calc_drag(state, v_segment, unit_vector, rho, last_tether_drag, v_app_perp, area)) setup=(init(); v_segment = Vec3(1.0, 2, 3); unit_vector = Vec3(2.0, 3.0, 4.0); rho = calc_rho(10.0f0); last_tether_drag = Vec3(0.0, 0.0, 0.0); v_app_perp =  Vec3(0, -3.0, -4.0); area=AREA)
+# @benchmark calc_cl(α) setup=(α=(rand()-0.5) * 360.0)
+# @benchmark calc_cl(calc_drag(state, v_segment, unit_vector, rho, last_tether_drag, v_app_perp, area)) setup=(init(); v_segment = Vec3(1.0, 2, 3); unit_vector = Vec3(2.0, 3.0, 4.0); rho = calc_rho(10.0f0); last_tether_drag = Vec3(0.0, 0.0, 0.0); v_app_perp =  Vec3(0, -3.0, -4.0); area=AREA)
+
+end
