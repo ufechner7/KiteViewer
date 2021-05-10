@@ -31,7 +31,7 @@ Scientific background: http://arxiv.org/abs/1406.6218 =#
 
 module KPS3
 
-using Dierckx, StaticArrays, LinearAlgebra# kitepower system model
+using Dierckx, StaticArrays, LinearAlgebra
 
 if ! @isdefined Utils
     include("Utils.jl")
@@ -56,7 +56,7 @@ const BRIDLE_DRAG = 1.1
 const ALPHA = se().alpha
 
 const K_ds = 1.5 # influence of the depower angle on the steering sensitivity
-const MAX_ALPHA_DEPOWER = 31.0 # was: 44
+const MAX_ALPHA_DEPOWER = 31.0
 
 const ALPHA_CL = [-180.0, -160.0, -90.0, -20.0, -10.0,  -5.0,  0.0, 20.0, 40.0, 90.0, 160.0, 180.0]
 const CL_LIST  = [   0.0,    0.5,   0.0,  0.08, 0.125,  0.15,  0.2,  1.0,  1.0,  0.0,  -0.5,   0.0]
@@ -102,7 +102,6 @@ function init()
     state.param_cd         = 1.0
     state
 end
-
 const state = init()
 
 # calculate the drag of one tether segment
@@ -121,15 +120,15 @@ end
 #     paramCL:      lift coefficient (function of power settings)
 #     rel_steering: value between -1.0 and +1.0
 function calc_aero_forces(s, pos_kite, v_kite, rho, rel_steering)
-    s.v_apparent   .= s.v_wind - v_kite
-    s.v_app_norm  = norm(s.v_apparent)
-    s.drag_force .= s.v_apparent ./ s.v_app_norm
-    s.kite_y     .= normalize(cross(pos_kite, s.drag_force))
-    K             = 0.5 * rho * s.v_app_norm^2 * se().area
-    s.lift_force .= K * s.param_cl .* normalize(cross(s.drag_force, s.kite_y))   
+    s.v_apparent    .= s.v_wind - v_kite
+    s.v_app_norm     = norm(s.v_apparent)
+    s.drag_force    .= s.v_apparent ./ s.v_app_norm
+    s.kite_y        .= normalize(cross(pos_kite, s.drag_force))
+    K                = 0.5 * rho * s.v_app_norm^2 * se().area
+    s.lift_force    .= K * s.param_cl .* normalize(cross(s.drag_force, s.kite_y))   
     # some additional drag is created while steering
-    s.drag_force .*= K * s.param_cd * BRIDLE_DRAG * (1.0 + 0.6 * abs(rel_steering)) 
-    s.cor_steering = C2_COR / s.v_app_norm * sin(s.psi) * cos(s.beta)
+    s.drag_force    .*= K * s.param_cd * BRIDLE_DRAG * (1.0 + 0.6 * abs(rel_steering)) 
+    s.cor_steering    = C2_COR / s.v_app_norm * sin(s.psi) * cos(s.beta)
     s.steering_force .= -K * REL_SIDE_AREA * STEERING_COEFFICIENT * (rel_steering + s.cor_steering) .* s.kite_y
     s.last_force     .= -(s.lift_force + s.drag_force + s.steering_force)
 end
