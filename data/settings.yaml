@@ -1,6 +1,6 @@
 system:
     log_file: "data/log_8700W_8ms" # filename without extension
-    time_lapse:   2.0              # relative replay speed
+    time_lapse:   3.0              # relative replay speed
     segments:       6              # number of tether segments
     sample_freq:   20              # sample frequency in Hz
     zoom:        0.03              # zoom factor for the system view
@@ -8,10 +8,15 @@ system:
     
 kite:
     model: "data/kite.obj" # 3D model of the kite
-    mass:  6.0             # kg
-    size: 20.0             # m^2
+    mass:  6.0             # [kg]
+    area: 20.0             # [m^2]
     lod:   5.0             # max lift over drag
 
 tether:
     diameter: 4 # mm
-    
+
+environment:
+    v_wind: 8.0      # wind speed at reference height      [m/s]
+    h_ref:  6.0      # reference height for the wind speed   [m]
+    rho_0:  1.225    # air density at the ground         [kg/m³]
+    alpha:  0.142857 # exponent of the wind profile law
