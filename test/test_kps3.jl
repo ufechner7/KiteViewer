@@ -11,7 +11,18 @@ if ! @isdefined Utils
 end
 
 if ! @isdefined state
-    const state = State(zeros(3), zeros(3), zeros(3), zeros(3), 0.0, 0.0)
+    const state = State(zeros(3), zeros(3), zeros(3), zeros(3), 0.0, 0.0, 0.0)
+end
+
+@testset "calc_rho" begin
+    @test isapprox(calc_rho(0.0), 1.225, atol=1e-5) 
+    @test isapprox(calc_rho(100.0), 1.210756, atol=1e-5) 
+end
+
+@testset "calc_wind_factor" begin
+    @test isapprox(calc_wind_factor(6.0),   1.0, atol=1e-5) 
+    @test isapprox(calc_wind_factor(10.0),  1.0757037, atol=1e-5) 
+    @test isapprox(calc_wind_factor(100.0), 1.494685, atol=1e-5)
 end
 
 @testset "calc_cl" begin
@@ -36,9 +47,13 @@ end
     @test v_app_perp ≈ [ 35.1, 52.2, 69.3]
 end
 
-println()
-display(@benchmark calc_cl(α) setup=(α=(rand()-0.5) * 360.0))
-println()
-display(@benchmark calc_cl(calc_drag(state, v_segment, unit_vector, rho, last_tether_drag, v_app_perp, area)) setup=(init(); v_segment = Vec3(1.0, 2, 3); unit_vector = Vec3(2.0, 3.0, 4.0); rho = calc_rho(10.0f0); last_tether_drag = Vec3(0.0, 0.0, 0.0); v_app_perp =  Vec3(0, -3.0, -4.0); area=se().area))
+println("\ncalc_rho:")
+show(@benchmark calc_rho(height) setup=(height=1.0 + rand() * 200.0))
+println("\ncalc_wind_factor:")
+show(@benchmark calc_wind_factor(height) setup=(height=rand() * 200.0))
+println("\ncalc_cl:")
+show(@benchmark calc_cl(α) setup=(α=(rand()-0.5) * 360.0))
+println("\ncalc_drag:")
+show(@benchmark calc_cl(calc_drag(state, v_segment, unit_vector, rho, last_tether_drag, v_app_perp, area)) setup=(init(); v_segment = Vec3(1.0, 2, 3); unit_vector = Vec3(2.0, 3.0, 4.0); rho = calc_rho(10.0f0); last_tether_drag = Vec3(0.0, 0.0, 0.0); v_app_perp =  Vec3(0, -3.0, -4.0); area=se().area))
 
 nothing

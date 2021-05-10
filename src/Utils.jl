@@ -44,22 +44,32 @@ mutable struct Settings
     zoom::Float64
     fixed_font::String
     area::Float64
+    v_wind::Float64
+    h_ref::Float64
+    rho_0::Float64
+    alpha::Float64
 end
-const SETTINGS = [Settings("","",0,0,0,0,"",0)]
+const SETTINGS = [Settings("","",0,0,0,0,"",0,0,0,0,0)]
 
 # getter function for the Settings struct
 function se()
     if SETTINGS[1].segments == 0
         # load settings from YAML
         dict = YAML.load_file(joinpath(DATA_PATH, "settings.yaml"))
-        SETTINGS[1].log_file=dict["system"]["log_file"]
-        SETTINGS[1].model=dict["kite"]["model"]
-        SETTINGS[1].area=dict["kite"]["area"]
-        SETTINGS[1].segments=dict["system"]["segments"]
-        SETTINGS[1].sample_freq=dict["system"]["sample_freq"]
-        SETTINGS[1].time_lapse=dict["system"]["time_lapse"]
-        SETTINGS[1].zoom=dict["system"]["zoom"]
-        SETTINGS[1].fixed_font=dict["system"]["fixed_font"]
+        SETTINGS[1].log_file    = dict["system"]["log_file"]
+        SETTINGS[1].segments    = dict["system"]["segments"]
+        SETTINGS[1].sample_freq = dict["system"]["sample_freq"]
+        SETTINGS[1].time_lapse  = dict["system"]["time_lapse"]
+        SETTINGS[1].zoom        = dict["system"]["zoom"]
+        SETTINGS[1].fixed_font  = dict["system"]["fixed_font"]
+
+        SETTINGS[1].model= dict["kite"]["model"]
+        SETTINGS[1].area = dict["kite"]["area"]
+
+        SETTINGS[1].v_wind = dict["environment"]["v_wind"]
+        SETTINGS[1].h_ref  = dict["environment"]["h_ref"]
+        SETTINGS[1].rho_0  = dict["environment"]["rho_0"]
+        SETTINGS[1].alpha  = dict["environment"]["alpha"]
     end
     return SETTINGS[1]
 end

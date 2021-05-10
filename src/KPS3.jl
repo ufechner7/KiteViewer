@@ -8,24 +8,20 @@ if ! @isdefined Utils
     using .Utils
 end
 
-export State, Vec3, MyFloat, init, calc_cl, calc_rho, calc_drag
-
-# settings
-const V_WIND = 8.0f0
+export State, Vec3, MyFloat, init, calc_cl, calc_rho, calc_wind_factor, calc_drag
 
 # fixed values
 const MyFloat = Float32
 const Vec3    = MVector{3, MyFloat}
 
 const G_EARTH = 9.81       # gravitational acceleration
-const RHO_0 = 1.225f0      # kg / m³
 const C_0 = -0.0032        # steering offset
 const C_D_TETHER = 0.958f0 # tether drag coefficient
 const L_BRIDLE = 33.4      # sum of the lengths of the bridle lines [m]
+const ALPHA = se().alpha
 
 const K_ds = 1.5 # influence of the depower angle on the steering sensitivity
 const MAX_ALPHA_DEPOWER = 31.0 # was: 44
-const ALPHA = 1/7
 
 const ALPHA_CL = [-180.0, -160.0, -90.0, -20.0, -10.0,  -5.0,  0.0, 20.0, 40.0, 90.0, 160.0, 180.0]
 const CL_LIST  = [   0.0,    0.5,   0.0,  0.08, 0.125,  0.15,  0.2,  1.0,  1.0,  0.0,  -0.5,   0.0]
@@ -37,29 +33,32 @@ const calc_cl = Spline1D(ALPHA_CL, CL_LIST)
 const calc_cd = Spline1D(ALPHA_CD, CD_LIST)
 
 # Calculate the air densisity as function of height
-calc_rho(height) = RHO_0 * exp(-height / 8550.0)
+calc_rho(height) = se().rho_0 * exp(-height / 8550.0)
 
 # Calculate the wind speed at a given height and reference height.
-calc_wind_factor(height) = (height / 6.0)^ALPHA
+# Fast version of: (height / se().h_ref)^ALPHA
+calc_wind_factor(height) = exp(ALPHA * log((height / se().h_ref)))
 
 mutable struct State
-    v_wind::Vec3
-    v_wind_gnd::Vec3
+    v_wind::Vec3        # wind vector at the height of the kite
+    v_wind_gnd::Vec3    # wind vector at reference height
     v_wind_tether::Vec3
     v_apparent::Vec3
+    seg_area::MyFloat   # area of one tether segment
     param_cl::MyFloat
     param_cd::MyFloat
 end
 
-const state = State(zeros(3), zeros(3), zeros(3), zeros(3), 0.0, 0.0)
+const state = State(zeros(3), zeros(3), zeros(3), zeros(3), 0.0,  0.0, 0.0)
 
 function init()
-    state.v_wind[1]        = V_WIND # westwind, downwind direction to the east
-    state.v_wind_gnd[1]    = V_WIND # westwind, downwind direction to the east
-    state.v_wind_tether[1] = V_WIND # wind at half of the height of the kite
+    state.v_wind[1]        = se().v_wind # westwind, downwind direction to the east
+    state.v_wind_gnd[1]    = se().v_wind # westwind, downwind direction to the east
+    state.v_wind_tether[1] = se().v_wind # wind at half of the height of the kite
     state.v_apparent       = zeros(3)
 end
 
+# calculate the drag of one tether segment
 function calc_drag(s, v_segment, unit_vector, rho, last_tether_drag, v_app_perp, area)
     s.v_apparent .= s.v_wind_tether - v_segment
     v_app_norm = norm(s.v_apparent)
