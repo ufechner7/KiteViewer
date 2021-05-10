@@ -123,7 +123,7 @@ function calc_aero_forces(s, pos_kite, v_kite, rho, rel_steering, v_apparent)
     s.temp       .= cross(s.drag_force, s.kite_y)
     s.temp       .= s.temp ./ norm(s.temp)
     s.lift_force .= K * s.param_cl .* s.temp
-    println(s.lift_force)
+    # println(s.lift_force)
 #     mul3(K * scalars[ParamCL], vec3[Temp], vec3[Lift_force])
 #     # some additional drag is created while steering
 #     mul2( K * scalars[ParamCD] * BRIDLE_DRAG * (1.0 + 0.6 * abs(rel_steering)), vec3[Drag_force])

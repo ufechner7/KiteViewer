@@ -53,7 +53,6 @@ end
     rho = MyFloat(calc_rho(10.0))
     rel_steering = 0.1
     KPS3.calc_aero_forces(state, pos_kite, v_kite, rho, rel_steering, state.v_apparent)
-    # println(state.v_apparent)
     @test state.v_apparent ≈ [5.0,  -5, -2]
     @test state.kite_y ≈ [ 0.64101597,  0.73258967, -0.22893427]
 end
@@ -66,5 +65,7 @@ println("\ncalc_cl:")
 show(@benchmark calc_cl(α) setup=(α=(rand()-0.5) * 360.0))
 println("\ncalc_drag:")
 show(@benchmark calc_cl(calc_drag(state, v_segment, unit_vector, rho, last_tether_drag, v_app_perp, area)) setup=(v_segment = Vec3(1.0, 2, 3); unit_vector = Vec3(2.0, 3.0, 4.0); rho = calc_rho(10.0f0); last_tether_drag = Vec3(0.0, 0.0, 0.0); v_app_perp =  Vec3(0, -3.0, -4.0); area=se().area))
+println("\ncalc_aero_forces:")
+show(@benchmark KPS3.calc_aero_forces(state, pos_kite, v_kite, rho, rel_steering, state.v_apparent) setup=(state.v_apparent .= Vec3(35.1, 52.2, 69.3); pos_kite = Vec3(30.0, 5.0, 100.0);  v_kite = Vec3(3.0, 5.0, 2.0);  rho = MyFloat(calc_rho(10.0));  rel_steering = 0.1))
 
 nothing
