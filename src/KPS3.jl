@@ -1,7 +1,37 @@
-# kitepower system model
+#= MIT License
+
+Copyright (c) 2020, 2021 Uwe Fechner
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE. =#
+
+#= Model of a kite-power system in implicit form: residual = f(y, yd)
+
+This model implements a 3D mass-spring system with reel-out. It uses five tether segments (the number can be
+configured in the file data/settings.yaml). The kite is modelled as additional mass at the end of the tether.
+The spring constant and the damping decrease with the segment length. The aerodynamic kite forces are
+calculated, depending on reel-out speed, depower and steering settings. 
+
+Scientific background: http://arxiv.org/abs/1406.6218 =#
+
 module KPS3
 
-using Dierckx, StaticArrays, LinearAlgebra
+using Dierckx, StaticArrays, LinearAlgebra# kitepower system model
 
 if ! @isdefined Utils
     include("Utils.jl")
@@ -46,13 +76,14 @@ mutable struct State
     v_wind_tether::Vec3
     v_apparent::Vec3
     drag_force::Vec3
+    kite_y::Vec3
     seg_area::MyFloat   # area of one tether segment
     param_cl::MyFloat
     param_cd::MyFloat
 end
 
 function init()
-    state = State(zeros(3), zeros(3), zeros(3), zeros(3), zeros(3), 0.0,  0.0, 0.0)
+    state = State(zeros(3), zeros(3), zeros(3), zeros(3), zeros(3), zeros(3), 0.0,  0.0, 0.0)
     state.v_wind[1]        = se().v_wind # westwind, downwind direction to the east
     state.v_wind_gnd[1]    = se().v_wind # westwind, downwind direction to the east
     state.v_wind_tether[1] = se().v_wind # wind at half of the height of the kite
@@ -72,15 +103,21 @@ function calc_drag(s, v_segment, unit_vector, rho, last_tether_drag, v_app_perp,
     v_app_norm
 end 
 
+# def cross(vec1, vec2):
+#     """ Calculate the cross product of two 3d vectors. """
+#     result = np.zeros(3)
+#     return cross_(vec1, vec2, result)
+
 #     pos_kite:     position of the kite
 #     rho:          air density [kg/m^3]
 #     paramCD:      drag coefficient (function of power settings)
 #     paramCL:      lift coefficient (function of power settings)
 #     rel_steering: value between -1.0 and +1.0
-function calcAeroForces(s, pos_kite, v_kite, rho, rel_steering, v_apparent)
-    v_apparent   .= s.v_wind - v_app_perp
+function calc_aero_forces(s, pos_kite, v_kite, rho, rel_steering, v_apparent)
+    v_apparent   .= s.v_wind - v_kite
     v_app_norm    = norm(s.v_apparent)
     s.drag_force .= s.v_apparent ./ v_app_norm
+    s.kite_y     .= cross(pos_kite, s.drag_force)
 #     cross3(pos_kite, vec3[Drag_force], vec3[Kite_y])
 #     normalize1(vec3[Kite_y])
 #     K = 0.5 * rho * scalars[V_app_norm]**2 * se().area

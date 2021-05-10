@@ -46,6 +46,17 @@ end
     @test v_app_perp ≈ [ 35.1, 52.2, 69.3]
 end
 
+@testset "test_calc_aero_forces" begin
+    v_apparent = Vec3(35.1, 52.2, 69.3)
+    pos_kite = Vec3(30.0, 5.0, 100.0)
+    v_kite = Vec3(3.0, 5.0, 2.0)
+    rho = MyFloat(calc_rho(10.0))
+    rel_steering = 0.1
+    KPS3.calc_aero_forces(state, pos_kite, v_kite, rho, rel_steering, v_apparent)
+    println(v_apparent)
+    println(state.kite_y)
+end
+
 println("\ncalc_rho:")
 show(@benchmark calc_rho(height) setup=(height=1.0 + rand() * 200.0))
 println("\ncalc_wind_factor:")
