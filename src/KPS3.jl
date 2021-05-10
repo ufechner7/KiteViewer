@@ -88,8 +88,4 @@ function calcAeroForces(s, pos_kite, v_kite, rho, rel_steering, v_apparent)
 #     neg_sum(vec3[Lift_force], vec3[Drag_force], vec3[Steering_force], vec3[Last_force])
 end
 
-
-# @benchmark calc_cl(α) setup=(α=(rand()-0.5) * 360.0)
-# @benchmark calc_cl(calc_drag(state, v_segment, unit_vector, rho, last_tether_drag, v_app_perp, area)) setup=(init(); v_segment = Vec3(1.0, 2, 3); unit_vector = Vec3(2.0, 3.0, 4.0); rho = calc_rho(10.0f0); last_tether_drag = Vec3(0.0, 0.0, 0.0); v_app_perp =  Vec3(0, -3.0, -4.0); area=AREA)
-
 end
