@@ -47,14 +47,15 @@ end
 end
 
 @testset "test_calc_aero_forces" begin
-    v_apparent = Vec3(35.1, 52.2, 69.3)
+    state.v_apparent .= Vec3(35.1, 52.2, 69.3)
     pos_kite = Vec3(30.0, 5.0, 100.0)
     v_kite = Vec3(3.0, 5.0, 2.0)
     rho = MyFloat(calc_rho(10.0))
     rel_steering = 0.1
-    KPS3.calc_aero_forces(state, pos_kite, v_kite, rho, rel_steering, v_apparent)
-    println(v_apparent)
-    println(state.kite_y)
+    KPS3.calc_aero_forces(state, pos_kite, v_kite, rho, rel_steering, state.v_apparent)
+    # println(state.v_apparent)
+    @test state.v_apparent ≈ [5.0,  -5, -2]
+    @test state.kite_y ≈ [ 0.64101597,  0.73258967, -0.22893427]
 end
 
 println("\ncalc_rho:")

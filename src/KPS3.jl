@@ -76,18 +76,23 @@ mutable struct State
     v_wind_tether::Vec3
     v_apparent::Vec3
     drag_force::Vec3
+    lift_force::Vec3
     kite_y::Vec3
+    temp::Vec3
     seg_area::MyFloat   # area of one tether segment
     param_cl::MyFloat
     param_cd::MyFloat
+    v_app_norm::MyFloat
 end
 
 function init()
-    state = State(zeros(3), zeros(3), zeros(3), zeros(3), zeros(3), zeros(3), 0.0,  0.0, 0.0)
+    state = State(zeros(3), zeros(3), zeros(3), zeros(3), zeros(3), zeros(3), zeros(3), zeros(3), 0.0,  0.0, 0.0, 0.0)
     state.v_wind[1]        = se().v_wind # westwind, downwind direction to the east
     state.v_wind_gnd[1]    = se().v_wind # westwind, downwind direction to the east
     state.v_wind_tether[1] = se().v_wind # wind at half of the height of the kite
     state.v_apparent       = zeros(3)
+    state.param_cl         = 0.2
+    state.param_cd         = 1.0
     state
 end
 
@@ -103,11 +108,6 @@ function calc_drag(s, v_segment, unit_vector, rho, last_tether_drag, v_app_perp,
     v_app_norm
 end 
 
-# def cross(vec1, vec2):
-#     """ Calculate the cross product of two 3d vectors. """
-#     result = np.zeros(3)
-#     return cross_(vec1, vec2, result)
-
 #     pos_kite:     position of the kite
 #     rho:          air density [kg/m^3]
 #     paramCD:      drag coefficient (function of power settings)
@@ -115,14 +115,15 @@ end
 #     rel_steering: value between -1.0 and +1.0
 function calc_aero_forces(s, pos_kite, v_kite, rho, rel_steering, v_apparent)
     v_apparent   .= s.v_wind - v_kite
-    v_app_norm    = norm(s.v_apparent)
-    s.drag_force .= s.v_apparent ./ v_app_norm
+    s.v_app_norm  = norm(s.v_apparent)
+    s.drag_force .= s.v_apparent ./ s.v_app_norm
     s.kite_y     .= cross(pos_kite, s.drag_force)
-#     cross3(pos_kite, vec3[Drag_force], vec3[Kite_y])
-#     normalize1(vec3[Kite_y])
-#     K = 0.5 * rho * scalars[V_app_norm]**2 * se().area
-#     cross3(vec3[Drag_force], vec3[Kite_y], vec3[Temp])
-#     normalize1(vec3[Temp])
+    s.kite_y     .= s.kite_y ./ norm(s.kite_y)
+    K             = 0.5 * rho * s.v_app_norm^2 * se().area
+    s.temp       .= cross(s.drag_force, s.kite_y)
+    s.temp       .= s.temp ./ norm(s.temp)
+    s.lift_force .= K * s.param_cl .* s.temp
+    println(s.lift_force)
 #     mul3(K * scalars[ParamCL], vec3[Temp], vec3[Lift_force])
 #     # some additional drag is created while steering
 #     mul2( K * scalars[ParamCD] * BRIDLE_DRAG * (1.0 + 0.6 * abs(rel_steering)), vec3[Drag_force])
