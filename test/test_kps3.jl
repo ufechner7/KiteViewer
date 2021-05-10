@@ -11,10 +11,10 @@ if ! @isdefined Utils
 end
 
 if ! @isdefined state
-    const state = State(zeros(3), zeros(3), zeros(3), zeros(3), zeros(3), 0.0, 0.0, 0.0)
+    const state = init()
 end
 
-@testset "calc_rho" begin
+@testset "calc_rho        " begin
     @test isapprox(calc_rho(0.0), 1.225, atol=1e-5) 
     @test isapprox(calc_rho(100.0), 1.210756, atol=1e-5) 
 end
@@ -25,15 +25,14 @@ end
     @test isapprox(calc_wind_factor(100.0), 1.494685, atol=1e-5)
 end
 
-@testset "calc_cl" begin
+@testset "calc_cl         " begin
     @test isapprox(calc_cl(-5.0), 0.150002588978, atol=1e-4) 
     @test isapprox(calc_cl( 0.0), 0.200085035326, atol=1e-4) 
     @test isapprox(calc_cl(10.0), 0.574103590856, atol=1e-4)
     @test isapprox(calc_cl(20.0), 1.0, atol=1e-4)
 end
 
-@testset "test_calc_drag" begin
-    init()
+@testset "test_calc_drag  " begin
     v_segment = Vec3(1.0, 2, 3)
     unit_vector = Vec3(2.0, 3.0, 4.0)
     rho = MyFloat(calc_rho(10.0))
@@ -54,6 +53,6 @@ show(@benchmark calc_wind_factor(height) setup=(height=rand() * 200.0))
 println("\ncalc_cl:")
 show(@benchmark calc_cl(α) setup=(α=(rand()-0.5) * 360.0))
 println("\ncalc_drag:")
-show(@benchmark calc_cl(calc_drag(state, v_segment, unit_vector, rho, last_tether_drag, v_app_perp, area)) setup=(init(); v_segment = Vec3(1.0, 2, 3); unit_vector = Vec3(2.0, 3.0, 4.0); rho = calc_rho(10.0f0); last_tether_drag = Vec3(0.0, 0.0, 0.0); v_app_perp =  Vec3(0, -3.0, -4.0); area=se().area))
+show(@benchmark calc_cl(calc_drag(state, v_segment, unit_vector, rho, last_tether_drag, v_app_perp, area)) setup=(v_segment = Vec3(1.0, 2, 3); unit_vector = Vec3(2.0, 3.0, 4.0); rho = calc_rho(10.0f0); last_tether_drag = Vec3(0.0, 0.0, 0.0); v_app_perp =  Vec3(0, -3.0, -4.0); area=se().area))
 
 nothing

@@ -51,14 +51,16 @@ mutable struct State
     param_cd::MyFloat
 end
 
-const state = State(zeros(3), zeros(3), zeros(3), zeros(3), zeros(3), 0.0,  0.0, 0.0)
-
 function init()
+    state = State(zeros(3), zeros(3), zeros(3), zeros(3), zeros(3), 0.0,  0.0, 0.0)
     state.v_wind[1]        = se().v_wind # westwind, downwind direction to the east
     state.v_wind_gnd[1]    = se().v_wind # westwind, downwind direction to the east
     state.v_wind_tether[1] = se().v_wind # wind at half of the height of the kite
     state.v_apparent       = zeros(3)
+    state
 end
+
+const state = init()
 
 # calculate the drag of one tether segment
 function calc_drag(s, v_segment, unit_vector, rho, last_tether_drag, v_app_perp, area)
