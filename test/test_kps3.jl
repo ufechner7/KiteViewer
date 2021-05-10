@@ -5,6 +5,11 @@ if ! @isdefined KPS3
     using .KPS3
 end
 
+if ! @isdefined Utils
+    include("../src/Utils.jl")
+    using .Utils
+end
+
 if ! @isdefined state
     const state = State(zeros(3), zeros(3), zeros(3), zeros(3), 0.0, 0.0)
 end
@@ -23,7 +28,7 @@ end
     rho = MyFloat(calc_rho(10.0))
     last_tether_drag = Vec3(0.0, 0.0, 0.0)
     v_app_perp = Vec3(0, -3.0, -4.0)
-    area=AREA    
+    area=se().area   
     state.v_wind_tether .= [0.1, 0.2, 0.3]
     v_app_norm = calc_drag(state, v_segment, unit_vector, rho, last_tether_drag, v_app_perp, area)
     @test v_app_norm ≈ 3.3674916481
@@ -34,6 +39,6 @@ end
 println()
 display(@benchmark calc_cl(α) setup=(α=(rand()-0.5) * 360.0))
 println()
-display(@benchmark calc_cl(calc_drag(state, v_segment, unit_vector, rho, last_tether_drag, v_app_perp, area)) setup=(init(); v_segment = Vec3(1.0, 2, 3); unit_vector = Vec3(2.0, 3.0, 4.0); rho = calc_rho(10.0f0); last_tether_drag = Vec3(0.0, 0.0, 0.0); v_app_perp =  Vec3(0, -3.0, -4.0); area=AREA))
+display(@benchmark calc_cl(calc_drag(state, v_segment, unit_vector, rho, last_tether_drag, v_app_perp, area)) setup=(init(); v_segment = Vec3(1.0, 2, 3); unit_vector = Vec3(2.0, 3.0, 4.0); rho = calc_rho(10.0f0); last_tether_drag = Vec3(0.0, 0.0, 0.0); v_app_perp =  Vec3(0, -3.0, -4.0); area=se().area))
 
 nothing

@@ -43,8 +43,9 @@ mutable struct Settings
     time_lapse::Float64
     zoom::Float64
     fixed_font::String
+    area::Float64
 end
-const SETTINGS = [Settings("","",0,0,0,0,"")]
+const SETTINGS = [Settings("","",0,0,0,0,"",0)]
 
 # getter function for the Settings struct
 function se()
@@ -53,6 +54,7 @@ function se()
         dict = YAML.load_file(joinpath(DATA_PATH, "settings.yaml"))
         SETTINGS[1].log_file=dict["system"]["log_file"]
         SETTINGS[1].model=dict["kite"]["model"]
+        SETTINGS[1].area=dict["kite"]["area"]
         SETTINGS[1].segments=dict["system"]["segments"]
         SETTINGS[1].sample_freq=dict["system"]["sample_freq"]
         SETTINGS[1].time_lapse=dict["system"]["time_lapse"]

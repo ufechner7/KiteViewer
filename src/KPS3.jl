@@ -3,11 +3,15 @@ module KPS3
 
 using Dierckx, StaticArrays, LinearAlgebra
 
-export State, Vec3, MyFloat, init, calc_cl, calc_rho, calc_drag, AREA
+if ! @isdefined Utils
+    include("Utils.jl")
+    using .Utils
+end
+
+export State, Vec3, MyFloat, init, calc_cl, calc_rho, calc_drag
 
 # settings
 const V_WIND = 8.0f0
-const AREA   = 20.0f0
 
 # fixed values
 const MyFloat = Float32
@@ -76,7 +80,7 @@ function calcAeroForces(s, pos_kite, v_kite, rho, rel_steering, v_apparent)
 #     normalize2(vec3[V_apparent], vec3[Drag_force])
 #     cross3(pos_kite, vec3[Drag_force], vec3[Kite_y])
 #     normalize1(vec3[Kite_y])
-#     K = 0.5 * rho * scalars[V_app_norm]**2 * AREA
+#     K = 0.5 * rho * scalars[V_app_norm]**2 * se().area
 #     cross3(vec3[Drag_force], vec3[Kite_y], vec3[Temp])
 #     normalize1(vec3[Temp])
 #     mul3(K * scalars[ParamCL], vec3[Temp], vec3[Lift_force])
