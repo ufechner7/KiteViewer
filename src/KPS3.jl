@@ -40,11 +40,7 @@ end
 
 export State, Vec3, MyFloat, init, calc_cl, calc_rho, calc_wind_factor, calc_drag
 
-# custom types
-const MyFloat = Float32
-const Vec3    = MVector{3, MyFloat}
-
-# constants
+# Constants
 const G_EARTH = 9.81                # gravitational acceleration
 const C0 = -0.0032                  # steering offset
 const C2_COR =  0.93
@@ -54,7 +50,7 @@ const REL_SIDE_AREA = 0.5
 const STEERING_COEFFICIENT = 0.6
 const BRIDLE_DRAG = 1.1
 const ALPHA = se().alpha
-const K_ds = 1.5 # influence of the depower angle on the steering sensitivity
+const K_ds = 1.5                    # influence of the depower angle on the steering sensitivity
 const MAX_ALPHA_DEPOWER = 31.0
 
 const ALPHA_CL = [-180.0, -160.0, -90.0, -20.0, -10.0,  -5.0,  0.0, 20.0, 40.0, 90.0, 160.0, 180.0]
@@ -64,12 +60,9 @@ const CD_LIST  = [   0.5,    0.5,    0.5,   1.0,   0.2, 0.1,  0.2,  1.0,   0.5, 
 const calc_cl = Spline1D(ALPHA_CL, CL_LIST)
 const calc_cd = Spline1D(ALPHA_CD, CD_LIST)
 
-# Calculate the air densisity as function of height
-calc_rho(height) = se().rho_0 * exp(-height / 8550.0)
-
-# Calculate the wind speed at a given height and reference height.
-# Fast version of: (height / se().h_ref)^ALPHA
-calc_wind_factor(height) = exp(ALPHA * log((height / se().h_ref)))
+# Type definitions
+const MyFloat = Float32
+const Vec3    = MVector{3, MyFloat}
 
 mutable struct State
     v_wind::Vec3        # wind vector at the height of the kite
@@ -101,6 +94,15 @@ function init()
     state
 end
 const state = init()
+
+# Functions
+
+# Calculate the air densisity as function of height
+calc_rho(height) = se().rho_0 * exp(-height / 8550.0)
+
+# Calculate the wind speed at a given height and reference height.
+# Fast version of: (height / se().h_ref)^ALPHA
+calc_wind_factor(height) = exp(ALPHA * log((height / se().h_ref)))
 
 # calculate the drag of one tether segment
 function calc_drag(s, v_segment, unit_vector, rho, last_tether_drag, v_app_perp, area)
