@@ -31,74 +31,71 @@ Scientific background: http://arxiv.org/abs/1406.6218 =#
 
 module KPS3
 
-using Dierckx, StaticArrays, LinearAlgebra
+using Dierckx, StaticArrays, LinearAlgebra, Parameters
 
 if ! @isdefined Utils
     include("Utils.jl")
     using .Utils
 end
 
-export State, Vec3, MyFloat, init, calc_cl, calc_rho, calc_wind_factor, calc_drag
+export State, Vec3, SimFloat, init, calc_cl, calc_rho, calc_wind_factor, calc_drag
 
 # Constants
-const G_EARTH = 9.81                # gravitational acceleration
-const C0 = -0.0032                  # steering offset
-const C2_COR =  0.93
-const CD_TETHER = se().cd_tether    # tether drag coefficient
-const L_BRIDLE = se().l_bridle      # sum of the lengths of the bridle lines [m]
-const REL_SIDE_AREA = 0.5
-const STEERING_COEFFICIENT = 0.6
-const BRIDLE_DRAG = 1.1
-const ALPHA = se().alpha
-const K_ds = 1.5                    # influence of the depower angle on the steering sensitivity
-const MAX_ALPHA_DEPOWER = 31.0
+@consts begin
+     G_EARTH = 9.81                # gravitational acceleration
+     C0 = -0.0032                  # steering offset
+     C2_COR =  0.93
+     CD_TETHER = se().cd_tether    # tether drag coefficient
+     D_TETHER = se().d_tether      # tether diameter in mm
+     L_BRIDLE = se().l_bridle      # sum of the lengths of the bridle lines [m]
+     REL_SIDE_AREA = 0.5
+     STEERING_COEFFICIENT = 0.6
+     BRIDLE_DRAG = 1.1
+     ALPHA = se().alpha
+     K_ds = 1.5                    # influence of the depower angle on the steering sensitivity
+     MAX_ALPHA_DEPOWER = 31.0
 
-const ALPHA_CL = [-180.0, -160.0, -90.0, -20.0, -10.0,  -5.0,  0.0, 20.0, 40.0, 90.0, 160.0, 180.0]
-const CL_LIST  = [   0.0,    0.5,   0.0,  0.08, 0.125,  0.15,  0.2,  1.0,  1.0,  0.0,  -0.5,   0.0]
-const ALPHA_CD = [-180.0, -170.0, -140.0, -90.0, -20.0, 0.0, 20.0, 90.0, 140.0, 170.0, 180.0]
-const CD_LIST  = [   0.5,    0.5,    0.5,   1.0,   0.2, 0.1,  0.2,  1.0,   0.5,   0.5,   0.5]
-const calc_cl = Spline1D(ALPHA_CL, CL_LIST)
-const calc_cd = Spline1D(ALPHA_CD, CD_LIST)
+     ALPHA_CL = [-180.0, -160.0, -90.0, -20.0, -10.0,  -5.0,  0.0, 20.0, 40.0, 90.0, 160.0, 180.0]
+     CL_LIST  = [   0.0,    0.5,   0.0,  0.08, 0.125,  0.15,  0.2,  1.0,  1.0,  0.0,  -0.5,   0.0]
+     ALPHA_CD = [-180.0, -170.0, -140.0, -90.0, -20.0, 0.0, 20.0, 90.0, 140.0, 170.0, 180.0]
+     CD_LIST  = [   0.5,    0.5,    0.5,   1.0,   0.2, 0.1,  0.2,  1.0,   0.5,   0.5,   0.5]
+     calc_cl = Spline1D(ALPHA_CL, CL_LIST)
+     calc_cd = Spline1D(ALPHA_CD, CD_LIST)
+end
 
 # Type definitions
-const MyFloat = Float32
-const Vec3    = MVector{3, MyFloat}
+const SimFloat = Float64
+const Vec3     = MVector{3, SimFloat}
 
-mutable struct State
-    v_wind::Vec3        # wind vector at the height of the kite
-    v_wind_gnd::Vec3    # wind vector at reference height
-    v_wind_tether::Vec3
-    v_apparent::Vec3
-    drag_force::Vec3
-    lift_force::Vec3
-    steering_force::Vec3
-    last_force::Vec3
-    spring_force::Vec3
-    kite_y::Vec3
-    segment::Vec3
-    seg_area::MyFloat   # area of one tether segment
-    c_spring::MyFloat
-    length::MyFloat
-    damping::MyFloat
-    param_cl::MyFloat
-    param_cd::MyFloat
-    v_app_norm::MyFloat
-    cor_steering::MyFloat
-    psi::MyFloat
-    beta::MyFloat
+@with_kw mutable struct State{S, T}
+    v_wind::T =           [se().v_wind, 0, 0]    # wind vector at the height of the kite
+    v_wind_gnd::T =       [se().v_wind, 0, 0]    # wind vector at reference height
+    v_wind_tether::T =    [se().v_wind, 0, 0]
+    v_apparent::T =       zero(T)
+    drag_force::T =       zero(T)
+    lift_force::T =       zero(T)
+    steering_force::T =   zero(T)
+    last_force::T =       zero(T)
+    spring_force::T =     zero(T)
+    total_forces::T =     zero(T)
+    kite_y::T =           zero(T)
+    segment::T =          zero(T)
+    last_tether_drag::T = zero(T)
+    seg_area::S =         zero(S)   # area of one tether segment
+    c_spring::S =         zero(S)
+    length::S =           zero(S)
+    damping::S =          zero(S)
+    area::S =             zero(S)
+    last_v_app_norm_tether::S = zero(S)
+    param_cl::S =         0.2
+    param_cd::S =         1.0
+    v_app_norm::S =       zero(S)
+    cor_steering::S =     zero(S)
+    psi::S =              zero(S)
+    beta::S =             zero(S)
 end
 
-function init()
-    state = State(zeros(3), zeros(3), zeros(3), zeros(3), zeros(3), zeros(3), zeros(3), zeros(3), zeros(3), zeros(3), zeros(3), 0.0, 0.0, 0.0, 0.0,  0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
-    state.v_wind[1]        = se().v_wind # westwind, downwind direction to the east
-    state.v_wind_gnd[1]    = se().v_wind # westwind, downwind direction to the east
-    state.v_wind_tether[1] = se().v_wind # wind at half of the height of the kite
-    state.v_apparent       = zeros(3)
-    state.param_cl         = 0.2
-    state.param_cd         = 1.0
-    state
-end
-const state = init()
+const state = State{SimFloat, Vec3}()
 
 # Functions
 
@@ -157,22 +154,17 @@ function calcRes(s, pos1, pos2, vel1, vel2, mass, veld, result, i)
     else
         s.spring_force .= k2 * (norm1 - s.length) + s.damping * spring_vel .* unit_vector
     end
-    # scalars[Area] = norm1 * scalars[D_tether]
-    # scalars[Last_v_app_norm_tether] = calcDrag(vec3, vec3[Av_vel], vec3[Unit_vector], \
-    #           rho, vec3[Last_tether_drag], vec3[V_app_perp], scalars[Area])
-    # # TODO: create a copy of the drag force !!!
+    s.area = norm1 * D_TETHER
+    s.Last_v_app_norm_tether = calc_drag(s, av_vel, unit_vector, rho, s.last_tether_drag, s.v_app_perp, s.area)
 
-    # if i == SEGMENTS:
-    #     scalars[Area] = L_BRIDLE * scalars[D_tether]
-    #     scalars[Last_v_app_norm_tether] = calcDrag(vec3, vec3[Av_vel], vec3[Unit_vector], \
-    #                      rho, vec3[Last_tether_drag], vec3[V_app_perp], scalars[Area])
-    #     mul3(0.5, vec3[Last_tether_drag], vec3[Temp])
-    #     add2(vec3[Spring_force], vec3[Temp])
-    #     add3(vec3[Temp], vec3[Last_tether_drag], vec3[Force])
-    # else:
-    #     mul3(0.5, vec3[Last_tether_drag], vec3[Temp])
-    #     add3(vec3[Temp], vec3[Spring_force], vec3[Force])
-    # add3(vec3[Force], vec3[Last_force], vec3[Total_forces])
+    if i == SEGMENTS
+        s.area = L_BRIDLE * D_TETHER
+        l.last_v_app_norm_tether = calc_drag(s, av_vel, unit_vector, rho, s.last_tether_drag, s.v_app_perp, s.area)
+        force = s.last_tether_drag + s.spring_force + 0.5 * s.last_tether_drag     
+    else
+        force = s.spring_force + 0.5 * s.last_tether_drag
+    end
+    s.total_forces .= force + s.last_force
     # mul3(0.5, vec3[Last_tether_drag], vec3[Temp])
     # sub2(vec3[Spring_force], vec3[Temp])
     # copy2(vec3[Temp], vec3[Last_force])

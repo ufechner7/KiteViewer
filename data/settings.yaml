@@ -14,7 +14,7 @@ kite:
     l_bridle: 33.4         # sum of the lengths of the bridle lines [m]
 
 tether:
-    diameter:  4           # [mm]
+    d_tether:  4           # tether diameter [mm]
     cd_tether: 0.958       # drag coefficient of the tether
 
 environment:

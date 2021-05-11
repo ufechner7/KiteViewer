@@ -1,4 +1,4 @@
-using Test, BenchmarkTools
+using Test, BenchmarkTools, StaticArrays
 
 if ! @isdefined KPS3
     include("../src/KPS3.jl")
@@ -11,7 +11,7 @@ if ! @isdefined Utils
 end
 
 if ! @isdefined state
-    const state = init()
+    const state = State{SimFloat, Vec3}()
 end
 
 @testset "calc_rho             " begin
@@ -35,7 +35,7 @@ end
 @testset "test_calc_drag       " begin
     v_segment = Vec3(1.0, 2, 3)
     unit_vector = Vec3(2.0, 3.0, 4.0)
-    rho = MyFloat(calc_rho(10.0))
+    rho = SimFloat(calc_rho(10.0))
     last_tether_drag = Vec3(0.0, 0.0, 0.0)
     v_app_perp = Vec3(0, -3.0, -4.0)
     area=se().area   
@@ -50,7 +50,7 @@ end
     state.v_apparent .= Vec3(35.1, 52.2, 69.3)
     pos_kite = Vec3(30.0, 5.0, 100.0)
     v_kite = Vec3(3.0, 5.0, 2.0)
-    rho = MyFloat(calc_rho(10.0))
+    rho = SimFloat(calc_rho(10.0))
     rel_steering = 0.1
     state.beta = 0.1
     state.psi = 0.2
@@ -71,6 +71,6 @@ show(@benchmark calc_cl(α) setup=(α=(rand()-0.5) * 360.0))
 println("\ncalc_drag:")
 show(@benchmark calc_cl(calc_drag(state, v_segment, unit_vector, rho, last_tether_drag, v_app_perp, area)) setup=(v_segment = Vec3(1.0, 2, 3); unit_vector = Vec3(2.0, 3.0, 4.0); rho = calc_rho(10.0f0); last_tether_drag = Vec3(0.0, 0.0, 0.0); v_app_perp =  Vec3(0, -3.0, -4.0); area=se().area))
 println("\ncalc_aero_forces:")
-show(@benchmark KPS3.calc_aero_forces(state, pos_kite, v_kite, rho, rel_steering) setup=(state.v_apparent .= Vec3(35.1, 52.2, 69.3); pos_kite = Vec3(30.0, 5.0, 100.0);  v_kite = Vec3(3.0, 5.0, 2.0);  rho = MyFloat(calc_rho(10.0));  rel_steering = 0.1))
+show(@benchmark KPS3.calc_aero_forces(state, pos_kite, v_kite, rho, rel_steering) setup=(state.v_apparent .= Vec3(35.1, 52.2, 69.3); pos_kite = Vec3(30.0, 5.0, 100.0);  v_kite = Vec3(3.0, 5.0, 2.0);  rho = SimFloat(calc_rho(10.0));  rel_steering = 0.1))
 
 nothing
