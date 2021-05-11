@@ -162,7 +162,7 @@ function calc_res(s, pos1, pos2, vel1, vel2, mass, veld, result, i)
 
     if i == SEGMENTS
         s.area = L_BRIDLE * D_TETHER
-        l.last_v_app_norm_tether = calc_drag(s, av_vel, unit_vector, rho, s.last_tether_drag, s.v_app_perp, s.area)
+        s.last_v_app_norm_tether = calc_drag(s, av_vel, unit_vector, rho, s.last_tether_drag, s.v_app_perp, s.area)
         force = s.last_tether_drag + s.spring_force + 0.5 * s.last_tether_drag     
     else
         force = s.spring_force + 0.5 * s.last_tether_drag
