@@ -62,6 +62,19 @@ end
     @test state.last_force ≈ [-555.24319976, 544.82004621, 80.49946362]
 end
 
+@testset "test_calc_res         " begin
+    i = 1
+    pos1 = Vec3(30.0, 5.0, 100.0)
+    pos2 = Vec3(30.0+10, 5.0+11, 100.0+20)
+    vel1 = Vec3(3.0, 5.0, 2.0)
+    vel2 = Vec3(3.0+0.1, 5.0+0.2, 2.0+0.3)
+    mass = 9.0
+    veld = Vec3(0.1, 0.3, 0.4)
+    result = Vec3(0, 0, 0)
+    calc_res(state, pos1, pos2, vel1, vel2, mass, veld, result, i)
+    println(result)
+end
+
 println("\ncalc_rho:")
 show(@benchmark calc_rho(height) setup=(height=1.0 + rand() * 200.0))
 println("\ncalc_wind_factor:")

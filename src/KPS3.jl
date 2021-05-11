@@ -38,7 +38,7 @@ if ! @isdefined Utils
     using .Utils
 end
 
-export State, Vec3, SimFloat, init, calc_cl, calc_rho, calc_wind_factor, calc_drag
+export State, Vec3, SimFloat, init, calc_cl, calc_rho, calc_wind_factor, calc_drag, calc_res
 
 # Constants
 @consts begin
@@ -46,6 +46,7 @@ export State, Vec3, SimFloat, init, calc_cl, calc_rho, calc_wind_factor, calc_dr
      C0 = -0.0032                  # steering offset
      C2_COR =  0.93
      CD_TETHER = se().cd_tether    # tether drag coefficient
+     SEGMENTS  = se().segments
      D_TETHER = se().d_tether      # tether diameter in mm
      L_BRIDLE = se().l_bridle      # sum of the lengths of the bridle lines [m]
      REL_SIDE_AREA = 0.5
@@ -72,6 +73,7 @@ const Vec3     = MVector{3, SimFloat}
     v_wind_gnd::T =       [se().v_wind, 0, 0]    # wind vector at reference height
     v_wind_tether::T =    [se().v_wind, 0, 0]
     v_apparent::T =       zero(T)
+    v_app_perp::T =       zero(T)
     drag_force::T =       zero(T)
     lift_force::T =       zero(T)
     steering_force::T =   zero(T)
@@ -81,6 +83,7 @@ const Vec3     = MVector{3, SimFloat}
     kite_y::T =           zero(T)
     segment::T =          zero(T)
     last_tether_drag::T = zero(T)
+    acc::T =              zero(T)           
     seg_area::S =         zero(S)   # area of one tether segment
     c_spring::S =         zero(S)
     length::S =           zero(S)
@@ -139,7 +142,7 @@ end
 function calc_res(s, pos1, pos2, vel1, vel2, mass, veld, result, i)
     s.segment .= pos1 - pos2
     height = (pos1[3] + pos2[3]) * 0.5
-    rho = calcRho(height)                # calculate the air density
+    rho = calc_rho(height)                # calculate the air density
     rel_vel = vel1 - vel2                # calculate the relative velocity
     av_vel = 0.5 * (vel1 + vel2)
     norm1 = norm(s.segment)
@@ -150,12 +153,12 @@ function calc_res(s, pos1, pos2, vel1, vel2, mass, veld, result, i)
 
     k2 = 0.05 * s.c_spring             # compression stiffness tether segments
     if norm1 - s.length > 0.0
-        s.spring_force .= s.c_spring * (norm1 - s.length) + s.damping * spring_vel .* unit_vector
+        s.spring_force .= s.c_spring * (norm1 - s.length) .+ (s.damping * spring_vel) .* unit_vector
     else
         s.spring_force .= k2 * (norm1 - s.length) + s.damping * spring_vel .* unit_vector
     end
     s.area = norm1 * D_TETHER
-    s.Last_v_app_norm_tether = calc_drag(s, av_vel, unit_vector, rho, s.last_tether_drag, s.v_app_perp, s.area)
+    s.last_v_app_norm_tether = calc_drag(s, av_vel, unit_vector, rho, s.last_tether_drag, s.v_app_perp, s.area)
 
     if i == SEGMENTS
         s.area = L_BRIDLE * D_TETHER
