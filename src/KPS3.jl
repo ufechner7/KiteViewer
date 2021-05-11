@@ -151,6 +151,7 @@ function calc_res(s, pos1, pos2, vel1, vel2, mass, veld, result, i)
     # # calculate the relative velocity in the direction of the spring (=segment)
     spring_vel = dot(unit_vector, rel_vel)
 
+    # tested until this point
     k2 = 0.05 * s.c_spring             # compression stiffness tether segments
     if norm1 - s.length > 0.0
         s.spring_force .= s.c_spring * (norm1 - s.length) .+ (s.damping * spring_vel) .* unit_vector

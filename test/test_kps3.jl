@@ -74,8 +74,8 @@ end
     result = Vec3(0, 0, 0)
     calc_res(state, pos1, pos2, vel1, vel2, mass, veld, result, i)
     i = SEGMENTS
-    calc_res(state, pos1, pos2, vel1, vel2, mass, veld, result, i)
-    println(result)
+    # calc_res(state, pos1, pos2, vel1, vel2, mass, veld, result, i)
+    # println(result)
 end
 
 println("\ncalc_rho:")
@@ -89,6 +89,6 @@ show(@benchmark calc_cl(calc_drag(state, v_segment, unit_vector, rho, last_tethe
 println("\ncalc_aero_forces:")
 show(@benchmark KPS3.calc_aero_forces(state, pos_kite, v_kite, rho, rel_steering) setup=(state.v_apparent .= Vec3(35.1, 52.2, 69.3); pos_kite = Vec3(30.0, 5.0, 100.0);  v_kite = Vec3(3.0, 5.0, 2.0);  rho = SimFloat(calc_rho(10.0));  rel_steering = 0.1))
 println("\ncalc_res:")
-show(@benchmark calc_res(state, pos1, pos2, vel1, vel2, mass, veld, result, i) setup=(i = 1; pos1 = Vec3(30.0, 5.0, 100.0); pos2 = Vec3(30.0+10, 5.0+11, 100.0+20); vel1 = Vec3(3.0, 5.0, 2.0); vel2 = Vec3(3.0+0.1, 5.0+0.2, 2.0+0.3); mass = 9.0; veld = Vec3(0.1, 0.3, 0.4); result = Vec3(0, 0, 0)))
+# show(@benchmark calc_res(state, pos1, pos2, vel1, vel2, mass, veld, result, i) setup=(i = 1; pos1 = Vec3(30.0, 5.0, 100.0); pos2 = Vec3(30.0+10, 5.0+11, 100.0+20); vel1 = Vec3(3.0, 5.0, 2.0); vel2 = Vec3(3.0+0.1, 5.0+0.2, 2.0+0.3); mass = 9.0; veld = Vec3(0.1, 0.3, 0.4); result = Vec3(0, 0, 0)))
 
 nothing
