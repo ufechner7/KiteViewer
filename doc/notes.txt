@@ -1,0 +1,48 @@
+# Type definitions
+const SimFloat = Float64
+
+calc_rho:
+Trial(7.396 ns)
+calc_wind_factor:
+Trial(15.860 ns)
+calc_cl:
+Trial(43.685 ns)
+calc_drag:
+Trial(50.991 ns)
+calc_aero_forces:
+Trial(46.220 ns)
+
+calc_rho:
+Trial(7.325 ns)
+calc_wind_factor:
+Trial(15.470 ns)
+calc_cl:
+Trial(43.721 ns)
+calc_drag:
+Trial(50.618 ns)
+calc_aero_forces:
+Trial(46.440 ns)
+
+# with non-mutable struct for vectors
+calc_rho:
+Trial(7.305 ns)
+calc_wind_factor:
+Trial(15.583 ns)
+calc_cl:
+Trial(45.483 ns)
+calc_drag:
+Trial(49.538 ns)
+calc_aero_forces:
+Trial(46.240 ns)
+
+calc_rho:
+Trial(7.489 ns)
+calc_wind_factor:
+Trial(16.154 ns)
+calc_cl:
+Trial(43.831 ns)
+calc_drag:
+Trial(48.701 ns)
+calc_aero_forces:
+Trial(46.645 ns)
+
