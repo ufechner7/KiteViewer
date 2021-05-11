@@ -136,7 +136,7 @@ end
 
 # Calculate the vector res1, that depends on the velocity and the acceleration.
 # The drag force of each segment is distributed equaly on both particles.
-function calcRes(s, pos1, pos2, vel1, vel2, mass, veld, result, i)
+function calc_res(s, pos1, pos2, vel1, vel2, mass, veld, result, i)
     s.segment .= pos1 - pos2
     height = (pos1[3] + pos2[3]) * 0.5
     rho = calcRho(height)                # calculate the air density
@@ -165,14 +165,9 @@ function calcRes(s, pos1, pos2, vel1, vel2, mass, veld, result, i)
         force = s.spring_force + 0.5 * s.last_tether_drag
     end
     s.total_forces .= force + s.last_force
-    # mul3(0.5, vec3[Last_tether_drag], vec3[Temp])
-    # sub2(vec3[Spring_force], vec3[Temp])
-    # copy2(vec3[Temp], vec3[Last_force])
-    # div3(vec3[Total_forces], mass, vec3[Acc])  # create the vector of the spring acceleration
-    # # the derivative of the velocity must be equal to the total acceleration
-    # copy2(vec3[Acc], vec3[Temp])
-    # vec3[Temp][2] -= G_EARTH
-    # sub3(veld, vec3[Temp], result)
+    s.last_force .= 0.5 * s.last_tether_drag - s.spring_force
+    s.acc .= s.total_forces ./ mass # create the vector of the spring acceleration
+    result .= veld - (s.acc - SVector(0, 0, G_EARTH))
 end
 
 end
