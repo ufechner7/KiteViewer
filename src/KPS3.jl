@@ -73,8 +73,13 @@ mutable struct State
     lift_force::Vec3
     steering_force::Vec3
     last_force::Vec3
+    spring_force::Vec3
     kite_y::Vec3
+    segment::Vec3
     seg_area::MyFloat   # area of one tether segment
+    c_spring::MyFloat
+    length::MyFloat
+    damping::MyFloat
     param_cl::MyFloat
     param_cd::MyFloat
     v_app_norm::MyFloat
@@ -84,7 +89,7 @@ mutable struct State
 end
 
 function init()
-    state = State(zeros(3), zeros(3), zeros(3), zeros(3), zeros(3), zeros(3), zeros(3), zeros(3), zeros(3), 0.0,  0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+    state = State(zeros(3), zeros(3), zeros(3), zeros(3), zeros(3), zeros(3), zeros(3), zeros(3), zeros(3), zeros(3), zeros(3), 0.0, 0.0, 0.0, 0.0,  0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
     state.v_wind[1]        = se().v_wind # westwind, downwind direction to the east
     state.v_wind_gnd[1]    = se().v_wind # westwind, downwind direction to the east
     state.v_wind_tether[1] = se().v_wind # wind at half of the height of the kite
@@ -108,8 +113,7 @@ calc_wind_factor(height) = exp(ALPHA * log((height / se().h_ref)))
 function calc_drag(s, v_segment, unit_vector, rho, last_tether_drag, v_app_perp, area)
     s.v_apparent .= s.v_wind_tether - v_segment
     v_app_norm = norm(s.v_apparent)
-    v_app_perp .= dot(s.v_apparent, unit_vector) .* unit_vector
-    v_app_perp .= s.v_apparent - v_app_perp
+    v_app_perp .= s.v_apparent .- dot(s.v_apparent, unit_vector) .* unit_vector
     last_tether_drag .= -0.5 * CD_TETHER * rho * norm(v_app_perp) * area .* v_app_perp
     v_app_norm
 end 
@@ -131,6 +135,52 @@ function calc_aero_forces(s, pos_kite, v_kite, rho, rel_steering)
     s.cor_steering    = C2_COR / s.v_app_norm * sin(s.psi) * cos(s.beta)
     s.steering_force .= -K * REL_SIDE_AREA * STEERING_COEFFICIENT * (rel_steering + s.cor_steering) .* s.kite_y
     s.last_force     .= -(s.lift_force + s.drag_force + s.steering_force)
+end
+
+# Calculate the vector res1, that depends on the velocity and the acceleration.
+# The drag force of each segment is distributed equaly on both particles.
+function calcRes(s, pos1, pos2, vel1, vel2, mass, veld, result, i)
+    s.segment .= pos1 - pos2
+    height = (pos1[3] + pos2[3]) * 0.5
+    rho = calcRho(height)                # calculate the air density
+    rel_vel = vel1 - vel2                # calculate the relative velocity
+    av_vel = 0.5 * (vel1 + vel2)
+    norm1 = norm(s.segment)
+    unit_vector = normalize(s.segment) # unit vector in the direction of the tether
+    # # look at: http://en.wikipedia.org/wiki/Vector_projection
+    # # calculate the relative velocity in the direction of the spring (=segment)
+    spring_vel = dot(unit_vector, rel_vel)
+
+    k2 = 0.05 * s.c_spring             # compression stiffness tether segments
+    if norm1 - s.length > 0.0
+        s.spring_force .= s.c_spring * (norm1 - s.length) + s.damping * spring_vel .* unit_vector
+    else
+        s.spring_force .= k2 * (norm1 - s.length) + s.damping * spring_vel .* unit_vector
+    end
+    # scalars[Area] = norm1 * scalars[D_tether]
+    # scalars[Last_v_app_norm_tether] = calcDrag(vec3, vec3[Av_vel], vec3[Unit_vector], \
+    #           rho, vec3[Last_tether_drag], vec3[V_app_perp], scalars[Area])
+    # # TODO: create a copy of the drag force !!!
+
+    # if i == SEGMENTS:
+    #     scalars[Area] = L_BRIDLE * scalars[D_tether]
+    #     scalars[Last_v_app_norm_tether] = calcDrag(vec3, vec3[Av_vel], vec3[Unit_vector], \
+    #                      rho, vec3[Last_tether_drag], vec3[V_app_perp], scalars[Area])
+    #     mul3(0.5, vec3[Last_tether_drag], vec3[Temp])
+    #     add2(vec3[Spring_force], vec3[Temp])
+    #     add3(vec3[Temp], vec3[Last_tether_drag], vec3[Force])
+    # else:
+    #     mul3(0.5, vec3[Last_tether_drag], vec3[Temp])
+    #     add3(vec3[Temp], vec3[Spring_force], vec3[Force])
+    # add3(vec3[Force], vec3[Last_force], vec3[Total_forces])
+    # mul3(0.5, vec3[Last_tether_drag], vec3[Temp])
+    # sub2(vec3[Spring_force], vec3[Temp])
+    # copy2(vec3[Temp], vec3[Last_force])
+    # div3(vec3[Total_forces], mass, vec3[Acc])  # create the vector of the spring acceleration
+    # # the derivative of the velocity must be equal to the total acceleration
+    # copy2(vec3[Acc], vec3[Temp])
+    # vec3[Temp][2] -= G_EARTH
+    # sub3(veld, vec3[Temp], result)
 end
 
 end
