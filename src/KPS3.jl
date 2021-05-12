@@ -92,7 +92,8 @@ const Vec3     = MVector{3, SimFloat}
     kite_y::T =           zeros(3)
     segment::T =          zeros(3)
     last_tether_drag::T = zeros(3)
-    acc::T =              zeros(3)           
+    acc::T =              zeros(3)     
+    vec_z::T =            zeros(3)      
     seg_area::S =         zero(S)   # area of one tether segment
     c_spring::S =         zero(S)
     length::S =           L_TOT_0
@@ -105,7 +106,8 @@ const Vec3     = MVector{3, SimFloat}
     cor_steering::S =     zero(S)
     psi::S =              zero(S)
     beta::S =             1.22      # elevation angle in radian; initial value about 70 degrees
-    last_alpha =          0.1
+    last_alpha::S =        0.1
+    alpha_depower::S =     0.0
     initial_masses::MVector{SEGMENTS+1, SimFloat} = ones(SEGMENTS+1) * MASS
     masses::MVector{SEGMENTS+1, SimFloat}         = ones(SEGMENTS+1)
 end
@@ -217,6 +219,22 @@ function set_cl_cd(s, alpha)
     end
     s.param_cl = calc_cl(angle)
     s.param_cd = calc_cd(angle)
+    nothing
+end
+
+# Calculate the angle of attack alpha from the apparend wind velocity vector
+# v_app and the z unit vector of the kite reference frame.
+function calc_alpha(v_app, vec_z)
+    π/2.0 - acos(-dot(v_app, vec_z) / norm(v_app))
+end
+
+# Calculate the lift over drag ratio as a function of the direction vector of the last tether
+# segment, the current depower setting and the apparent wind speed.
+# Set the calculated CL and CD values. 
+function set_lod(s, vec_c, v_app)
+    s.vec_z .= normalize(vec_c)
+    alpha = calc_alpha(v_app, s.vec_z) - s.alpha_depower
+    set_cl_cd(s, alpha)
 end
 
 end

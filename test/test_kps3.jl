@@ -1,4 +1,4 @@
-using Test, BenchmarkTools, StaticArrays, Revise
+using Test, BenchmarkTools, StaticArrays, Revise, LinearAlgebra
 
 if ! @isdefined KPS3
     includet("../src/KPS3.jl")
@@ -55,6 +55,8 @@ end
     rel_steering = 0.1
     state.beta = 0.1
     state.psi = 0.2
+    state.param_cl = 0.2
+    state.param_cd = 1.0
     KPS3.calc_aero_forces(state, pos_kite, v_kite, rho, rel_steering)
     @test state.v_apparent ≈ [5.0,  -5, -2]
     @test state.kite_y ≈ [ 0.64101597,  0.73258967, -0.22893427]
@@ -80,10 +82,10 @@ end
     state.v_wind_tether .= [0.1, 0.2, 0.3]
     # TODO make it work for length > zero
     state.length = 0.0
-    calc_res(state, pos1, pos2, vel1, vel2, mass, veld, result, i)
+    KPS3.calc_res(state, pos1, pos2, vel1, vel2, mass, veld, result, i)
     @test result ≈ [0.2118964, 0.50409798, 10.59137013]
     i = SEGMENTS
-    calc_res(state, pos1, pos2, vel1, vel2, mass, veld, result, i)
+    KPS3.calc_res(state, pos1, pos2, vel1, vel2, mass, veld, result, i)
     @test result ≈ [0.04174994,  0.14058806, 10.32680159]
 end
 
@@ -105,6 +107,24 @@ end
     KPS3.loop(state, pos, vel, posd, veld, res1, res2)
 end
 
+@testset "test_calc_alpha      " begin
+    v_app = Vec3(10,2,3)
+    vec_z = normalize(Vec3(3,2,0))
+    alpha = KPS3.calc_alpha(v_app, vec_z)
+    @test alpha ≈ -1.091003745821884
+end
+
+@testset "test_set_cl_cd       " begin
+    alpha = 10.0
+    KPS3.set_cl_cd(state, alpha)
+end
+
+@testset "test_set_lod         " begin
+    v_app = Vec3(10,2,3)
+    vec_c = Vec3(3,2,0)
+    KPS3.set_lod(state, vec_c, v_app)
+end
+
 println("\ncalc_rho:")
 show(@benchmark calc_rho(height) setup=(height=1.0 + rand() * 200.0))
 println("\ncalc_wind_factor:")
@@ -123,7 +143,7 @@ show(@benchmark KPS3.calc_aero_forces(state, pos_kite, v_kite, rho, rel_steering
                                       v_kite = Vec3(3.0, 5.0, 2.0);  
                                       rho = SimFloat(calc_rho(10.0));  rel_steering = 0.1))
 println("\ncalc_res:")
-show(@benchmark calc_res(state, pos1, pos2, vel1, vel2, mass, veld, result, i) setup=(i = 1; 
+show(@benchmark KPS3.calc_res(state, pos1, pos2, vel1, vel2, mass, veld, result, i) setup=(i = 1; 
                          pos1 = Vec3(30.0, 5.0, 100.0); pos2 = Vec3(30.0+10, 5.0+11, 100.0+20); 
                          vel1 = Vec3(3.0, 5.0, 2.0); vel2 = Vec3(3.0+0.1, 5.0+0.2, 2.0+0.3); 
                          mass = 9.0; veld = Vec3(0.1, 0.3, 0.4); result = Vec3(0, 0, 0)))
@@ -132,4 +152,10 @@ show(@benchmark KPS3.loop(state, pos, vel, posd, veld, res1, res2) setup=(pos = 
                           vel  = zeros(SVector{SEGMENTS+1, Vec3}); posd  = zeros(SVector{SEGMENTS+1, Vec3}); 
                           veld  = zeros(SVector{SEGMENTS+1, Vec3}); res1  = zeros(SVector{SEGMENTS+1, Vec3}); 
                           res2  = zeros(SVector{SEGMENTS+1, Vec3}) ))
+println("\nset_cl_cd")
+show(@benchmark set_cl_cd(state, alpha) setup= (alpha = 10.0))
+println("\ncalc_alpha")
+show(@benchmark KPS3.calc_alpha(v_app, vec_z) setup=(v_app = Vec3(10,2,3); vec_z = normalize(Vec3(3,2,0))))
+println("\nset_lod")
+show(@benchmark KPS3.set_lod(state, vec_c, v_app) setup=(v_app = Vec3(10,2,3); vec_c = Vec3(3,2,0)))
 nothing
