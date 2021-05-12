@@ -192,14 +192,14 @@ end
 # that iterates over all tether segments. 
 function loop(s, pos, vel, posd, veld, res0, res1)
     s.masses               .= s.length ./ L_0 .* s.initial_masses
-    s.masses[SEGMENTS+1]  .+= (KITE_MASS + KCU_MASS)
+    s.masses[SEGMENTS+1]   += (KITE_MASS + KCU_MASS)
     res0[1] .= pos[1]
     res1[1] .= vel[1]
     for i in 2:SEGMENTS+1
         res0[i] .= vel[i] - posd[i]
     end
     for i in SEGMENTS:-1:2
-        calc_res(state, pos[i], pos[i-1], vel[i], vel[i-1], masses[i], veld[i],  res1[i], i)
+        calc_res(state, pos[i], pos[i-1], vel[i], vel[i-1], s.masses[i], veld[i],  res1[i], i)
     end
 end
 

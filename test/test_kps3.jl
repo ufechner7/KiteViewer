@@ -100,9 +100,10 @@ end
     vel  = zeros(SVector{SEGMENTS+1, Vec3})
     posd = zeros(SVector{SEGMENTS+1, Vec3})
     veld = zeros(SVector{SEGMENTS+1, Vec3})
+    res1 = zeros(SVector{SEGMENTS+1, Vec3})
+    res2 = zeros(SVector{SEGMENTS+1, Vec3})
     println(pos)
-    # TODO initialize pos, vel, posd, veld, res0 and res1
-    # loop(state, pos, vel, posd, veld, res0, res1)
+    KPS3.loop(state, pos, vel, posd, veld, res1, res2)
 end
 
 println("\ncalc_rho:")
