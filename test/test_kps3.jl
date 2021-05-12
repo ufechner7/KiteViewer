@@ -102,7 +102,6 @@ end
     veld = zeros(SVector{SEGMENTS+1, Vec3})
     res1 = zeros(SVector{SEGMENTS+1, Vec3})
     res2 = zeros(SVector{SEGMENTS+1, Vec3})
-    println(pos)
     KPS3.loop(state, pos, vel, posd, veld, res1, res2)
 end
 
