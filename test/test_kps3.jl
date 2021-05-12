@@ -1,7 +1,7 @@
-using Test, BenchmarkTools, StaticArrays
+using Test, BenchmarkTools, StaticArrays, Revise
 
 if ! @isdefined KPS3
-    include("../src/KPS3.jl")
+    includet("../src/KPS3.jl")
     using .KPS3
 end
 
@@ -72,10 +72,17 @@ end
     mass = 9.0
     veld = Vec3(0.1, 0.3, 0.4)
     result = Vec3(0, 0, 0)
+    state.c_spring=0.011
+    state.damping = 0.01
+    state.last_tether_drag = Vec3(5.0,6,7)
+    state.last_force = Vec3(-1.0, -2, -3)
+    state.v_app_perp = Vec3(0.1,0.22,0.33)
+    state.v_wind_tether .= [0.1, 0.2, 0.3]
     calc_res(state, pos1, pos2, vel1, vel2, mass, veld, result, i)
+    @test result ≈ [0.2118964, 0.50409798, 10.59137013]
     i = SEGMENTS
-    # calc_res(state, pos1, pos2, vel1, vel2, mass, veld, result, i)
-    # println(result)
+    calc_res(state, pos1, pos2, vel1, vel2, mass, veld, result, i)
+    @test result ≈ [0.04174994,  0.14058806, 10.32680159]
 end
 
 println("\ncalc_rho:")
@@ -85,10 +92,10 @@ show(@benchmark calc_wind_factor(height) setup=(height=rand() * 200.0))
 println("\ncalc_cl:")
 show(@benchmark calc_cl(α) setup=(α=(rand()-0.5) * 360.0))
 println("\ncalc_drag:")
-show(@benchmark calc_cl(calc_drag(state, v_segment, unit_vector, rho, last_tether_drag, v_app_perp, area)) setup=(v_segment = Vec3(1.0, 2, 3); unit_vector = Vec3(2.0, 3.0, 4.0); rho = calc_rho(10.0f0); last_tether_drag = Vec3(0.0, 0.0, 0.0); v_app_perp =  Vec3(0, -3.0, -4.0); area=se().area))
+show(@benchmark calc_drag(state, v_segment, unit_vector, rho, last_tether_drag, v_app_perp, area) setup=(v_segment = Vec3(1.0, 2, 3); unit_vector = Vec3(2.0, 3.0, 4.0); rho = calc_rho(10.0f0); last_tether_drag = Vec3(0.0, 0.0, 0.0); v_app_perp =  Vec3(0, -3.0, -4.0); area=se().area))
 println("\ncalc_aero_forces:")
 show(@benchmark KPS3.calc_aero_forces(state, pos_kite, v_kite, rho, rel_steering) setup=(state.v_apparent .= Vec3(35.1, 52.2, 69.3); pos_kite = Vec3(30.0, 5.0, 100.0);  v_kite = Vec3(3.0, 5.0, 2.0);  rho = SimFloat(calc_rho(10.0));  rel_steering = 0.1))
 println("\ncalc_res:")
-# show(@benchmark calc_res(state, pos1, pos2, vel1, vel2, mass, veld, result, i) setup=(i = 1; pos1 = Vec3(30.0, 5.0, 100.0); pos2 = Vec3(30.0+10, 5.0+11, 100.0+20); vel1 = Vec3(3.0, 5.0, 2.0); vel2 = Vec3(3.0+0.1, 5.0+0.2, 2.0+0.3); mass = 9.0; veld = Vec3(0.1, 0.3, 0.4); result = Vec3(0, 0, 0)))
+show(@benchmark calc_res(state, pos1, pos2, vel1, vel2, mass, veld, result, i) setup=(i = 1; pos1 = Vec3(30.0, 5.0, 100.0); pos2 = Vec3(30.0+10, 5.0+11, 100.0+20); vel1 = Vec3(3.0, 5.0, 2.0); vel2 = Vec3(3.0+0.1, 5.0+0.2, 2.0+0.3); mass = 9.0; veld = Vec3(0.1, 0.3, 0.4); result = Vec3(0, 0, 0)))
 
 nothing

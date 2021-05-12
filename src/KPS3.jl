@@ -43,11 +43,12 @@ export State, Vec3, SimFloat, init, calc_cl, calc_rho, calc_wind_factor, calc_dr
 # Constants
 @consts begin
      G_EARTH = 9.81                # gravitational acceleration
+     G_EARTH_VEC = SVector(0, 0, G_EARTH)
      C0 = -0.0032                  # steering offset
      C2_COR =  0.93
      CD_TETHER = se().cd_tether    # tether drag coefficient
      SEGMENTS  = se().segments
-     D_TETHER = se().d_tether      # tether diameter in mm
+     D_TETHER = se().d_tether/1000 # tether diameter [m]
      L_BRIDLE = se().l_bridle      # sum of the lengths of the bridle lines [m]
      REL_SIDE_AREA = 0.5
      STEERING_COEFFICIENT = 0.6
@@ -80,6 +81,9 @@ const Vec3     = MVector{3, SimFloat}
     last_force::T =       zero(T)
     spring_force::T =     zero(T)
     total_forces::T =     zero(T)
+    force::T =            zero(T)
+    unit_vector::T =      zero(T)
+    av_vel::T =           zero(T)
     kite_y::T =           zero(T)
     segment::T =          zero(T)
     last_tether_drag::T = zero(T)
@@ -144,34 +148,37 @@ function calc_res(s, pos1, pos2, vel1, vel2, mass, veld, result, i)
     height = (pos1[3] + pos2[3]) * 0.5
     rho = calc_rho(height)                # calculate the air density
     rel_vel = vel1 - vel2                # calculate the relative velocity
-    av_vel = 0.5 * (vel1 + vel2)
+    s.av_vel .= 0.5 * (vel1 + vel2)
     norm1 = norm(s.segment)
-    unit_vector = normalize(s.segment) # unit vector in the direction of the tether
+    s.unit_vector .= normalize(s.segment) # unit vector in the direction of the tether
     # # look at: http://en.wikipedia.org/wiki/Vector_projection
     # # calculate the relative velocity in the direction of the spring (=segment)
-    spring_vel = dot(unit_vector, rel_vel)
+    spring_vel = dot(s.unit_vector, rel_vel)
 
-    # tested until this point
     k2 = 0.05 * s.c_spring             # compression stiffness tether segments
     if norm1 - s.length > 0.0
-        s.spring_force .= s.c_spring * (norm1 - s.length) .+ (s.damping * spring_vel) .* unit_vector
+        s.spring_force .= (s.c_spring * (norm1 - s.length) + s.damping * spring_vel) .* s.unit_vector
     else
-        s.spring_force .= k2 * (norm1 - s.length) + s.damping * spring_vel .* unit_vector
+        s.spring_force .= k2 * ((norm1 - s.length) + (s.damping * spring_vel)) .* s.unit_vector
     end
+
     s.area = norm1 * D_TETHER
-    s.last_v_app_norm_tether = calc_drag(s, av_vel, unit_vector, rho, s.last_tether_drag, s.v_app_perp, s.area)
+    s.last_v_app_norm_tether = calc_drag(s, s.av_vel, s.unit_vector, rho, s.last_tether_drag, s.v_app_perp, s.area)
 
     if i == SEGMENTS
         s.area = L_BRIDLE * D_TETHER
-        s.last_v_app_norm_tether = calc_drag(s, av_vel, unit_vector, rho, s.last_tether_drag, s.v_app_perp, s.area)
-        force = s.last_tether_drag + s.spring_force + 0.5 * s.last_tether_drag     
+        s.last_v_app_norm_tether = calc_drag(s, s.av_vel, s.unit_vector, rho, s.last_tether_drag, s.v_app_perp, s.area)
+        s.force .= s.last_tether_drag + s.spring_force + 0.5 * s.last_tether_drag     
     else
-        force = s.spring_force + 0.5 * s.last_tether_drag
+        s.force .= s.spring_force + 0.5 * s.last_tether_drag
     end
-    s.total_forces .= force + s.last_force
+
+    # tested until this point
+    s.total_forces .= s.force + s.last_force
     s.last_force .= 0.5 * s.last_tether_drag - s.spring_force
     s.acc .= s.total_forces ./ mass # create the vector of the spring acceleration
-    result .= veld - (s.acc - SVector(0, 0, G_EARTH))
+    result .= veld - (s.acc - G_EARTH_VEC)
+    nothing
 end
 
 end
