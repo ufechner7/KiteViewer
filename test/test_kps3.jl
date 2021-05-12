@@ -78,6 +78,8 @@ end
     state.last_force = Vec3(-1.0, -2, -3)
     state.v_app_perp = Vec3(0.1,0.22,0.33)
     state.v_wind_tether .= [0.1, 0.2, 0.3]
+    # TODO make it work for length > zero
+    state.length = 0.0
     calc_res(state, pos1, pos2, vel1, vel2, mass, veld, result, i)
     @test result ≈ [0.2118964, 0.50409798, 10.59137013]
     i = SEGMENTS

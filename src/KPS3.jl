@@ -49,6 +49,9 @@ export State, Vec3, SimFloat, init, calc_cl, calc_rho, calc_wind_factor, calc_dr
      SEGMENTS  = se().segments
      D_TETHER = se().d_tether/1000 # tether diameter [m]
      L_BRIDLE = se().l_bridle      # sum of the lengths of the bridle lines [m]
+     L_TOT_0  = 150.0              # initial tether length [m]
+     L_0      = L_TOT_0 / SEGMENTS # initial segment length [m]
+     MASS = 0.011 * L_0            # initial mass per particle: 1.1 kg per 100m = 0.011 kg/m for 4mm Dyneema
      REL_SIDE_AREA = 0.5
      STEERING_COEFFICIENT = 0.6
      BRIDLE_DRAG = 1.1
@@ -89,7 +92,7 @@ const Vec3     = MVector{3, SimFloat}
     acc::T =              zero(T)           
     seg_area::S =         zero(S)   # area of one tether segment
     c_spring::S =         zero(S)
-    length::S =           zero(S)
+    length::S =           L_TOT_0
     damping::S =          zero(S)
     area::S =             zero(S)
     last_v_app_norm_tether::S = zero(S)
@@ -98,7 +101,10 @@ const Vec3     = MVector{3, SimFloat}
     v_app_norm::S =       zero(S)
     cor_steering::S =     zero(S)
     psi::S =              zero(S)
-    beta::S =             zero(S)
+    beta::S =             1.22      # elevation angle in radian; initial value about 70 degrees
+    last_alpha =          0.1
+    initial_masses::MVector{SEGMENTS+1, SimFloat} = ones(SEGMENTS+1) * MASS
+    masses::MVector{SEGMENTS+1, SimFloat} = ones(SEGMENTS+1)
 end
 
 const state = State{SimFloat, Vec3}()
@@ -183,6 +189,7 @@ end
 # Calculate the vector res0 using a vector expression, and calculate res1 using a loop
 # that iterates over all tether segments. 
 function loop(s, initial_masses, masses, pos, vel, posd, veld, res0, res1)
+    s.masses .= s.length ./ L_0 .* initial_masses
     # mul3(scalars[Length] / L_0, initial_masses, masses)
     # masses[SEGMENTS] += (KITE_MASS + KCU_MASS)
     # copy2(pos[0], res0[0]) # res0[0] = pos[0]
