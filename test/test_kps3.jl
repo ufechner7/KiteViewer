@@ -63,7 +63,7 @@ end
     @test state.last_force ≈ [-555.24319976, 544.82004621, 80.49946362]
 end
 
-@testset "test_calc_res         " begin
+@testset "test_calc_res        " begin
     i = 1
     pos1 = Vec3(30.0, 5.0, 100.0)
     pos2 = Vec3(30.0+10, 5.0+11, 100.0+20)
@@ -87,7 +87,7 @@ end
     @test result ≈ [0.04174994,  0.14058806, 10.32680159]
 end
 
-@testset "test_calc_loop         " begin
+@testset "test_calc_loop       " begin
     state.c_spring=0.011
     state.damping = 0.01
     state.last_tether_drag = Vec3(5.0,6,7)
@@ -128,7 +128,7 @@ show(@benchmark calc_res(state, pos1, pos2, vel1, vel2, mass, veld, result, i) s
                          vel1 = Vec3(3.0, 5.0, 2.0); vel2 = Vec3(3.0+0.1, 5.0+0.2, 2.0+0.3); 
                          mass = 9.0; veld = Vec3(0.1, 0.3, 0.4); result = Vec3(0, 0, 0)))
 println("\ncalc_loop")
-display(@benchmark KPS3.loop(state, pos, vel, posd, veld, res1, res2) setup=(pos = zeros(SVector{SEGMENTS+1, Vec3}); 
+show(@benchmark KPS3.loop(state, pos, vel, posd, veld, res1, res2) setup=(pos = zeros(SVector{SEGMENTS+1, Vec3}); 
                           vel  = zeros(SVector{SEGMENTS+1, Vec3}); posd  = zeros(SVector{SEGMENTS+1, Vec3}); 
                           veld  = zeros(SVector{SEGMENTS+1, Vec3}); res1  = zeros(SVector{SEGMENTS+1, Vec3}); 
                           res2  = zeros(SVector{SEGMENTS+1, Vec3}) ))
