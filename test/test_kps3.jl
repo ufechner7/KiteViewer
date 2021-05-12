@@ -87,6 +87,24 @@ end
     @test result ≈ [0.04174994,  0.14058806, 10.32680159]
 end
 
+@testset "test_calc_loop         " begin
+    state.c_spring=0.011
+    state.damping = 0.01
+    state.last_tether_drag = Vec3(5.0,6,7)
+    state.last_force = Vec3(-1.0, -2, -3)
+    state.v_app_perp = Vec3(0.1,0.22,0.33)
+    state.v_wind_tether .= [0.1, 0.2, 0.3]
+    # TODO make it work for length > zero
+    state.length = 0.0
+    pos  = zeros(SVector{SEGMENTS+1, Vec3})
+    vel  = zeros(SVector{SEGMENTS+1, Vec3})
+    posd = zeros(SVector{SEGMENTS+1, Vec3})
+    veld = zeros(SVector{SEGMENTS+1, Vec3})
+    println(pos)
+    # TODO initialize pos, vel, posd, veld, res0 and res1
+    # loop(state, pos, vel, posd, veld, res0, res1)
+end
+
 println("\ncalc_rho:")
 show(@benchmark calc_rho(height) setup=(height=1.0 + rand() * 200.0))
 println("\ncalc_wind_factor:")

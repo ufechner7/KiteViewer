@@ -190,15 +190,17 @@ end
 
 # Calculate the vector res0 using a vector expression, and calculate res1 using a loop
 # that iterates over all tether segments. 
-function loop(s, initial_masses, masses, pos, vel, posd, veld, res0, res1)
-    s.masses               .= s.length ./ L_0 .* initial_masses
+function loop(s, pos, vel, posd, veld, res0, res1)
+    s.masses               .= s.length ./ L_0 .* s.initial_masses
     s.masses[SEGMENTS+1]  .+= (KITE_MASS + KCU_MASS)
     res0[1] .= pos[1]
     res1[1] .= vel[1]
-    # for i in xrange(1, SEGMENTS+1):
-    #     sub3(vel[i], posd[i], res0[i])
-    # for i in xrange(SEGMENTS, 0, -1):    # count down from particle = SEGMENTS to 1
-    #     calcRes(scalars, vec3, pos[i], pos[i-1], vel[i], vel[i-1], masses[i], veld[i],  res1[i], i)
+    for i in 2:SEGMENTS+1
+        res0[i] .= vel[i] - posd[i]
+    end
+    for i in SEGMENTS:-1:2
+        calc_res(state, pos[i], pos[i-1], vel[i], vel[i-1], masses[i], veld[i],  res1[i], i)
+    end
 end
 
 end
