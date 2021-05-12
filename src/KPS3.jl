@@ -43,7 +43,6 @@ export State, Vec3, SimFloat, init, calc_cl, calc_rho, calc_wind_factor, calc_dr
 # Constants
 @consts begin
      G_EARTH = 9.81                # gravitational acceleration
-     G_EARTH_VEC = SVector(0, 0, G_EARTH)
      C0 = -0.0032                  # steering offset
      C2_COR =  0.93
      CD_TETHER = se().cd_tether    # tether drag coefficient
@@ -164,20 +163,20 @@ function calc_res(s, pos1, pos2, vel1, vel2, mass, veld, result, i)
 
     s.area = norm1 * D_TETHER
     s.last_v_app_norm_tether = calc_drag(s, s.av_vel, s.unit_vector, rho, s.last_tether_drag, s.v_app_perp, s.area)
-
+    
     if i == SEGMENTS
         s.area = L_BRIDLE * D_TETHER
         s.last_v_app_norm_tether = calc_drag(s, s.av_vel, s.unit_vector, rho, s.last_tether_drag, s.v_app_perp, s.area)
+        # TODO Check this equation
         s.force .= s.last_tether_drag + s.spring_force + 0.5 * s.last_tether_drag     
     else
         s.force .= s.spring_force + 0.5 * s.last_tether_drag
     end
 
-    # tested until this point
     s.total_forces .= s.force + s.last_force
     s.last_force .= 0.5 * s.last_tether_drag - s.spring_force
     s.acc .= s.total_forces ./ mass # create the vector of the spring acceleration
-    result .= veld - (s.acc - G_EARTH_VEC)
+    result .= veld - (s.acc - SVector(0, 0, G_EARTH))
     nothing
 end
 
