@@ -38,7 +38,7 @@ if ! @isdefined Utils
     using .Utils
 end
 
-export State, Vec3, SimFloat, init, calc_cl, calc_rho, calc_wind_factor, calc_drag, calc_res
+export State, Vec3, SimFloat, init, calc_cl, calc_rho, calc_wind_factor, calc_drag, set_cl_cd
 
 # Constants
 @consts begin
@@ -52,12 +52,13 @@ export State, Vec3, SimFloat, init, calc_cl, calc_rho, calc_wind_factor, calc_dr
      L_TOT_0  = 150.0              # initial tether length [m]
      L_0      = L_TOT_0 / SEGMENTS # initial segment length [m]
      MASS = 0.011 * L_0            # initial mass per particle: 1.1 kg per 100m = 0.011 kg/m for 4mm Dyneema
-     KITE_MASS = 11.4     # kite including sensor unit
+     KITE_MASS = 11.4              # kite including sensor unit
      KCU_MASS  =  8.4
      REL_SIDE_AREA = 0.5
      STEERING_COEFFICIENT = 0.6
      BRIDLE_DRAG = 1.1
      ALPHA = se().alpha
+     ALPHA_ZERO = 0.0
      K_ds = 1.5                    # influence of the depower angle on the steering sensitivity
      MAX_ALPHA_DEPOWER = 31.0
 
@@ -146,6 +147,7 @@ function calc_aero_forces(s, pos_kite, v_kite, rho, rel_steering)
     s.cor_steering    = C2_COR / s.v_app_norm * sin(s.psi) * cos(s.beta)
     s.steering_force .= -K * REL_SIDE_AREA * STEERING_COEFFICIENT * (rel_steering + s.cor_steering) .* s.kite_y
     s.last_force     .= -(s.lift_force + s.drag_force + s.steering_force)
+    nothing
 end
 
 # Calculate the vector res1, that depends on the velocity and the acceleration.
@@ -201,6 +203,20 @@ function loop(s, pos, vel, posd, veld, res0, res1)
     for i in SEGMENTS:-1:2
         calc_res(state, pos[i], pos[i-1], vel[i], vel[i-1], s.masses[i], veld[i],  res1[i], i)
     end
+    nothing
+end
+
+# Calculate the lift and drag coefficient as a function of the relative depower setting.
+function set_cl_cd(s, alpha)   
+    angle =  alpha * 180.0 / π + ALPHA_ZERO
+    if angle > 180.0
+        angle -= 360.0
+    end
+    if angle < -180.0
+        angle += 360.0
+    end
+    s.param_cl = calc_cl(angle)
+    s.param_cd = calc_cd(angle)
 end
 
 end
