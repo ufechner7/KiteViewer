@@ -52,6 +52,8 @@ export State, Vec3, SimFloat, init, calc_cl, calc_rho, calc_wind_factor, calc_dr
      L_TOT_0  = 150.0              # initial tether length [m]
      L_0      = L_TOT_0 / SEGMENTS # initial segment length [m]
      MASS = 0.011 * L_0            # initial mass per particle: 1.1 kg per 100m = 0.011 kg/m for 4mm Dyneema
+     KITE_MASS = 11.4     # kite including sensor unit
+     KCU_MASS  =  8.4
      REL_SIDE_AREA = 0.5
      STEERING_COEFFICIENT = 0.6
      BRIDLE_DRAG = 1.1
@@ -104,7 +106,7 @@ const Vec3     = MVector{3, SimFloat}
     beta::S =             1.22      # elevation angle in radian; initial value about 70 degrees
     last_alpha =          0.1
     initial_masses::MVector{SEGMENTS+1, SimFloat} = ones(SEGMENTS+1) * MASS
-    masses::MVector{SEGMENTS+1, SimFloat} = ones(SEGMENTS+1)
+    masses::MVector{SEGMENTS+1, SimFloat}         = ones(SEGMENTS+1)
 end
 
 const state = State{SimFloat, Vec3}()
@@ -189,12 +191,10 @@ end
 # Calculate the vector res0 using a vector expression, and calculate res1 using a loop
 # that iterates over all tether segments. 
 function loop(s, initial_masses, masses, pos, vel, posd, veld, res0, res1)
-    s.masses .= s.length ./ L_0 .* initial_masses
-    # mul3(scalars[Length] / L_0, initial_masses, masses)
-    # masses[SEGMENTS] += (KITE_MASS + KCU_MASS)
-    # copy2(pos[0], res0[0]) # res0[0] = pos[0]
-    # copy2(vel[0], res1[0]) # res1[0] = vel[0]
-    # # res0[1:SEGMENTS+1] = vel[1:SEGMENTS+1] - posd[1:SEGMENTS+1]
+    s.masses               .= s.length ./ L_0 .* initial_masses
+    s.masses[SEGMENTS+1]  .+= (KITE_MASS + KCU_MASS)
+    res0[1] .= pos[1]
+    res1[1] .= vel[1]
     # for i in xrange(1, SEGMENTS+1):
     #     sub3(vel[i], posd[i], res0[i])
     # for i in xrange(SEGMENTS, 0, -1):    # count down from particle = SEGMENTS to 1
