@@ -163,7 +163,7 @@ function calc_res(s, pos1, pos2, vel1, vel2, mass, veld, result, i)
 
     s.area = norm1 * D_TETHER
     s.last_v_app_norm_tether = calc_drag(s, s.av_vel, s.unit_vector, rho, s.last_tether_drag, s.v_app_perp, s.area)
-    
+
     if i == SEGMENTS
         s.area = L_BRIDLE * D_TETHER
         s.last_v_app_norm_tether = calc_drag(s, s.av_vel, s.unit_vector, rho, s.last_tether_drag, s.v_app_perp, s.area)
@@ -178,6 +178,20 @@ function calc_res(s, pos1, pos2, vel1, vel2, mass, veld, result, i)
     s.acc .= s.total_forces ./ mass # create the vector of the spring acceleration
     result .= veld - (s.acc - SVector(0, 0, G_EARTH))
     nothing
+end
+
+# Calculate the vector res0 using a vector expression, and calculate res1 using a loop
+# that iterates over all tether segments. 
+function loop(s, initial_masses, masses, pos, vel, posd, veld, res0, res1)
+    # mul3(scalars[Length] / L_0, initial_masses, masses)
+    # masses[SEGMENTS] += (KITE_MASS + KCU_MASS)
+    # copy2(pos[0], res0[0]) # res0[0] = pos[0]
+    # copy2(vel[0], res1[0]) # res1[0] = vel[0]
+    # # res0[1:SEGMENTS+1] = vel[1:SEGMENTS+1] - posd[1:SEGMENTS+1]
+    # for i in xrange(1, SEGMENTS+1):
+    #     sub3(vel[i], posd[i], res0[i])
+    # for i in xrange(SEGMENTS, 0, -1):    # count down from particle = SEGMENTS to 1
+    #     calcRes(scalars, vec3, pos[i], pos[i-1], vel[i], vel[i-1], masses[i], veld[i],  res1[i], i)
 end
 
 end
