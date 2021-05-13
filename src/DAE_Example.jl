@@ -2,7 +2,9 @@ using DifferentialEquations, Sundials, GLMakie
 # Tutorial example showing how to use an implicit solver 
 # It simulates a falling mass.
 
-const G_EARTH  = [0.0, 0.0, -9.81]
+if ! @isdefined G_EARTH
+    const G_EARTH  = [0.0, 0.0, -9.81]
+end
 
 # Falling mass.
 # State vector y   = mass.pos, mass.vel
