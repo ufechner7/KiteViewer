@@ -237,4 +237,26 @@ function set_lod(s, vec_c, v_app)
     set_cl_cd(s, alpha)
 end
 
+# N-point tether model:
+# Inputs:
+# State vector state_y   = pos0, pos1, ..., posn-1, vel0, vel1, ..., veln-1
+# Derivative   der_yd    = vel0, vel1, ..., veln-1, acc0, acc1, ..., accn-1
+# Output:
+# Residual     res = res0, res1 = pos0,  ..., vel0, ...
+
+function clear(s)
+    # self.res = np.zeros((SEGMENTS + 1) * 6).reshape((2, -1, 3))
+    # # if WINCH_MODEL:
+    # #     self.res = np.append(self.res, 0.0) # res_length
+    # #     self.res = np.append(self.res, 0.0) # res_v_reel_out
+    # self.t_0 = 0.0 # relative start time of the current time interval
+    # self.v_reel_out = 0.0
+    # self.last_v_reel_out = 0.0
+    # self.sync_speed = 0.0
+    # self.vec3[V_wind, 0] = V_WIND
+    # self.l_tether = L_0 * SEGMENTS
+    # self.pos_kite, self.v_kite = np.zeros(3), np.zeros(3)
+    # self.rho = RHO_0
+end
+
 end
