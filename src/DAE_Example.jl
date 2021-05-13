@@ -1,10 +1,14 @@
-using DifferentialEquations, Sundials, GLMakie
+using DifferentialEquations, Sundials, GLMakie, StaticArrays
 # Tutorial example showing how to use an implicit solver 
 # It simulates a falling mass.
 
 if ! @isdefined G_EARTH
     const G_EARTH  = [0.0, 0.0, -9.81]
 end
+
+# Type definitions
+const SimFloat = Float64
+const Vec3     = MVector{3, SimFloat}
 
 # Falling mass.
 # State vector y   = mass.pos, mass.vel
@@ -15,9 +19,9 @@ function res1(res, yd, y, p, t)
     res[4:6] .= yd[4:6] - G_EARTH
 end
 
-vel_0 = [0.0, 0.0, 50.0]    # Initial velocity
-pos_0 = [0.0, 0.0,  0.0]    # Initial position
-acc_0 = [0.0, 0.0, -9.81]   # Initial acceleration
+vel_0 = Vec3(0.0, 0.0, 50.0)    # Initial velocity
+pos_0 = Vec3(0.0, 0.0,  0.0)    # Initial position
+acc_0 = Vec3(0.0, 0.0, -9.81)   # Initial acceleration
 y0  = vcat(pos_0, vel_0)    # Initial pos, vel
 yd0 = vcat(vel_0, acc_0)    # Initial vel, acc
 
