@@ -1,4 +1,4 @@
-using Test, BenchmarkTools, StaticArrays, Revise, LinearAlgebra
+using Test, BenchmarkTools, StaticArrays, Revise, LinearAlgebra, SciMLBase
 
 if ! @isdefined KPS3
     includet("../src/KPS3.jl")
@@ -123,6 +123,26 @@ end
     v_app = Vec3(10,2,3)
     vec_c = Vec3(3,2,0)
     KPS3.set_lod(state, vec_c, v_app)
+end
+
+# Inputs:
+# State vector state_y   = pos1, pos2, ..., posn, vel1, vel2, ..., veln
+# Derivative   der_yd    = vel1, vel2, ..., veln, acc1, acc2, ..., accn
+# Output:
+# Residual     res = res1, res2 = pos1,  ..., vel1, ...
+@testset "test_residual        " begin
+    res1 = zeros(SVector{SEGMENTS+1, Vec3})
+    res2 = deepcopy(res1)
+    res = vcat(res1, res2)
+    pos = deepcopy(res1)
+    vel = deepcopy(res1)
+    y = vcat(pos, vel)
+    der_pos = deepcopy(res1)
+    der_vel = deepcopy(res1)
+    yd = vcat(der_pos, der_vel)
+    p = SciMLBase.NullParameters()
+    t = 0.0
+    residual!(res, yd, y, p, t)
 end
 
 println("\ncalc_rho:")

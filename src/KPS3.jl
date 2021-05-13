@@ -38,7 +38,7 @@ if ! @isdefined Utils
     using .Utils
 end
 
-export State, Vec3, SimFloat, init, calc_cl, calc_rho, calc_wind_factor, calc_drag, set_cl_cd
+export State, Vec3, SimFloat, init, calc_cl, calc_rho, calc_wind_factor, calc_drag, set_cl_cd, residual!
 
 # Constants
 @consts begin
@@ -237,12 +237,14 @@ function set_lod(s, vec_c, v_app)
     set_cl_cd(s, alpha)
 end
 
+function residual!(res, yd, y, p, t)
 # N-point tether model:
 # Inputs:
 # State vector state_y   = pos0, pos1, ..., posn-1, vel0, vel1, ..., veln-1
 # Derivative   der_yd    = vel0, vel1, ..., veln-1, acc0, acc1, ..., accn-1
 # Output:
 # Residual     res = res0, res1 = pos0,  ..., vel0, ...
+end
 
 function clear(s)
     # self.res = np.zeros((SEGMENTS + 1) * 6).reshape((2, -1, 3))
