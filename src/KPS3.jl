@@ -380,17 +380,10 @@ function set_v_wind_ground(s, height, v_wind_gnd=V_WIND, wind_dir=0.0)
     if height < 6.0
         height = 6.0
     end
-    v_wind0 = v_wind_gnd * calc_wind_factor(height) * cos(wind_dir)
-    v_wind1 = v_wind_gnd * calc_wind_factor(height) * sin(wind_dir)
-    s.v_wind[1] = v_wind0
-    s.v_wind[2] = v_wind1
-    s.v_wind[3] = 0.0
-    # self.vec3[V_wind_gnd, 0] = v_wind_gnd * cos(wind_dir)
-    # self.vec3[V_wind_gnd, 1] = v_wind_gnd * sin(wind_dir)
-    # # self.vec3[V_wind_tether][0] = calcWindHeight(v_wind_gnd, height / 2.0)
-    # self.vec3[V_wind_tether, 0] = v_wind_gnd * calcWindFactor(height / 2.0) * math.cos(wind_dir)
-    # self.vec3[V_wind_tether, 1] = v_wind_gnd * calcWindFactor(height / 2.0) * math.sin(wind_dir)
-    # self.rho = calcRho(height)
+    s.v_wind .= v_wind_gnd * calcWindFactor(height) .* [cos(wind_dir), sin(wind_dir), 0]
+    s.v_wind_gnd .= [v_wind_gnd * cos(wind_dir), v_wind_gnd * sin(wind_dir), 0.0]
+    s.v_wind_tether .= v_wind_gnd * calcWindFactor(height / 2.0) .* [cos(wind_dir), sin(wind_dir), 0]
+    s.rho = calc_rho(height)
 end
 
 function get_lod(s)
