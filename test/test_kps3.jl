@@ -130,7 +130,7 @@ end
 # Derivative   der_yd    = vel1, vel2, ..., veln, acc1, acc2, ..., accn
 # Output:
 # Residual     res = res1, res2 = pos1,  ..., vel1, ...
-@testset "test_residual        " begin
+@testset "test_residual!       " begin
     res1 = zeros(SVector{SEGMENTS+1, Vec3})
     res2 = deepcopy(res1)
     res = reduce(vcat, vcat(res1, res2))
@@ -138,15 +138,15 @@ end
     pos[1] .= [1.0,2,3]
     vel = deepcopy(res1) 
     y = reduce(vcat, vcat(pos, vel))
-    # der_pos = deepcopy(res1)
-    # der_vel = deepcopy(res1)
-    # yd = reduce(vcat, vcat(der_pos, der_vel))
-    # p = SciMLBase.NullParameters()
-    # t = 0.0
-    # residual!(res, yd, y, p, t)
-    pos1 = KPS3.unpack(y)
-    display(pos1)
+    der_pos = deepcopy(res1)
+    der_vel = deepcopy(res1)
+    yd = reduce(vcat, vcat(der_pos, der_vel))
+    p = SciMLBase.NullParameters()
+    t = 0.0
+    residual!(res, yd, y, p, t)
 end
+
+
 
 #= println("\ncalc_rho:")
 show(@benchmark calc_rho(height) setup=(height=1.0 + rand() * 200.0))
@@ -181,4 +181,9 @@ println("\ncalc_alpha")
 show(@benchmark KPS3.calc_alpha(v_app, vec_z) setup=(v_app = Vec3(10,2,3); vec_z = normalize(Vec3(3,2,0))))
 println("\nset_lod")
 show(@benchmark KPS3.set_lod(state, vec_c, v_app) setup=(v_app = Vec3(10,2,3); vec_c = Vec3(3,2,0))) =#
+display(@benchmark residual!(res, yd, y, p, t) setup = (res1 = zeros(SVector{SEGMENTS+1, Vec3}); res2 = deepcopy(res1); 
+                                                        res = reduce(vcat, vcat(res1, res2)); pos = deepcopy(res1);
+                                                        pos[1] .= [1.0,2,3]; vel = deepcopy(res1); y = reduce(vcat, vcat(pos, vel));
+                                                        der_pos = deepcopy(res1); der_vel = deepcopy(res1); yd = reduce(vcat, vcat(der_pos, der_vel));
+                                                        p = SciMLBase.NullParameters(); t = 0.0))
 nothing
