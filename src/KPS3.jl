@@ -38,7 +38,7 @@ if ! @isdefined Utils
     using .Utils
 end
 
-export State, Vec3, SimFloat, init, calc_cl, calc_rho, calc_wind_factor, calc_drag, calc_set_cl_cd, residual!
+export State, Vec3, SimFloat, init, calc_cl, calc_rho, calc_wind_factor, calc_drag, calc_set_cl_cd, clear, residual!
 
 # Constants
 @consts begin
@@ -254,10 +254,10 @@ function clear(s)
     s.v_reel_out = 0.0
     s.last_v_reel_out = 0.0
     # self.sync_speed = 0.0
-    s.v_wind[0] = V_WIND
+    s.v_wind[1] = se().v_wind
     s.l_tether = L_0 * SEGMENTS
-    s.pos_kite, self.v_kite = zeros(3), zeros(3)
-    s.rho = RHO_0
+    s.pos_kite, s.v_kite = zeros(3), zeros(3)
+    s.rho = se().rho_0
 end
 
 # N-point tether model:

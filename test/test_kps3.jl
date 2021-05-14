@@ -125,6 +125,10 @@ end
     KPS3.calc_set_cl_cd(state, vec_c, v_app)
 end
 
+@testset "test_clear           " begin
+    KPS3.clear(state)
+end
+
 # Inputs:
 # State vector state_y   = pos1, pos2, ..., posn, vel1, vel2, ..., veln
 # Derivative   der_yd    = vel1, vel2, ..., veln, acc1, acc2, ..., accn
@@ -143,6 +147,7 @@ end
     yd = reduce(vcat, vcat(der_pos, der_vel))
     p = SciMLBase.NullParameters()
     t = 0.0
+    clear(state)
     residual!(res, yd, y, p, t)
 end
 
