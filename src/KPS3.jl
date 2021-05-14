@@ -244,11 +244,14 @@ end
 # Output:
 # Residual     res = res0, res1 = pos0,  ..., vel0, ...
 function residual!(res, yd, y, p, t)
-    part  = reshape(y,  (3, SEGMENTS+1, 2))
-    partd = reshape(yd, (3, SEGMENTS+1, 2))
-    pos, vel = part[:,:,1], partd[:,:,2]
-    println(pos)
-    println(vel)
+    part = reshape(SVector{6*(SEGMENTS+1)}(y),  Size(3, SEGMENTS+1, 2))
+    partd = reshape(SVector{6*(SEGMENTS+1)}(yd),  Size(3, SEGMENTS+1, 2))
+    pos1, vel1 = part[:,:,1], part[:,:,2]
+    pos = SVector{SEGMENTS+1}(SVector(pos1[:,i]) for i in 1:SEGMENTS+1)
+    vel = SVector{SEGMENTS+1}(SVector(vel1[:,i]) for i in 1:SEGMENTS+1)
+    posd1, veld1 = partd[:,:,1], partd[:,:,2]
+    posd = SVector{SEGMENTS+1}(SVector(posd1[:,i]) for i in 1:SEGMENTS+1)
+    veld = SVector{SEGMENTS+1}(SVector(veld1[:,i]) for i in 1:SEGMENTS+1)
 end
 
 function unpack(y)
