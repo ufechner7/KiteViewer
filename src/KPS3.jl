@@ -249,6 +249,17 @@ function calc_set_cl_cd(s, vec_c, v_app)
     set_cl_cd(s, alpha)
 end
 
+function clear(s)
+    s.t_0 = 0.0                     # relative start time of the current time interval
+    s.v_reel_out = 0.0
+    s.last_v_reel_out = 0.0
+    # self.sync_speed = 0.0
+    s.v_wind[0] = V_WIND
+    s.l_tether = L_0 * SEGMENTS
+    s.pos_kite, self.v_kite = zeros(3), zeros(3)
+    s.rho = RHO_0
+end
+
 # N-point tether model:
 # Inputs:
 # State vector state_y   = pos1, pos2, ..., posn, vel1, vel2, ..., veln
@@ -290,21 +301,6 @@ function residual!(res, yd, y, p, time)
         end
     end
     nothing
-end
-
-function clear(s)
-    # self.res = np.zeros((SEGMENTS + 1) * 6).reshape((2, -1, 3))
-    # # if WINCH_MODEL:
-    # #     self.res = np.append(self.res, 0.0) # res_length
-    # #     self.res = np.append(self.res, 0.0) # res_v_reel_out
-    s.t_0 = 0.0                     # relative start time of the current time interval
-    # self.v_reel_out = 0.0
-    # self.last_v_reel_out = 0.0
-    # self.sync_speed = 0.0
-    # self.vec3[V_wind, 0] = V_WIND
-    # self.l_tether = L_0 * SEGMENTS
-    # self.pos_kite, self.v_kite = np.zeros(3), np.zeros(3)
-    # self.rho = RHO_0
 end
 
 end
