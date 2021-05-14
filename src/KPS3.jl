@@ -38,7 +38,7 @@ if ! @isdefined Utils
     using .Utils
 end
 
-export State, Vec3, SimFloat, init, calc_cl, calc_rho, calc_wind_factor, calc_drag, set_cl_cd, residual!
+export State, Vec3, SimFloat, init, calc_cl, calc_rho, calc_wind_factor, calc_drag, calc_set_cl_cd, residual!
 
 # Constants
 @consts begin
@@ -51,6 +51,8 @@ export State, Vec3, SimFloat, init, calc_cl, calc_rho, calc_wind_factor, calc_dr
      L_BRIDLE = se().l_bridle      # sum of the lengths of the bridle lines [m]
      L_TOT_0  = 150.0              # initial tether length [m]
      L_0      = L_TOT_0 / SEGMENTS # initial segment length [m]
+     C_SPRING = 6.146e5 / L_0      # initial spring constant  [N/m]
+     DAMPING  = 2 * 473.0 / L_0    # initial damping constant [Ns/m]
      MASS = 0.011 * L_0            # initial mass per particle: 1.1 kg per 100m = 0.011 kg/m for 4mm Dyneema
      KITE_MASS = 11.4              # kite including sensor unit
      KCU_MASS  =  8.4
@@ -93,11 +95,15 @@ const Vec3     = MVector{3, SimFloat}
     segment::T =          zeros(3)
     last_tether_drag::T = zeros(3)
     acc::T =              zeros(3)     
-    vec_z::T =            zeros(3)      
+    vec_z::T =            zeros(3)
+    pos_kite::T =         zeros(3)
+    v_kite::T =           zeros(3)        
+    res1::SVector{SEGMENTS+1, Vec3} = zeros(SVector{SEGMENTS+1, Vec3})
+    res2::SVector{SEGMENTS+1, Vec3} = zeros(SVector{SEGMENTS+1, Vec3})
     seg_area::S =         zero(S)   # area of one tether segment
-    c_spring::S =         zero(S)
+    c_spring::S =         zero(S)   # depends on lenght of tether segement
     length::S =           L_TOT_0
-    damping::S =          zero(S)
+    damping::S =          zero(S)   # depends on lenght of tether segement
     area::S =             zero(S)
     last_v_app_norm_tether::S = zero(S)
     param_cl::S =         0.2
@@ -108,6 +114,12 @@ const Vec3     = MVector{3, SimFloat}
     beta::S =             1.22      # elevation angle in radian; initial value about 70 degrees
     last_alpha::S =        0.1
     alpha_depower::S =     0.0
+    t_0::S =               0.0      # relative start time of the current time interval
+    v_reel_out::S =        0.0
+    last_v_reel_out::S =   0.0
+    l_tether::S =          0.0
+    rho::S =               se().rho_0
+    steering::S =          0.0
     initial_masses::MVector{SEGMENTS+1, SimFloat} = ones(SEGMENTS+1) * MASS
     masses::MVector{SEGMENTS+1, SimFloat}         = ones(SEGMENTS+1)
 end
@@ -192,18 +204,18 @@ function calc_res(s, pos1, pos2, vel1, vel2, mass, veld, result, i)
     nothing
 end
 
-# Calculate the vector res0 using a vector expression, and calculate res1 using a loop
+# Calculate the vector res1 using a vector expression, and calculate res2 using a loop
 # that iterates over all tether segments. 
-function loop(s, pos, vel, posd, veld, res0, res1)
+function loop(s, pos, vel, posd, veld, res1, res2)
     s.masses               .= s.length ./ L_0 .* s.initial_masses
     s.masses[SEGMENTS+1]   += (KITE_MASS + KCU_MASS)
-    res0[1] .= pos[1]
-    res1[1] .= vel[1]
+    res1[1] .= pos[1]
+    res2[1] .= vel[1]
     for i in 2:SEGMENTS+1
-        res0[i] .= vel[i] - posd[i]
+        res1[i] .= vel[i] - posd[i]
     end
     for i in SEGMENTS:-1:2
-        calc_res(state, pos[i], pos[i-1], vel[i], vel[i-1], s.masses[i], veld[i],  res1[i], i)
+        calc_res(state, pos[i], pos[i-1], vel[i], vel[i-1], s.masses[i], veld[i],  res2[i], i)
     end
     nothing
 end
@@ -231,7 +243,7 @@ end
 # Calculate the lift over drag ratio as a function of the direction vector of the last tether
 # segment, the current depower setting and the apparent wind speed.
 # Set the calculated CL and CD values. 
-function set_lod(s, vec_c, v_app)
+function calc_set_cl_cd(s, vec_c, v_app)
     s.vec_z .= normalize(vec_c)
     alpha = calc_alpha(v_app, s.vec_z) - s.alpha_depower
     set_cl_cd(s, alpha)
@@ -239,11 +251,12 @@ end
 
 # N-point tether model:
 # Inputs:
-# State vector state_y   = pos0, pos1, ..., posn-1, vel0, vel1, ..., veln-1
-# Derivative   der_yd    = vel0, vel1, ..., veln-1, acc0, acc1, ..., accn-1
+# State vector state_y   = pos1, pos2, ..., posn, vel1, vel2, ..., veln
+# Derivative   der_yd    = vel1, vel2, ..., veln, acc1, acc2, ..., accn
 # Output:
-# Residual     res = res0, res1 = pos0,  ..., vel0, ...
-function residual!(res, yd, y, p, t)
+# Residual     res = res1, res2 = pos1,  ..., vel1, ...
+function residual!(res, yd, y, p, time)
+    # unpack the vectors y and yd
     part = reshape(SVector{6*(SEGMENTS+1)}(y),  Size(3, SEGMENTS+1, 2))
     partd = reshape(SVector{6*(SEGMENTS+1)}(yd),  Size(3, SEGMENTS+1, 2))
     pos1, vel1 = part[:,:,1], part[:,:,2]
@@ -252,12 +265,31 @@ function residual!(res, yd, y, p, t)
     posd1, veld1 = partd[:,:,1], partd[:,:,2]
     posd = SVector{SEGMENTS+1}(SVector(posd1[:,i]) for i in 1:SEGMENTS+1)
     veld = SVector{SEGMENTS+1}(SVector(veld1[:,i]) for i in 1:SEGMENTS+1)
-end
 
-function unpack(y)
-    part  = reshape(y,  Size(3, SEGMENTS+1, 2))
-    pos1 = part[:,:,1]
-    pos2 = [SVector(pos1[:,i]) for i in 1:SEGMENTS+1]
+    # update parameters
+    s = state
+    delta_t = time - s.t_0
+    delta_v = s.v_reel_out - s.last_v_reel_out
+    s.length = (s.l_tether + s.last_v_reel_out * delta_t + 0.5 * delta_v * delta_t^2) / SEGMENTS
+
+    s.c_spring = C_SPRING * L_0 / s.length
+    s.damping  = DAMPING  * L_0 / s.length
+
+    # call core calculation routines
+    vec_c = SVector{3, SimFloat}(pos[SEGMENTS] - s.pos_kite)     # convert to SVector to avoid allocations
+    v_app = SVector{3, SimFloat}(s.v_wind - s.v_kite)
+    calc_set_cl_cd(s, vec_c, v_app)
+    calc_aero_forces(s, s.pos_kite, s.v_kite, s.rho, s.steering) # force at the kite
+    loop(s, pos, vel, posd, veld, s.res1, s.res2)
+    
+    # copy and flatten result
+    for i in 1:SEGMENTS+1
+        for j in 1:3
+           @inbounds res[3*i+j] = s.res1[i][j]
+           @inbounds res[SEGMENTS+1+3*i+j] = s.res2[i][j]
+        end
+    end
+    nothing
 end
 
 function clear(s)
@@ -265,7 +297,7 @@ function clear(s)
     # # if WINCH_MODEL:
     # #     self.res = np.append(self.res, 0.0) # res_length
     # #     self.res = np.append(self.res, 0.0) # res_v_reel_out
-    # self.t_0 = 0.0 # relative start time of the current time interval
+    s.t_0 = 0.0                     # relative start time of the current time interval
     # self.v_reel_out = 0.0
     # self.last_v_reel_out = 0.0
     # self.sync_speed = 0.0
