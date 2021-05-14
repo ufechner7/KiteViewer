@@ -334,4 +334,19 @@ function set_depower_steering(s, depower, steering)
     # println("LoD: ", s.param_cl/ s.param_cd)
 end
 
+function set_beta_psi(s, beta, psi)
+    s.beta = beta
+    s.psi  = psi
+end
+
+# Setter for the tether reel-out lenght (at zero force).
+function set_l_tether(s, l_tether)
+    s.l_tether = l_tether
+end
+
+# Getter for the tether reel-out lenght (at zero force).
+function get_l_tether(s)
+    s.l_tether
+end
+
 end
