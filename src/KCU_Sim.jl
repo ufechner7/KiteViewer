@@ -17,7 +17,7 @@ const TAPE_THICKNESS = 6e-4           # thickness of the depower tape [m]
 function calc_delta_l(rel_depower)
     u = DEPOWER_DRUM_DIAMETER * (100.0 + STEERING_LINE_SAG) / 100.0
     l_ro = 0.0
-    rotations = (rel_depower - 0.01 * DEPOWER_OFFSET) * 10.0 * 11./3. * (3918.8 - 230.8) / 4096.
+    rotations = (rel_depower - 0.01 * DEPOWER_OFFSET) * 10.0 * 11.0 / 3.0 * (3918.8 - 230.8) / 4096.
     while rotations > 0.0
          l_ro += u * π    
          rotations -= 1.0
@@ -33,7 +33,7 @@ end
 # length increase of the depower line delta_l [m].
 function calc_alpha_depower(rel_depower)
     a   = POWER2STEER_DIST
-    b_0 = HEIGHT_B + 0.5 * Height_K
+    b_0 = HEIGHT_B + 0.5 * HEIGHT_K
     b = b_0 + 0.5 * calc_delta_l(rel_depower) # factor 0.5 due to the pulleys
 
     c = sqrt(a * a + b_0 * b_0)
@@ -42,11 +42,11 @@ function calc_alpha_depower(rel_depower)
          return nothing
     else
         tmp = 1/(2*a*b)*(a*a+b*b-c*c)
-        if tmp > 1.0:
-            println("-->>> WARNING: tmp > 1.0: ", tmp)
+        if tmp > 1.0
+            println("-->>> WARNING: tmp > 1.0: $tmp")
             tmp = 1.0
         elseif tmp < -1.0
-            println("-->>> WARNING: tmp < 1.0: ", tmp)
+            println("-->>> WARNING: tmp < 1.0: $tmp")
             tmp = -1.0
         end            
         return pi/2.0 - acos(tmp)
