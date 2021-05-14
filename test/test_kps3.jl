@@ -160,6 +160,12 @@ end
     clear(state)
 end
 
+@testset "test_set_depower_steering" begin
+    depower  = 0.0
+    steering = 0.0
+    set_depower_steering(state, depower, steering)
+end
+
 println("\ncalc_rho:")
 show(@benchmark calc_rho(height) setup=(height=1.0 + rand() * 200.0))
 println("\ncalc_wind_factor:")

@@ -38,8 +38,9 @@ if ! @isdefined Utils
     using .Utils
 end
 
-export State, Vec3, SimFloat, calc_cl, calc_rho, calc_wind_factor, calc_drag, calc_set_cl_cd, clear, residual!
-export set_v_reel_out
+export State, Vec3, SimFloat                                                            # types
+export calc_cl, calc_rho, calc_wind_factor, calc_drag, calc_set_cl_cd, clear, residual! # functions
+export set_v_reel_out, set_depower_steering                                             # setters  
 
 # Constants
 @consts begin
@@ -121,6 +122,7 @@ const Vec3     = MVector{3, SimFloat}
     last_v_reel_out::S =   0.0
     l_tether::S =          0.0
     rho::S =               se().rho_0
+    depower::S =           0.0
     steering::S =          0.0
     initial_masses::MVector{SEGMENTS+1, SimFloat} = ones(SEGMENTS+1) * MASS
     masses::MVector{SEGMENTS+1, SimFloat}         = ones(SEGMENTS+1)
@@ -313,6 +315,19 @@ function set_v_reel_out(s, v_reel_out, t_0, period_time = PERIOD_TIME)
     s.last_v_reel_out = s.v_reel_out
     s.v_reel_out = v_reel_out
     s.t_0 = t_0
+end
+
+# Setter depower and the steering model inputs. Valid range for steering: -1.0 .. 1.0.
+# Valid range for depower: 0 .. 1.0
+function set_depower_steering(s, depower, steering)
+    s.steering = steering
+    s.depower  = depower
+    # s.alpha_depower = calc_alpha_depower(depower) * (MAX_ALPHA_DEPOWER / 31.0)
+    # # print "depower, alpha_depower", form(depower), form(degrees(self.scalars[Alpha_depower]))
+    # # print "v_app_norm, CL, rho: ", form(self.scalars[V_app_norm]),form(self.scalars[ParamCL]), form(self.rho)
+    # self.scalars[Steering] = (steering - C_0) / (1.0 + K_ds * (self.scalars[Alpha_depower] \
+    #                                           / radians(MAX_ALPHA_DEPOWER)))
+    # # print "LoD: ", self.scalars[ParamCL]/ self.scalars[ParamCD]
 end
 
 end
