@@ -119,10 +119,10 @@ end
     KPS3.set_cl_cd(state, alpha)
 end
 
-@testset "test_set_lod         " begin
+@testset "test_calc_set_cl_cd  " begin
     v_app = Vec3(10,2,3)
     vec_c = Vec3(3,2,0)
-    KPS3.set_lod(state, vec_c, v_app)
+    KPS3.calc_set_cl_cd(state, vec_c, v_app)
 end
 
 # Inputs:
@@ -176,7 +176,7 @@ show(@benchmark KPS3.loop(state, pos, vel, posd, veld, res1, res2) setup=(pos = 
                           veld  = zeros(SVector{SEGMENTS+1, Vec3}); res1  = zeros(SVector{SEGMENTS+1, Vec3}); 
                           res2  = zeros(SVector{SEGMENTS+1, Vec3}) ))
 println("\nset_cl_cd")
-show(@benchmark set_cl_cd(state, alpha) setup= (alpha = 10.0))
+show(@benchmark calc_set_cl_cd(state, alpha) setup= (alpha = 10.0))
 println("\ncalc_alpha")
 show(@benchmark KPS3.calc_alpha(v_app, vec_z) setup=(v_app = Vec3(10,2,3); vec_z = normalize(Vec3(3,2,0))))
 println("\nset_lod")
