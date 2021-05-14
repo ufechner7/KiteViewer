@@ -373,4 +373,29 @@ function get_v_wind(s)
     s.v_wind
 end
 
+# Set the vector of the wind-velocity at the height of the kite. As parameter the height,
+# the ground wind speed and the wind direction are needed.
+# Must be called every 50 ms.
+function set_v_wind_ground(self, height, v_wind_gnd=V_WIND, wind_dir=0.0)
+    if height < 6.0
+        height = 6.0
+    end
+    # v_wind0 = v_wind_gnd * calcWindFactor(height) * cos(wind_dir)
+    # v_wind1 = v_wind_gnd * calcWindFactor(height) * sin(wind_dir)
+    # self.vec3[V_wind, 0] = v_wind0
+    # self.vec3[V_wind, 1] = v_wind1
+    # self.vec3[V_wind, 2] = 0.0
+    # self.vec3[V_wind_gnd, 0] = v_wind_gnd * math.cos(wind_dir)
+    # self.vec3[V_wind_gnd, 1] = v_wind_gnd * math.sin(wind_dir)
+    # # self.vec3[V_wind_tether][0] = calcWindHeight(v_wind_gnd, height / 2.0)
+    # self.vec3[V_wind_tether, 0] = v_wind_gnd * calcWindFactor(height / 2.0) * math.cos(wind_dir)
+    # self.vec3[V_wind_tether, 1] = v_wind_gnd * calcWindFactor(height / 2.0) * math.sin(wind_dir)
+    # self.rho = calcRho(height)
+end
+
+function get_lod(s)
+    lift, drag = s.get_lod
+    return lift / drag
+end
+
 end
