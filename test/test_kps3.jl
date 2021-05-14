@@ -146,9 +146,7 @@ end
     residual!(res, yd, y, p, t)
 end
 
-
-
-#= println("\ncalc_rho:")
+println("\ncalc_rho:")
 show(@benchmark calc_rho(height) setup=(height=1.0 + rand() * 200.0))
 println("\ncalc_wind_factor:")
 show(@benchmark calc_wind_factor(height) setup=(height=rand() * 200.0))
@@ -176,12 +174,13 @@ show(@benchmark KPS3.loop(state, pos, vel, posd, veld, res1, res2) setup=(pos = 
                           veld  = zeros(SVector{SEGMENTS+1, Vec3}); res1  = zeros(SVector{SEGMENTS+1, Vec3}); 
                           res2  = zeros(SVector{SEGMENTS+1, Vec3}) ))
 println("\nset_cl_cd")
-show(@benchmark calc_set_cl_cd(state, alpha) setup= (alpha = 10.0))
+show(@benchmark KPS3.set_cl_cd(state, alpha) setup= (alpha = 10.0))
 println("\ncalc_alpha")
 show(@benchmark KPS3.calc_alpha(v_app, vec_z) setup=(v_app = Vec3(10,2,3); vec_z = normalize(Vec3(3,2,0))))
-println("\nset_lod")
-show(@benchmark KPS3.set_lod(state, vec_c, v_app) setup=(v_app = Vec3(10,2,3); vec_c = Vec3(3,2,0))) =#
-display(@benchmark residual!(res, yd, y, p, t) setup = (res1 = zeros(SVector{SEGMENTS+1, Vec3}); res2 = deepcopy(res1); 
+println("\ncalc_set_cl_cd")
+show(@benchmark KPS3.calc_set_cl_cd(state, vec_c, v_app) setup=(v_app = Vec3(10,2,3); vec_c = Vec3(3,2,0)))
+println("\nresidual!")
+show(@benchmark residual!(res, yd, y, p, t) setup = (res1 = zeros(SVector{SEGMENTS+1, Vec3}); res2 = deepcopy(res1); 
                                                         res = reduce(vcat, vcat(res1, res2)); pos = deepcopy(res1);
                                                         pos[1] .= [1.0,2,3]; vel = deepcopy(res1); y = reduce(vcat, vcat(pos, vel));
                                                         der_pos = deepcopy(res1); der_vel = deepcopy(res1); yd = reduce(vcat, vcat(der_pos, der_vel));
