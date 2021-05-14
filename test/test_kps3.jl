@@ -151,6 +151,15 @@ end
     residual!(res, yd, y, p, t)
 end
 
+@testset "test_set_v_reel_out  " begin
+    v_reel_out = 1.1
+    t_0 = 5.5
+    set_v_reel_out(state, v_reel_out, t_0)
+    @test state.v_reel_out ≈ 1.1
+    @test state.t_0 ≈ 5.5
+    clear(state)
+end
+
 println("\ncalc_rho:")
 show(@benchmark calc_rho(height) setup=(height=1.0 + rand() * 200.0))
 println("\ncalc_wind_factor:")

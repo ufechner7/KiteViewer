@@ -38,11 +38,13 @@ if ! @isdefined Utils
     using .Utils
 end
 
-export State, Vec3, SimFloat, init, calc_cl, calc_rho, calc_wind_factor, calc_drag, calc_set_cl_cd, clear, residual!
+export State, Vec3, SimFloat, calc_cl, calc_rho, calc_wind_factor, calc_drag, calc_set_cl_cd, clear, residual!
+export set_v_reel_out
 
 # Constants
 @consts begin
      G_EARTH = 9.81                # gravitational acceleration
+     PERIOD_TIME = 1.0 / se().sample_freq
      C0 = -0.0032                  # steering offset
      C2_COR =  0.93
      CD_TETHER = se().cd_tether    # tether drag coefficient
@@ -301,6 +303,16 @@ function residual!(res, yd, y, p, time)
         end
     end
     nothing
+end
+
+# Setter for the reel-out speed. Must be called every 50 ms (before each simulation).
+# It also updates the tether length, therefore it must be called even if v_reelout has
+# not changed.
+function set_v_reel_out(s, v_reel_out, t_0, period_time = PERIOD_TIME)
+    s.l_tether += 0.5 * (v_reel_out + s.last_v_reel_out) * period_time
+    s.last_v_reel_out = s.v_reel_out
+    s.v_reel_out = v_reel_out
+    s.t_0 = t_0
 end
 
 end
