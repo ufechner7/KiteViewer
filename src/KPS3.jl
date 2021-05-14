@@ -349,4 +349,28 @@ function get_l_tether(s)
     s.l_tether
 end
 
+# Return the absolute value of the force at the winch as calculated during the last simulation. 
+function get_force(s)
+    norm(s.last_force) 
+end
+
+# Return an array of the scalar spring forces of all tether segements.
+# Input: The vector pos of the positions of the point masses that belong to the tether.
+function get_spring_forces(s, pos)
+    forces = zeros(SEGMENTS)
+    for i in 1:SEGMENTS
+        forces[i] =  s.c_spring * (norm(pos[i+1] - pos[i]) - s.length)
+    end
+    forces
+end
+
+function get_lift_drag(s)
+    norm(s.lift_force), norm(s.drag_force)
+end
+
+# Return the vector of the wind velocity at the height of the kite.
+function get_v_wind(s)
+    s.v_wind
+end
+
 end
