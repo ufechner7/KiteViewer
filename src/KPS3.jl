@@ -237,13 +237,24 @@ function set_lod(s, vec_c, v_app)
     set_cl_cd(s, alpha)
 end
 
-function residual!(res, yd, y, p, t)
 # N-point tether model:
 # Inputs:
 # State vector state_y   = pos0, pos1, ..., posn-1, vel0, vel1, ..., veln-1
 # Derivative   der_yd    = vel0, vel1, ..., veln-1, acc0, acc1, ..., accn-1
 # Output:
 # Residual     res = res0, res1 = pos0,  ..., vel0, ...
+function residual!(res, yd, y, p, t)
+    part  = reshape(y,  (3, SEGMENTS+1, 2))
+    partd = reshape(yd, (3, SEGMENTS+1, 2))
+    pos, vel = part[:,:,1], partd[:,:,2]
+    println(pos)
+    println(vel)
+end
+
+function unpack(y)
+    part  = reshape(y,  Size(3, SEGMENTS+1, 2))
+    pos1 = part[:,:,1]
+    pos2 = [SVector(pos1[:,i]) for i in 1:SEGMENTS+1]
 end
 
 function clear(s)
