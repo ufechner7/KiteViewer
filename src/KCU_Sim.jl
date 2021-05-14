@@ -4,11 +4,11 @@ module KCU_Sim
 
 export calc_alpha_depower
 
-const HEIGHT_K = 2.0                         # height of the kite
-const HEIGHT_B = 6.93                        # height of the bridle
+const HEIGHT_K = 2.23                        # height of the kite
+const HEIGHT_B = 4.9                         # height of the bridle
 const POWER2STEER_DIST = 1.3                 
 const DEPOWER_DRUM_DIAMETER = 69.0e-3 * 0.97 # outer diameter of the depower drum at depower = DEPOWER_OFFSET [m]
-const DEPOWER_OFFSET = 23.8
+const DEPOWER_OFFSET = 23.6
 const STEERING_LINE_SAG = 0.0                # sag of the steering lines in percent
 const TAPE_THICKNESS = 6e-4           # thickness of the depower tape [m]
 
