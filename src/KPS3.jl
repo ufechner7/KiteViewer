@@ -38,6 +38,11 @@ if ! @isdefined Utils
     using .Utils
 end
 
+if ! @isdefined KCU_Sim
+    include("KCU_Sim.jl")
+    using .KCU_Sim
+end
+
 export State, Vec3, SimFloat                                                            # types
 export calc_cl, calc_rho, calc_wind_factor, calc_drag, calc_set_cl_cd, clear, residual! # functions
 export set_v_reel_out, set_depower_steering                                             # setters  
@@ -322,12 +327,11 @@ end
 function set_depower_steering(s, depower, steering)
     s.steering = steering
     s.depower  = depower
-    # s.alpha_depower = calc_alpha_depower(depower) * (MAX_ALPHA_DEPOWER / 31.0)
-    # # print "depower, alpha_depower", form(depower), form(degrees(self.scalars[Alpha_depower]))
-    # # print "v_app_norm, CL, rho: ", form(self.scalars[V_app_norm]),form(self.scalars[ParamCL]), form(self.rho)
-    # self.scalars[Steering] = (steering - C_0) / (1.0 + K_ds * (self.scalars[Alpha_depower] \
-    #                                           / radians(MAX_ALPHA_DEPOWER)))
-    # # print "LoD: ", self.scalars[ParamCL]/ self.scalars[ParamCD]
+    s.alpha_depower = calc_alpha_depower(depower) * (MAX_ALPHA_DEPOWER / 31.0)
+    # print "depower, alpha_depower", form(depower), form(degrees(self.scalars[Alpha_depower]))
+    # print "v_app_norm, CL, rho: ", form(self.scalars[V_app_norm]),form(self.scalars[ParamCL]), form(self.rho)
+    s.steering = (steering - C0) / (1.0 + K_ds * (s.alpha_depower / deg2rad(MAX_ALPHA_DEPOWER)))
+    # println("LoD: ", s.param_cl/ s.param_cd)
 end
 
 end

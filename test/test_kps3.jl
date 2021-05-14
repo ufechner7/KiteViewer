@@ -161,7 +161,7 @@ end
 end
 
 @testset "test_set_depower_steering" begin
-    depower  = 0.0
+    depower  = 0.25
     steering = 0.0
     set_depower_steering(state, depower, steering)
 end
