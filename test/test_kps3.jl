@@ -65,49 +65,66 @@ end
     @test state.last_force ≈ [-555.24319976, 544.82004621, 80.49946362]
 end
 
-@testset "test_calc_res        " begin
-    i = 1
-    pos1 = Vec3(30.0, 5.0, 100.0)
-    pos2 = Vec3(30.0+10, 5.0+11, 100.0+20)
-    vel1 = Vec3(3.0, 5.0, 2.0)
-    vel2 = Vec3(3.0+0.1, 5.0+0.2, 2.0+0.3)
-    mass = 9.0
-    veld = Vec3(0.1, 0.3, 0.4)
-    result = Vec3(0, 0, 0)
-    state.c_spring=0.011
-    state.damping = 0.01
-    state.last_tether_drag = Vec3(5.0,6,7)
-    state.last_force = Vec3(-1.0, -2, -3)
-    state.v_app_perp = Vec3(0.1,0.22,0.33)
-    state.v_wind_tether .= [0.1, 0.2, 0.3]
-    # TODO make it work for length > zero
-    state.length = 0.0
-    KPS3.calc_res(state, pos1, pos2, vel1, vel2, mass, veld, result, i)
-    @test result ≈ [0.2118964, 0.50409798, 10.59137013]
-    i = SEGMENTS
-    KPS3.calc_res(state, pos1, pos2, vel1, vel2, mass, veld, result, i)
-    @test result ≈ [0.04174994,  0.14058806, 10.32680159]
-end
+# @testset "test_calc_res        " begin
+#     i = 2
+#     pos1 = Vec3(30.0, 5.0, 100.0)
+#     pos2 = Vec3(30.0+10, 5.0+11, 100.0+20)
+#     vel1 = Vec3(3.0, 5.0, 2.0)
+#     vel2 = Vec3(3.0+0.1, 5.0+0.2, 2.0+0.3)
+#     mass = 9.0
+#     veld = Vec3(0.1, 0.3, 0.4)
+#     result = Vec3(0, 0, 0)
+#     state.c_spring=0.011
+#     state.damping = 0.01
+#     state.last_tether_drag = Vec3(5.0,6,7)
+#     state.last_force = Vec3(-1.0, -2, -3)
+#     state.v_app_perp = Vec3(0.1,0.22,0.33)
+#     state.v_wind_tether .= [0.1, 0.2, 0.3]
+#     state.length = 10.0
+#     KPS3.calc_res(state, pos1, pos2, vel1, vel2, mass, veld, result, i)
+#     @test result ≈ [  0.20699179,   0.49870291,  10.58156092]
+#     i = SEGMENTS+1
+#     KPS3.calc_res(state, pos1, pos2, vel1, vel2, mass, veld, result, i)
+#     @test result ≈ [0.04174994,  0.14058806, 10.32680159]
+# end
 
 @testset "test_calc_loop       " begin
+    KPS3.clear(state)
     state.c_spring=0.011
     state.damping = 0.01
     state.last_tether_drag = Vec3(5.0,6,7)
     state.last_force = Vec3(-1.0, -2, -3)
     state.v_app_perp = Vec3(0.1,0.22,0.33)
     state.v_wind_tether .= [0.1, 0.2, 0.3]
-    # TODO make it work for length > zero
-    state.length = 0.0
+    state.length = 10.0
+    state.c_spring = KPS3.C_SPRING * KPS3.L_0 / state.length
+    state.damping  = KPS3.DAMPING  * KPS3.L_0 / state.length
     pos  = zeros(SVector{SEGMENTS+1, Vec3})
+    for i in 1:SEGMENTS+1
+        pos[i][3] = 5.0 * (i-1)
+    end
     vel  = zeros(SVector{SEGMENTS+1, Vec3})
     posd = zeros(SVector{SEGMENTS+1, Vec3})
     veld = zeros(SVector{SEGMENTS+1, Vec3})
     res1 = zeros(SVector{SEGMENTS+1, Vec3})
     res2 = zeros(SVector{SEGMENTS+1, Vec3})
     KPS3.loop(state, pos, vel, posd, veld, res1, res2)
+    @test sum(res1) ≈ [0.0, 0.0, 0.0]
+    @test isapprox(res2[7], [5.03576566e-02, 1.00715313e-01, 7.81683430e+02], rtol=1e-4) 
+    println(res2)
 end
 
-@testset "test_calc_alpha      " begin
+# [ 0.05035766  0.10071531  9.96081617]
+
+# [[  0.00000000e+00   0.00000000e+00   0.00000000e+00]
+#  [  2.38418505e-03   4.76837010e-03   9.81000000e+00]
+#  [  2.38279119e-03   4.76558239e-03   9.81000000e+00]
+#  [  2.38139816e-03   4.76279631e-03   9.81000000e+00]
+#  [  2.38000593e-03   4.76001187e-03   9.81000000e+00]
+#  [  9.13190455e-03   1.82638091e-02   9.81000000e+00]
+#  [  5.03576566e-02   1.00715313e-01   9.96081617e+00]]
+
+#= @testset "test_calc_alpha      " begin
     v_app = Vec3(10,2,3)
     vec_z = normalize(Vec3(3,2,0))
     alpha = KPS3.calc_alpha(v_app, vec_z)
@@ -127,7 +144,7 @@ end
 
 @testset "test_clear           " begin
     KPS3.clear(state)
-end
+end 
 
 # Inputs:
 # State vector state_y   = pos1, pos2, ..., posn, vel1, vel2, ..., veln
@@ -188,16 +205,20 @@ end
     p = SciMLBase.NullParameters()
     t = 0.0
     residual!(res, yd0, y0, p, t)
+    @test my_state.length ≈ 25.03333333333333
     @test my_state.c_spring ≈ 24551.26498
     @test my_state.damping  ≈  37.7896138482
-
+    @test isapprox(my_state.param_cl, 1.11349300703, atol=1e-4)
+    @test isapprox(my_state.param_cd, 0.319248524333, atol=1e-4) # [-275.31680793466865, -3.5309114469539753e-5, -873.0000830018812]
+ 
     @test sum(my_state.res1) ≈ [0.0, 1.0e-6, 0.0]
     @test my_state.res2[1]   ≈ [1.00000000e-06,  1.00000000e-06,  1.00000000e-06]
 
-    # @test my_state.res2[2]   ≈ [8.83559075e+00, -4.72588546e-07, -5.10109289e+00]
+    # @test isapprox(my_state.res2[2], [8.83559075e+00, -4.72588546e-07, -5.10109289e+00], atol=1e-4)
     ## println("res1: ", my_state.res1)
     # println("res2: "); display(my_state.res2)
 end
+=#
 
 # res: [[[ -0.00000000e+00   1.00000000e-06  -0.00000000e+00]
 #   [  0.00000000e+00   0.00000000e+00   0.00000000e+00]
@@ -210,10 +231,10 @@ end
 # [[  1.00000000e-06   1.00000000e-06   1.00000000e-06]
 # [  8.83559075e+00  -4.72588546e-07  -5.10109289e+00]
 # [  8.81318565e+00  -4.68864292e-07  -5.08829453e+00]
-# [  2.42072067e+00   5.96546671e-07  -1.39760315e+00]
-# [  2.41459859e+00   5.97567018e-07  -1.39406857e+00]
-# [  2.81260617e+00   5.31232413e-07  -1.62385835e+00]
-# [  1.44519121e+01   2.65882576e-06   4.35399941e+01]]]
+# [  8.79089680e+00  -4.65149483e-07  -5.07542606e+00]
+# [  8.76866432e+00  -4.61444069e-07  -5.06259013e+00]
+# [  1.02140374e+01  -7.02339621e-07  -5.89707669e+00]
+# [  1.49735632e+01   2.71870215e-06   4.51115984e+01]]]
 
 #= println("\ncalc_rho:")
 show(@benchmark calc_rho(height) setup=(height=1.0 + rand() * 200.0))

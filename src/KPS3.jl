@@ -174,7 +174,8 @@ function calc_aero_forces(s, pos_kite, v_kite, rho, rel_steering)
     s.drag_force    .*= K * s.param_cd * BRIDLE_DRAG * (1.0 + 0.6 * abs(rel_steering)) 
     s.cor_steering    = C2_COR / s.v_app_norm * sin(s.psi) * cos(s.beta)
     s.steering_force .= -K * REL_SIDE_AREA * STEERING_COEFFICIENT * (rel_steering + s.cor_steering) .* s.kite_y
-    s.last_force     .= -(s.lift_force + s.drag_force + s.steering_force)
+    s.last_force     .= -(s.lift_force + s.drag_force + s.steering_force) 
+    # println(s.last_force) # [ -2.75319859e+02  -3.53069933e-05  -8.72978299e+02]
     nothing
 end
 
@@ -183,7 +184,7 @@ end
 function calc_res(s, pos1, pos2, vel1, vel2, mass, veld, result, i)
     s.segment .= pos1 - pos2
     height = (pos1[3] + pos2[3]) * 0.5
-    rho = calc_rho(height)                # calculate the air density
+    rho = calc_rho(height)               # calculate the air density
     rel_vel = vel1 - vel2                # calculate the relative velocity
     s.av_vel .= 0.5 * (vel1 + vel2)
     norm1 = norm(s.segment)
@@ -193,6 +194,7 @@ function calc_res(s, pos1, pos2, vel1, vel2, mass, veld, result, i)
     spring_vel = dot(s.unit_vector, rel_vel)
 
     k2 = 0.05 * s.c_spring             # compression stiffness tether segments
+    println("k2, s.c_spring: $k2 $(s.c_spring)")
     if norm1 - s.length > 0.0
         s.spring_force .= (s.c_spring * (norm1 - s.length) + s.damping * spring_vel) .* s.unit_vector
     else
@@ -201,7 +203,7 @@ function calc_res(s, pos1, pos2, vel1, vel2, mass, veld, result, i)
 
     s.area = norm1 * D_TETHER
     s.last_v_app_norm_tether = calc_drag(s, s.av_vel, s.unit_vector, rho, s.last_tether_drag, s.v_app_perp, s.area)
-
+    
     if i == SEGMENTS
         s.area = L_BRIDLE * D_TETHER
         s.last_v_app_norm_tether = calc_drag(s, s.av_vel, s.unit_vector, rho, s.last_tether_drag, s.v_app_perp, s.area)
@@ -228,8 +230,9 @@ function loop(s, pos, vel, posd, veld, res1, res2)
     for i in 2:SEGMENTS+1
         res1[i] .= vel[i] - posd[i]
     end
-    for i in SEGMENTS:-1:2
-        calc_res(state, pos[i], pos[i-1], vel[i], vel[i-1], s.masses[i], veld[i],  res2[i], i)
+    for i in SEGMENTS+1:-1:2
+        calc_res(s, pos[i], pos[i-1], vel[i], vel[i-1], s.masses[i], veld[i],  res2[i], i)
+        return nothing
     end
     nothing
 end
