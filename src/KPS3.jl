@@ -384,11 +384,51 @@ function set_v_wind_ground(s, height, v_wind_gnd=V_WIND, wind_dir=0.0)
     s.v_wind_gnd .= [v_wind_gnd * cos(wind_dir), v_wind_gnd * sin(wind_dir), 0.0]
     s.v_wind_tether .= v_wind_gnd * calcWindFactor(height / 2.0) .* [cos(wind_dir), sin(wind_dir), 0]
     s.rho = calc_rho(height)
+    nothing
 end
 
 function get_lod(s)
     lift, drag = s.get_lod
     return lift / drag
+end
+
+# Calculate the initial conditions y0, yd0 and sw0. Tether with the given elevation angle,
+# particle zero fixed at origin. """
+function init(s)
+    DELTA = 1e-6
+    set_cl_cd(s, 10.0/180.0 * π)
+    print("param_cl, param_cd: ", s.param_cl, s.param_cd)
+    pos, vel, acc = [], [], []
+    state_y = DELTA
+    vel_incr = 0
+    sin_el, cos_el = sin(ELEVATION / 180.0 * π), cos(ELEVATION / 180.0 * π)
+    for i in 1:SEGMENTS + 1
+        radius =  -i * L_0
+        if i == 0
+            push!(pos, Vec3(-cos_el * radius, DELTA, -sin_el * radius))
+            push!(vel, Vec3(DELTA, DELTA, DELTA))
+        else
+             push!(pos, Vec3(-cos_el * radius, state_y, -sin_el * radius))
+             if i < SEGMENTS
+                 push!(vel, Vec3(DELTA, DELTA, -sin_el * vel_incr*i))
+             else
+                push!(vel, Vec3(DELTA, DELTA, -sin_el * vel_incr*(i-1.0)))
+             end
+        end
+        push!(acc, Vec3(DELTA, DELTA, -9.81))
+    end
+    state_y0, yd0 = [], []
+    for i in 1:SEGMENTS + 1
+        push!(state_y0,  pos[i]) # Initial state vector
+        yd0 = push!(yd0, vel[i])             # Initial state vector derivative
+    end
+    for i in range (SEGMENTS + 1):
+        push!(state_y0, vel[i])  # Initial state vector
+        push!(yd0, acc[i])       # Initial state vector derivative
+    end
+    s.set_l_tether(L_0 *  SEGMENTS)
+    s.set_v_reel_out(V_REEL_OUT, 0.0)
+    return state_y0, yd0
 end
 
 end
