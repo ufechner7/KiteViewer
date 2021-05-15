@@ -168,11 +168,41 @@ end
 
 @testset "test_init            " begin
     y0, yd0 = KPS3.init(state)
-    println(y0)
-    println(yd0)
-    println(length(y0))
-    println(length(yd0))
+    @test length(y0)  == (SEGMENTS+1) * 6
+    @test length(yd0) == (SEGMENTS+1) * 6
+    @test sum(y0)  ≈ 717.1633589868303
+    @test sum(yd0) ≈ -68.669971000000018
+    @test isapprox(state.param_cl, 0.574103590856, atol=1e-4)
+    @test isapprox(state.param_cd, 0.125342896308, atol=1e-4)
 end
+
+@testset "test_initial_residual" begin
+    res1 = zeros(SVector{SEGMENTS+1, Vec3})
+    res2 = deepcopy(res1)
+    res = reduce(vcat, vcat(res1, res2))
+    y0, yd0 = KPS3.init(state)
+    p = SciMLBase.NullParameters()
+    t = 0.0
+    clear(state)
+    residual!(res, yd0, y0, p, t)
+    println(res)
+end
+
+# res: [[[ -0.00000000e+00   1.00000000e-06  -0.00000000e+00]
+#   [  0.00000000e+00   0.00000000e+00   0.00000000e+00]
+#   [  0.00000000e+00   0.00000000e+00   0.00000000e+00]
+#   [  0.00000000e+00   0.00000000e+00   0.00000000e+00]
+#   [  0.00000000e+00   0.00000000e+00   0.00000000e+00]
+#   [  0.00000000e+00   0.00000000e+00   0.00000000e+00]
+#   [  0.00000000e+00   0.00000000e+00   0.00000000e+00]]
+
+#  [[  1.00000000e-06   1.00000000e-06   1.00000000e-06]
+#   [  8.83559075e+00  -4.72588546e-07  -5.10109289e+00]
+#   [  8.81318565e+00  -4.68864292e-07  -5.08829453e+00]
+#   [  2.42072067e+00   5.96546671e-07  -1.39760315e+00]
+#   [  2.41459859e+00   5.97567018e-07  -1.39406857e+00]
+#   [  2.81260617e+00   5.31232413e-07  -1.62385835e+00]
+#   [  1.50240780e-01   1.01724489e-06   4.52634885e-01]]]
 
 #= println("\ncalc_rho:")
 show(@benchmark calc_rho(height) setup=(height=1.0 + rand() * 200.0))

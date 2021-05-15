@@ -400,7 +400,6 @@ end
 function init(s)
     DELTA = 1e-6
     set_cl_cd(s, 10.0/180.0 * π)
-    println("param_cl, param_cd: ", s.param_cl,", ", s.param_cd)
     pos, vel, acc = Vec3[], Vec3[], Vec3[]
     state_y = DELTA
     vel_incr = 0
