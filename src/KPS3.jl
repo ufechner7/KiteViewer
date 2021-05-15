@@ -59,7 +59,7 @@ export set_v_reel_out, set_depower_steering                                     
      L_BRIDLE = se().l_bridle      # sum of the lengths of the bridle lines [m]
      L_TOT_0  = 150.0              # initial tether length [m]
      L_0      = L_TOT_0 / SEGMENTS # initial segment length [m]
-     C_SPRING = 6.146e5 / L_0      # initial spring constant  [N/m]
+     C_SPRING = 6.146e5 / L_0      # initial spring constant  [N/m] 24584.0
      DAMPING  = 2 * 473.0 / L_0    # initial damping constant [Ns/m]
      MASS = 0.011 * L_0            # initial mass per particle: 1.1 kg per 100m = 0.011 kg/m for 4mm Dyneema
      KITE_MASS = 11.4              # kite including sensor unit
@@ -72,7 +72,7 @@ export set_v_reel_out, set_depower_steering                                     
      K_ds = 1.5                    # influence of the depower angle on the steering sensitivity
      MAX_ALPHA_DEPOWER = 31.0
      ELEVATION = 60.0              # initial elevation angle in degrees
-     V_REEL_OUT = 0.0              # initial reel out speed
+     V_REEL_OUT = 4.0              # initial reel out speed
 
      ALPHA_CL = [-180.0, -160.0, -90.0, -20.0, -10.0,  -5.0,  0.0, 20.0, 40.0, 90.0, 160.0, 180.0]
      CL_LIST  = [   0.0,    0.5,   0.0,  0.08, 0.125,  0.15,  0.2,  1.0,  1.0,  0.0,  -0.5,   0.0]
@@ -440,6 +440,7 @@ function init(s, output=false)
         push!(yd0, acc[i])       # Initial state vector derivative
     end
     set_l_tether(s, L_0 *  SEGMENTS)
+    set_v_reel_out(s, V_REEL_OUT, 0.0)
     set_v_reel_out(s, V_REEL_OUT, 0.0)
     elements = length(reduce(vcat, state_y0))
     if output
