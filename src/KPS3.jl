@@ -194,7 +194,6 @@ function calc_res(s, pos1, pos2, vel1, vel2, mass, veld, result, i)
     spring_vel = dot(s.unit_vector, rel_vel)
 
     k2 = 0.05 * s.c_spring             # compression stiffness tether segments
-    println("k2, s.c_spring: $k2 $(s.c_spring)")
     if norm1 - s.length > 0.0
         s.spring_force .= (s.c_spring * (norm1 - s.length) + s.damping * spring_vel) .* s.unit_vector
     else
@@ -204,7 +203,7 @@ function calc_res(s, pos1, pos2, vel1, vel2, mass, veld, result, i)
     s.area = norm1 * D_TETHER
     s.last_v_app_norm_tether = calc_drag(s, s.av_vel, s.unit_vector, rho, s.last_tether_drag, s.v_app_perp, s.area)
     
-    if i == SEGMENTS
+    if i == SEGMENTS+1
         s.area = L_BRIDLE * D_TETHER
         s.last_v_app_norm_tether = calc_drag(s, s.av_vel, s.unit_vector, rho, s.last_tether_drag, s.v_app_perp, s.area)
         # TODO Check this equation
@@ -212,7 +211,7 @@ function calc_res(s, pos1, pos2, vel1, vel2, mass, veld, result, i)
     else
         s.force .= s.spring_force + 0.5 * s.last_tether_drag
     end
-
+   
     s.total_forces .= s.force + s.last_force
     s.last_force .= 0.5 * s.last_tether_drag - s.spring_force
     s.acc .= s.total_forces ./ mass # create the vector of the spring acceleration
@@ -232,7 +231,6 @@ function loop(s, pos, vel, posd, veld, res1, res2)
     end
     for i in SEGMENTS+1:-1:2
         calc_res(s, pos[i], pos[i-1], vel[i], vel[i-1], s.masses[i], veld[i],  res2[i], i)
-        return nothing
     end
     nothing
 end

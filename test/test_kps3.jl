@@ -111,20 +111,13 @@ end
     KPS3.loop(state, pos, vel, posd, veld, res1, res2)
     @test sum(res1) ≈ [0.0, 0.0, 0.0]
     @test isapprox(res2[7], [5.03576566e-02, 1.00715313e-01, 7.81683430e+02], rtol=1e-4) 
-    println(res2)
+    @test isapprox(res2[6], [9.13190455e-03, 1.82638091e-02, 9.81000000e+00], rtol=1e-4) 
+    @test isapprox(res2[5], [2.38000593e-03, 4.76001187e-03, 9.81000000e+00], rtol=1e-4) 
+    @test isapprox(res2[2], [2.38418505e-03, 4.76837010e-03, 9.81000000e+00], rtol=1e-4)
+    @test isapprox(res2[1], [0.0,0.0,0.0], rtol=1e-4)
 end
 
-# [ 0.05035766  0.10071531  9.96081617]
-
-# [[  0.00000000e+00   0.00000000e+00   0.00000000e+00]
-#  [  2.38418505e-03   4.76837010e-03   9.81000000e+00]
-#  [  2.38279119e-03   4.76558239e-03   9.81000000e+00]
-#  [  2.38139816e-03   4.76279631e-03   9.81000000e+00]
-#  [  2.38000593e-03   4.76001187e-03   9.81000000e+00]
-#  [  9.13190455e-03   1.82638091e-02   9.81000000e+00]
-#  [  5.03576566e-02   1.00715313e-01   9.96081617e+00]]
-
-#= @testset "test_calc_alpha      " begin
+@testset "test_calc_alpha      " begin
     v_app = Vec3(10,2,3)
     vec_z = normalize(Vec3(3,2,0))
     alpha = KPS3.calc_alpha(v_app, vec_z)
@@ -146,27 +139,27 @@ end
     KPS3.clear(state)
 end 
 
-# Inputs:
-# State vector state_y   = pos1, pos2, ..., posn, vel1, vel2, ..., veln
-# Derivative   der_yd    = vel1, vel2, ..., veln, acc1, acc2, ..., accn
-# Output:
-# Residual     res = res1, res2 = pos1,  ..., vel1, ...
-@testset "test_residual!       " begin
-    res1 = zeros(SVector{SEGMENTS+1, Vec3})
-    res2 = deepcopy(res1)
-    res = reduce(vcat, vcat(res1, res2))
-    pos = deepcopy(res1)
-    pos[1] .= [1.0,2,3]
-    vel = deepcopy(res1) 
-    y = reduce(vcat, vcat(pos, vel))
-    der_pos = deepcopy(res1)
-    der_vel = deepcopy(res1)
-    yd = reduce(vcat, vcat(der_pos, der_vel))
-    p = SciMLBase.NullParameters()
-    t = 0.0
-    clear(state)
-    residual!(res, yd, y, p, t)
-end
+# # Inputs:
+# # State vector state_y   = pos1, pos2, ..., posn, vel1, vel2, ..., veln
+# # Derivative   der_yd    = vel1, vel2, ..., veln, acc1, acc2, ..., accn
+# # Output:
+# # Residual     res = res1, res2 = pos1,  ..., vel1, ...
+# @testset "test_residual!       " begin
+#     res1 = zeros(SVector{SEGMENTS+1, Vec3})
+#     res2 = deepcopy(res1)
+#     res = reduce(vcat, vcat(res1, res2))
+#     pos = deepcopy(res1)
+#     pos[1] .= [1.0,2,3]
+#     vel = deepcopy(res1) 
+#     y = reduce(vcat, vcat(pos, vel))
+#     der_pos = deepcopy(res1)
+#     der_vel = deepcopy(res1)
+#     yd = reduce(vcat, vcat(der_pos, der_vel))
+#     p = SciMLBase.NullParameters()
+#     t = 0.0
+#     clear(state)
+#     residual!(res, yd, y, p, t)
+# end
 
 @testset "test_set_v_reel_out  " begin
     v_reel_out = 1.1
@@ -214,27 +207,12 @@ end
     @test sum(my_state.res1) ≈ [0.0, 1.0e-6, 0.0]
     @test my_state.res2[1]   ≈ [1.00000000e-06,  1.00000000e-06,  1.00000000e-06]
 
-    # @test isapprox(my_state.res2[2], [8.83559075e+00, -4.72588546e-07, -5.10109289e+00], atol=1e-4)
+    @test isapprox(my_state.res2[2], [8.83559075e+00, -4.72588546e-07, -5.10109289e+00], rtol=3e-2)
+    @test isapprox(my_state.res2[3], [8.81318565e+00, -4.68864292e-07, -5.08829453e+00], rtol=1e-3)
+    @test isapprox(my_state.res2[7], [1.49735632e+01,  2.71870215e-06,  4.51115984e+01], rtol=1e-3)
     ## println("res1: ", my_state.res1)
-    # println("res2: "); display(my_state.res2)
+    println("res2: "); display(my_state.res2)
 end
-=#
-
-# res: [[[ -0.00000000e+00   1.00000000e-06  -0.00000000e+00]
-#   [  0.00000000e+00   0.00000000e+00   0.00000000e+00]
-#   [  0.00000000e+00   0.00000000e+00   0.00000000e+00]
-#   [  0.00000000e+00   0.00000000e+00   0.00000000e+00]
-#   [  0.00000000e+00   0.00000000e+00   0.00000000e+00]
-#   [  0.00000000e+00   0.00000000e+00   0.00000000e+00]
-#   [  0.00000000e+00   0.00000000e+00   0.00000000e+00]]
-
-# [[  1.00000000e-06   1.00000000e-06   1.00000000e-06]
-# [  8.83559075e+00  -4.72588546e-07  -5.10109289e+00]
-# [  8.81318565e+00  -4.68864292e-07  -5.08829453e+00]
-# [  8.79089680e+00  -4.65149483e-07  -5.07542606e+00]
-# [  8.76866432e+00  -4.61444069e-07  -5.06259013e+00]
-# [  1.02140374e+01  -7.02339621e-07  -5.89707669e+00]
-# [  1.49735632e+01   2.71870215e-06   4.51115984e+01]]]
 
 #= println("\ncalc_rho:")
 show(@benchmark calc_rho(height) setup=(height=1.0 + rand() * 200.0))
