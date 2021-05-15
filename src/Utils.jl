@@ -44,6 +44,7 @@ mutable struct Settings
     zoom::Float64
     fixed_font::String
     area::Float64
+    mass::Float64
     v_wind::Float64
     h_ref::Float64
     rho_0::Float64
@@ -52,7 +53,7 @@ mutable struct Settings
     d_tether::Float64
     l_bridle::Float64
 end
-const SETTINGS = [Settings("","",0,0,0,0,"",0,0,0,0,0,0,0,0)]
+const SETTINGS = [Settings("","",0,0,0,0,"",0,0,0,0,0,0,0,0,0)]
 
 # getter function for the Settings struct
 function se()
@@ -68,6 +69,7 @@ function se()
 
         SETTINGS[1].model= dict["kite"]["model"]
         SETTINGS[1].area = dict["kite"]["area"]
+        SETTINGS[1].mass = dict["kite"]["mass"]
         SETTINGS[1].l_bridle = dict["kite"]["l_bridle"]
 
         SETTINGS[1].cd_tether = dict["tether"]["cd_tether"]

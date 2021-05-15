@@ -57,12 +57,12 @@ export set_v_reel_out, set_depower_steering                                     
      SEGMENTS  = se().segments
      D_TETHER = se().d_tether/1000 # tether diameter [m]
      L_BRIDLE = se().l_bridle      # sum of the lengths of the bridle lines [m]
-     L_TOT_0  = 150.0              # initial tether length [m]
+     L_TOT_0  = 392.0              # initial tether length [m]
      L_0      = L_TOT_0 / SEGMENTS # initial segment length [m]
      C_SPRING = 6.146e5 / L_0      # initial spring constant  [N/m] 24584.0
      DAMPING  = 2 * 473.0 / L_0    # initial damping constant [Ns/m]
      MASS = 0.011 * L_0            # initial mass per particle: 1.1 kg per 100m = 0.011 kg/m for 4mm Dyneema
-     KITE_MASS = 11.4              # kite including sensor unit
+     KITE_MASS = se().mass         # kite including sensor unit
      KCU_MASS  =  8.4
      REL_SIDE_AREA = 0.5
      STEERING_COEFFICIENT = 0.6
@@ -71,8 +71,8 @@ export set_v_reel_out, set_depower_steering                                     
      ALPHA_ZERO = 0.0
      K_ds = 1.5                    # influence of the depower angle on the steering sensitivity
      MAX_ALPHA_DEPOWER = 31.0
-     ELEVATION = 60.0              # initial elevation angle in degrees
-     V_REEL_OUT = 4.0              # initial reel out speed
+     ELEVATION = 70.0              # initial elevation angle in degrees
+     V_REEL_OUT = 0.0              # initial reel out speed
 
      ALPHA_CL = [-180.0, -160.0, -90.0, -20.0, -10.0,  -5.0,  0.0, 20.0, 40.0, 90.0, 160.0, 180.0]
      CL_LIST  = [   0.0,    0.5,   0.0,  0.08, 0.125,  0.15,  0.2,  1.0,  1.0,  0.0,  -0.5,   0.0]
@@ -391,13 +391,13 @@ end
 # Set the vector of the wind-velocity at the height of the kite. As parameter the height,
 # the ground wind speed and the wind direction are needed.
 # Must be called every 50 ms.
-function set_v_wind_ground(s, height, v_wind_gnd=V_WIND, wind_dir=0.0)
+function set_v_wind_ground(s, height, v_wind_gnd=se().v_wind, wind_dir=0.0)
     if height < 6.0
         height = 6.0
     end
-    s.v_wind .= v_wind_gnd * calcWindFactor(height) .* [cos(wind_dir), sin(wind_dir), 0]
+    s.v_wind .= v_wind_gnd * calc_wind_factor(height) .* [cos(wind_dir), sin(wind_dir), 0]
     s.v_wind_gnd .= [v_wind_gnd * cos(wind_dir), v_wind_gnd * sin(wind_dir), 0.0]
-    s.v_wind_tether .= v_wind_gnd * calcWindFactor(height / 2.0) .* [cos(wind_dir), sin(wind_dir), 0]
+    s.v_wind_tether .= v_wind_gnd * calc_wind_factor(height / 2.0) .* [cos(wind_dir), sin(wind_dir), 0]
     s.rho = calc_rho(height)
     nothing
 end
@@ -417,12 +417,12 @@ function init(s, output=false)
     vel_incr = 0
     sin_el, cos_el = sin(ELEVATION / 180.0 * π), cos(ELEVATION / 180.0 * π)
     for i in 0:SEGMENTS
-        radius =  -i * L_0
+        radius =  -i * L_0*1.00263
         if i == 0
             push!(pos, Vec3(-cos_el * radius, DELTA, -sin_el * radius))
             push!(vel, Vec3(DELTA, DELTA, DELTA))
         else
-             push!(pos, Vec3(-cos_el * radius, state_y, -sin_el * radius))
+             push!(pos, Vec3(-cos_el * radius*(1.0+0.000057*i/7.0), state_y, -sin_el * radius*(1.0+0.000057*i/7.0)))
              if i < SEGMENTS
                  push!(vel, Vec3(DELTA, DELTA, -sin_el * vel_incr*i))
              else
@@ -431,6 +431,8 @@ function init(s, output=false)
         end
         push!(acc, Vec3(DELTA, DELTA, -9.81))
     end
+    forces = get_spring_forces(s, pos)
+    println("Winch force: $(norm(forces[1])) N")
     state_y0, yd0 = Vec3[], Vec3[]
     for i in 1:SEGMENTS+1
         push!(state_y0,  pos[i]) # Initial state vector
@@ -440,6 +442,7 @@ function init(s, output=false)
         push!(state_y0, vel[i])  # Initial state vector
         push!(yd0, acc[i])       # Initial state vector derivative
     end
+    set_v_wind_ground(s, pos[SEGMENTS+1][3])
     set_l_tether(s, L_0 *  SEGMENTS)
     set_v_reel_out(s, V_REEL_OUT, 0.0)
     set_v_reel_out(s, V_REEL_OUT, 0.0)

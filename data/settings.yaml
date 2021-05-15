@@ -5,11 +5,16 @@ system:
     sample_freq:   20              # sample frequency in Hz
     zoom:        0.03              # zoom factor for the system view
     fixed_font: ""                 # name or filepath+filename of alternative fixed pitch font
+
+initial:
+    l_tether: 392.0       # initial tether length   [m]
+    elevation: 70.0       # initial elevation angle [deg]
+    v_reel_out: 0.0       # initial reel out speed  [m/s]
     
 kite:
     model: "data/kite.obj" # 3D model of the kite
-    mass:  6.0             # [kg]
-    area: 20.0             # [m^2]
+    mass:  6.2             # kit mass incl. sensor unit [kg]
+    area:  10.0            # [m^2]
     lod:   5.0             # max lift over drag
     l_bridle: 33.4         # sum of the lengths of the bridle lines [m]
 
@@ -18,7 +23,7 @@ tether:
     cd_tether: 0.958       # drag coefficient of the tether
 
 environment:
-    v_wind: 8.0      # wind speed at reference height      [m/s]
+    v_wind: 9.1      # wind speed at reference height      [m/s]
     h_ref:  6.0      # reference height for the wind speed   [m]
     rho_0:  1.225    # air density at the ground         [kg/m³]
     alpha:  0.142857 # exponent of the wind profile law
