@@ -207,7 +207,7 @@ function calc_res(s, pos1, pos2, vel1, vel2, mass, veld, result, i)
         s.area = L_BRIDLE * D_TETHER
         s.last_v_app_norm_tether = calc_drag(s, s.av_vel, s.unit_vector, rho, s.last_tether_drag, s.v_app_perp, s.area)
         # TODO Check this equation
-        s.force .= s.last_tether_drag + s.spring_force + 0.5 * s.last_tether_drag     
+        s.force .= s.spring_force + 0.5 * s.last_tether_drag     
     else
         s.force .= s.spring_force + 0.5 * s.last_tether_drag
     end
@@ -417,19 +417,19 @@ function init(s, output=false)
     vel_incr = 0
     sin_el, cos_el = sin(ELEVATION / 180.0 * π), cos(ELEVATION / 180.0 * π)
     for i in 0:SEGMENTS
-        radius =  -i * L_0*1.00263
+        radius =  -i * L_0*1.00293
         if i == 0
             push!(pos, Vec3(-cos_el * radius, DELTA, -sin_el * radius))
             push!(vel, Vec3(DELTA, DELTA, DELTA))
         else
-             push!(pos, Vec3(-cos_el * radius*(1.0+0.000057*i/7.0), state_y, -sin_el * radius*(1.0+0.000057*i/7.0)))
+             push!(pos, Vec3(-cos_el * radius*(1.0+0.00002*i/7.0), state_y, -sin_el * radius*(1.0+0.00002*i/7.0)))
              if i < SEGMENTS
                  push!(vel, Vec3(DELTA, DELTA, -sin_el * vel_incr*i))
              else
                 push!(vel, Vec3(DELTA, DELTA, -sin_el * vel_incr*(i-1.0)))
              end
         end
-        push!(acc, Vec3(DELTA, DELTA, -9.81))
+        push!(acc, Vec3(DELTA, DELTA, DELTA))
     end
     forces = get_spring_forces(s, pos)
     println("Winch force: $(norm(forces[1])) N")
