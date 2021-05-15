@@ -314,12 +314,12 @@ function residual!(res, yd, y, p, time)
     calc_set_cl_cd(s, vec_c, v_app)
     calc_aero_forces(s, s.pos_kite, s.v_kite, s.rho, s.steering) # force at the kite
     loop(s, pos, vel, posd, veld, s.res1, s.res2)
-    
+   
     # copy and flatten result
     for i in 1:SEGMENTS+1
         for j in 1:3
-           @inbounds res[3*i+j] = s.res1[i][j]
-           @inbounds res[SEGMENTS+1+3*i+j] = s.res2[i][j]
+           @inbounds res[3*(i-1)+j] = s.res1[i][j]
+           @inbounds res[3*(SEGMENTS+1)+3*(i-1)+j] = s.res2[i][j]
         end
     end
     nothing
