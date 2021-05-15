@@ -186,7 +186,12 @@ end
     p = SciMLBase.NullParameters()
     t = 0.0
     residual!(res, yd0, y0, p, t)
-    println(res)
+    @test sum(my_state.res1) ≈ [0.0, 1.0e-6, 0.0]
+    @test my_state.res2[1]   ≈ [1.00000000e-06,  1.00000000e-06,  1.00000000e-06]
+    @test my_state.res2[2]   ≈ [8.83559075e+00, -4.72588546e-07, -5.10109289e+00]
+    println(sum(my_state.res1))
+    println("res1: ", my_state.res1)
+    println("res2: "); display(my_state.res2)
 end
 
 # res: [[[ -0.00000000e+00   1.00000000e-06  -0.00000000e+00]
