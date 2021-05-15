@@ -180,10 +180,11 @@ end
     res1 = zeros(SVector{SEGMENTS+1, Vec3})
     res2 = deepcopy(res1)
     res = reduce(vcat, vcat(res1, res2))
-    y0, yd0 = KPS3.init(state)
+    my_state = KPS3.get_state()
+    clear(my_state)
+    y0, yd0 = KPS3.init(my_state)
     p = SciMLBase.NullParameters()
     t = 0.0
-    clear(state)
     residual!(res, yd0, y0, p, t)
     println(res)
 end

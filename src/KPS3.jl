@@ -138,6 +138,9 @@ end
 const state = State{SimFloat, Vec3}()
 
 # Functions
+function get_state()
+    state
+end
 
 # Calculate the air densisity as function of height
 calc_rho(height) = se().rho_0 * exp(-height / 8550.0)
@@ -271,6 +274,13 @@ function clear(s)
     s.rho = se().rho_0
 end
 
+function unpack(y)
+    part = reshape(SVector{6*(SEGMENTS+1)}(y),  Size(3, SEGMENTS+1, 2))
+    pos1 = part[:,:,1]
+    pos = SVector{SEGMENTS+1}(SVector(pos1[:,i]) for i in 1:SEGMENTS+1)
+    return pos
+end
+
 # N-point tether model:
 # Inputs:
 # State vector state_y   = pos1, pos2, ..., posn, vel1, vel2, ..., veln
@@ -290,10 +300,11 @@ function residual!(res, yd, y, p, time)
 
     # update parameters
     s = state
+    s.pos_kite .= pos[SEGMENTS+1]
+    s.v_kite   .= vel[SEGMENTS+1]
     delta_t = time - s.t_0
     delta_v = s.v_reel_out - s.last_v_reel_out
     s.length = (s.l_tether + s.last_v_reel_out * delta_t + 0.5 * delta_v * delta_t^2) / SEGMENTS
-
     s.c_spring = C_SPRING * L_0 / s.length
     s.damping  = DAMPING  * L_0 / s.length
 
@@ -397,7 +408,7 @@ end
 
 # Calculate the initial conditions y0, yd0 and sw0. Tether with the given elevation angle,
 # particle zero fixed at origin. """
-function init(s)
+function init(s, output=false)
     DELTA = 1e-6
     set_cl_cd(s, 10.0/180.0 * π)
     pos, vel, acc = Vec3[], Vec3[], Vec3[]
@@ -431,6 +442,12 @@ function init(s)
     set_l_tether(s, L_0 *  SEGMENTS)
     set_v_reel_out(s, V_REEL_OUT, 0.0)
     elements = length(reduce(vcat, state_y0))
+    if output
+        print("y0: ")
+        display(state_y0)
+        print("yd0: ")
+        display(yd0)
+    end
     return MVector{elements, SimFloat}(reduce(vcat, state_y0)), MVector{elements, SimFloat}(reduce(vcat, yd0))
 end
 
