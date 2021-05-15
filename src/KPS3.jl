@@ -71,6 +71,8 @@ export set_v_reel_out, set_depower_steering                                     
      ALPHA_ZERO = 0.0
      K_ds = 1.5                    # influence of the depower angle on the steering sensitivity
      MAX_ALPHA_DEPOWER = 31.0
+     ELEVATION = 60.0              # initial elevation angle in degrees
+     V_REEL_OUT = 0.0              # initial reel out speed
 
      ALPHA_CL = [-180.0, -160.0, -90.0, -20.0, -10.0,  -5.0,  0.0, 20.0, 40.0, 90.0, 160.0, 180.0]
      CL_LIST  = [   0.0,    0.5,   0.0,  0.08, 0.125,  0.15,  0.2,  1.0,  1.0,  0.0,  -0.5,   0.0]
@@ -332,6 +334,7 @@ function set_depower_steering(s, depower, steering)
     # print "v_app_norm, CL, rho: ", form(self.scalars[V_app_norm]),form(self.scalars[ParamCL]), form(self.rho)
     s.steering = (steering - C0) / (1.0 + K_ds * (s.alpha_depower / deg2rad(MAX_ALPHA_DEPOWER)))
     # println("LoD: ", s.param_cl/ s.param_cd)
+    nothing
 end
 
 function set_beta_psi(s, beta, psi)
@@ -397,8 +400,8 @@ end
 function init(s)
     DELTA = 1e-6
     set_cl_cd(s, 10.0/180.0 * π)
-    print("param_cl, param_cd: ", s.param_cl, s.param_cd)
-    pos, vel, acc = [], [], []
+    println("param_cl, param_cd: ", s.param_cl,", ", s.param_cd)
+    pos, vel, acc = Vec3[], Vec3[], Vec3[]
     state_y = DELTA
     vel_incr = 0
     sin_el, cos_el = sin(ELEVATION / 180.0 * π), cos(ELEVATION / 180.0 * π)
@@ -417,18 +420,18 @@ function init(s)
         end
         push!(acc, Vec3(DELTA, DELTA, -9.81))
     end
-    state_y0, yd0 = [], []
+    state_y0, yd0 = Vec3[], Vec3[]
     for i in 1:SEGMENTS + 1
         push!(state_y0,  pos[i]) # Initial state vector
         yd0 = push!(yd0, vel[i])             # Initial state vector derivative
     end
-    for i in range (SEGMENTS + 1):
+    for i in 1:SEGMENTS + 1
         push!(state_y0, vel[i])  # Initial state vector
         push!(yd0, acc[i])       # Initial state vector derivative
     end
-    s.set_l_tether(L_0 *  SEGMENTS)
-    s.set_v_reel_out(V_REEL_OUT, 0.0)
-    return state_y0, yd0
+    set_l_tether(s, L_0 *  SEGMENTS)
+    set_v_reel_out(s, V_REEL_OUT, 0.0)
+    return MVector{42, SimFloat}(reduce(vcat, state_y0)), MVector{42, SimFloat}(reduce(vcat, yd0))
 end
 
 end

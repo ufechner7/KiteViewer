@@ -166,7 +166,15 @@ end
     set_depower_steering(state, depower, steering)
 end
 
-println("\ncalc_rho:")
+@testset "test_init            " begin
+    y0, yd0 = KPS3.init(state)
+    println(y0)
+    println(yd0)
+    println(length(y0))
+    println(length(yd0))
+end
+
+#= println("\ncalc_rho:")
 show(@benchmark calc_rho(height) setup=(height=1.0 + rand() * 200.0))
 println("\ncalc_wind_factor:")
 show(@benchmark calc_wind_factor(height) setup=(height=rand() * 200.0))
@@ -204,5 +212,5 @@ show(@benchmark residual!(res, yd, y, p, t) setup = (res1 = zeros(SVector{SEGMEN
                                                         res = reduce(vcat, vcat(res1, res2)); pos = deepcopy(res1);
                                                         pos[1] .= [1.0,2,3]; vel = deepcopy(res1); y = reduce(vcat, vcat(pos, vel));
                                                         der_pos = deepcopy(res1); der_vel = deepcopy(res1); yd = reduce(vcat, vcat(der_pos, der_vel));
-                                                        p = SciMLBase.NullParameters(); t = 0.0))
+                                                        p = SciMLBase.NullParameters(); t = 0.0)) =#
 nothing
