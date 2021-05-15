@@ -405,7 +405,7 @@ function init(s)
     state_y = DELTA
     vel_incr = 0
     sin_el, cos_el = sin(ELEVATION / 180.0 * π), cos(ELEVATION / 180.0 * π)
-    for i in 1:SEGMENTS + 1
+    for i in 0:SEGMENTS
         radius =  -i * L_0
         if i == 0
             push!(pos, Vec3(-cos_el * radius, DELTA, -sin_el * radius))
@@ -421,17 +421,18 @@ function init(s)
         push!(acc, Vec3(DELTA, DELTA, -9.81))
     end
     state_y0, yd0 = Vec3[], Vec3[]
-    for i in 1:SEGMENTS + 1
+    for i in 1:SEGMENTS+1
         push!(state_y0,  pos[i]) # Initial state vector
-        yd0 = push!(yd0, vel[i])             # Initial state vector derivative
+        yd0 = push!(yd0, vel[i]) # Initial state vector derivative
     end
-    for i in 1:SEGMENTS + 1
+    for i in 1:SEGMENTS+1
         push!(state_y0, vel[i])  # Initial state vector
         push!(yd0, acc[i])       # Initial state vector derivative
     end
     set_l_tether(s, L_0 *  SEGMENTS)
     set_v_reel_out(s, V_REEL_OUT, 0.0)
-    return MVector{42, SimFloat}(reduce(vcat, state_y0)), MVector{42, SimFloat}(reduce(vcat, yd0))
+    elements = length(reduce(vcat, state_y0))
+    return MVector{elements, SimFloat}(reduce(vcat, state_y0)), MVector{elements, SimFloat}(reduce(vcat, yd0))
 end
 
 end
