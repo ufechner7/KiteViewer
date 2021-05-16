@@ -7,9 +7,9 @@ system:
     fixed_font: ""                 # name or filepath+filename of alternative fixed pitch font
 
 initial:
-    l_tether: 392.0       # initial tether length   [m]
-    elevation: 70.0       # initial elevation angle [deg]
-    v_reel_out: 0.0       # initial reel out speed  [m/s]
+    l_tether: 392.0        # initial tether length   [m]
+    elevation: 70.0        # initial elevation angle [deg]
+    v_reel_out: 0.0        # initial reel out speed  [m/s]
     
 kite:
     model: "data/kite.obj" # 3D model of the kite
@@ -21,6 +21,8 @@ kite:
 tether:
     d_tether:  4           # tether diameter [mm]
     cd_tether: 0.958       # drag coefficient of the tether
+    damping: 946.0         # 2 * 473.0 damping coefficient for 1 m tether [Ns/m]
+    c_spring: 6.146e5      # spring constant coefficient for 1 m tether [N/m]
 
 environment:
     v_wind: 9.1      # wind speed at reference height      [m/s]
