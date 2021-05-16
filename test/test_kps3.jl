@@ -93,34 +93,34 @@ end
     @test result ≈ [0.04174994,  0.14058806, 10.32680159]
 end
 
-# @testset "test_calc_loop       " begin
-#     KPS3.clear(state)
-#     state.c_spring=0.011
-#     state.damping = 0.01
-#     state.last_tether_drag = Vec3(5.0,6,7)
-#     state.last_force = Vec3(-1.0, -2, -3)
-#     state.v_app_perp = Vec3(0.1,0.22,0.33)
-#     state.v_wind_tether .= [0.1, 0.2, 0.3]
-#     state.length = 10.0
-#     state.c_spring = KPS3.C_SPRING * KPS3.L_0 / state.length
-#     state.damping  = KPS3.DAMPING  * KPS3.L_0 / state.length
-#     pos  = zeros(SVector{SEGMENTS+1, Vec3})
-#     for i in 1:SEGMENTS+1
-#         pos[i][3] = 5.0 * (i-1)
-#     end
-#     vel  = zeros(SVector{SEGMENTS+1, Vec3})
-#     posd = zeros(SVector{SEGMENTS+1, Vec3})
-#     veld = zeros(SVector{SEGMENTS+1, Vec3})
-#     res1 = zeros(SVector{SEGMENTS+1, Vec3})
-#     res2 = zeros(SVector{SEGMENTS+1, Vec3})
-#     KPS3.loop(state, pos, vel, posd, veld, res1, res2)
-#     @test sum(res1) ≈ [0.0, 0.0, 0.0]
-#     @test isapprox(res2[7], [5.03576566e-02, 1.00715313e-01, 7.81683430e+02], rtol=1e-4) 
-#     @test isapprox(res2[6], [9.13190455e-03, 1.82638091e-02, 9.81000000e+00], rtol=1e-4) 
-#     @test isapprox(res2[5], [2.38000593e-03, 4.76001187e-03, 9.81000000e+00], rtol=1e-4) 
-#     @test isapprox(res2[2], [2.38418505e-03, 4.76837010e-03, 9.81000000e+00], rtol=1e-4)
-#     @test isapprox(res2[1], [0.0,0.0,0.0], rtol=1e-4)
-# end
+@testset "test_calc_loop       " begin
+    KPS3.clear(state)
+    state.c_spring=0.011
+    state.damping = 0.01
+    state.last_tether_drag = Vec3(5.0,6,7)
+    state.last_force = Vec3(-1.0, -2, -3)
+    state.v_app_perp = Vec3(0.1,0.22,0.33)
+    state.v_wind_tether .= [0.1, 0.2, 0.3]
+    state.length = 10.0
+    state.c_spring = KPS3.set.c_spring / state.length
+    state.damping  = KPS3.set.damping / state.length
+    pos  = zeros(SVector{SEGMENTS+1, Vec3})
+    for i in 1:SEGMENTS+1
+        pos[i][3] = 5.0 * (i-1)
+    end
+    vel  = zeros(SVector{SEGMENTS+1, Vec3})
+    posd = zeros(SVector{SEGMENTS+1, Vec3})
+    veld = zeros(SVector{SEGMENTS+1, Vec3})
+    res1 = zeros(SVector{SEGMENTS+1, Vec3})
+    res2 = zeros(SVector{SEGMENTS+1, Vec3})
+    KPS3.loop(state, pos, vel, posd, veld, res1, res2)
+    @test sum(res1) ≈ [0.0, 0.0, 0.0]
+    # @test isapprox(res2[7], [5.03576566e-02, 1.00715313e-01, 7.81683430e+02], rtol=1e-4) 
+    # @test isapprox(res2[6], [9.13190455e-03, 1.82638091e-02, 9.81000000e+00], rtol=1e-4) 
+    # @test isapprox(res2[5], [2.38000593e-03, 4.76001187e-03, 9.81000000e+00], rtol=1e-4) 
+    # @test isapprox(res2[2], [2.38418505e-03, 4.76837010e-03, 9.81000000e+00], rtol=1e-4)
+    # @test isapprox(res2[1], [0.0,0.0,0.0], rtol=1e-4)
+end
 
 
 @testset "test_calc_alpha      " begin
