@@ -13,6 +13,10 @@ end
 if ! @isdefined state
     const state = State{SimFloat, Vec3}()
     const SEGMENTS  = se().segments
+    KPS3.set.area = 20.0
+    KPS3.set.v_wind = 8.0
+    state.area = 20.0
+    state.v_wind[1] = 8.0
 end
 
 @testset "calc_rho             " begin
@@ -20,12 +24,12 @@ end
     @test isapprox(calc_rho(100.0), 1.210756, atol=1e-5) 
 end
 
-#=
 @testset "calc_wind_factor     " begin
     @test isapprox(calc_wind_factor(6.0),   1.0, atol=1e-5) 
     @test isapprox(calc_wind_factor(10.0),  1.0757037, atol=1e-5) 
     @test isapprox(calc_wind_factor(100.0), 1.494685, atol=1e-5)
 end
+
 
 @testset "calc_cl              " begin
     @test isapprox(calc_cl(-5.0), 0.150002588978, atol=1e-4) 
@@ -40,7 +44,7 @@ end
     rho = SimFloat(calc_rho(10.0))
     last_tether_drag = Vec3(0.0, 0.0, 0.0)
     v_app_perp = Vec3(0, -3.0, -4.0)
-    area=se().area   
+    area = 20.0   
     state.v_wind_tether .= [0.1, 0.2, 0.3]
     v_app_norm = calc_drag(state, v_segment, unit_vector, rho, last_tether_drag, v_app_perp, area)
     @test v_app_norm ≈ 3.3674916481
@@ -66,15 +70,31 @@ end
     @test state.last_force ≈ [-555.24319976, 544.82004621, 80.49946362]
 end
 
-# @testset "test_calc_res        " begin
-#     i = 2
-#     pos1 = Vec3(30.0, 5.0, 100.0)
-#     pos2 = Vec3(30.0+10, 5.0+11, 100.0+20)
-#     vel1 = Vec3(3.0, 5.0, 2.0)
-#     vel2 = Vec3(3.0+0.1, 5.0+0.2, 2.0+0.3)
-#     mass = 9.0
-#     veld = Vec3(0.1, 0.3, 0.4)
-#     result = Vec3(0, 0, 0)
+@testset "test_calc_res        " begin
+    i = 2
+    pos1 = Vec3(30.0, 5.0, 100.0)
+    pos2 = Vec3(30.0+10, 5.0+11, 100.0+20)
+    vel1 = Vec3(3.0, 5.0, 2.0)
+    vel2 = Vec3(3.0+0.1, 5.0+0.2, 2.0+0.3)
+    mass = 9.0
+    veld = Vec3(0.1, 0.3, 0.4)
+    result = Vec3(0, 0, 0)
+    state.c_spring = 0.011
+    state.damping = 0.01
+    state.last_tether_drag = Vec3(5.0,6,7)
+    state.last_force = Vec3(-1.0, -2, -3)
+    state.v_app_perp = Vec3(0.1,0.22,0.33)
+    state.v_wind_tether .= [0.1, 0.2, 0.3]
+    state.length = 10.0
+    KPS3.calc_res(state, pos1, pos2, vel1, vel2, mass, veld, result, i)
+    @test result ≈ [  0.20699179,   0.49870291,  10.58156092]
+    i = SEGMENTS+1
+    KPS3.calc_res(state, pos1, pos2, vel1, vel2, mass, veld, result, i)
+    @test result ≈ [0.04174994,  0.14058806, 10.32680159]
+end
+
+# @testset "test_calc_loop       " begin
+#     KPS3.clear(state)
 #     state.c_spring=0.011
 #     state.damping = 0.01
 #     state.last_tether_drag = Vec3(5.0,6,7)
@@ -82,41 +102,26 @@ end
 #     state.v_app_perp = Vec3(0.1,0.22,0.33)
 #     state.v_wind_tether .= [0.1, 0.2, 0.3]
 #     state.length = 10.0
-#     KPS3.calc_res(state, pos1, pos2, vel1, vel2, mass, veld, result, i)
-#     @test result ≈ [  0.20699179,   0.49870291,  10.58156092]
-#     i = SEGMENTS+1
-#     KPS3.calc_res(state, pos1, pos2, vel1, vel2, mass, veld, result, i)
-#     @test result ≈ [0.04174994,  0.14058806, 10.32680159]
+#     state.c_spring = KPS3.C_SPRING * KPS3.L_0 / state.length
+#     state.damping  = KPS3.DAMPING  * KPS3.L_0 / state.length
+#     pos  = zeros(SVector{SEGMENTS+1, Vec3})
+#     for i in 1:SEGMENTS+1
+#         pos[i][3] = 5.0 * (i-1)
+#     end
+#     vel  = zeros(SVector{SEGMENTS+1, Vec3})
+#     posd = zeros(SVector{SEGMENTS+1, Vec3})
+#     veld = zeros(SVector{SEGMENTS+1, Vec3})
+#     res1 = zeros(SVector{SEGMENTS+1, Vec3})
+#     res2 = zeros(SVector{SEGMENTS+1, Vec3})
+#     KPS3.loop(state, pos, vel, posd, veld, res1, res2)
+#     @test sum(res1) ≈ [0.0, 0.0, 0.0]
+#     @test isapprox(res2[7], [5.03576566e-02, 1.00715313e-01, 7.81683430e+02], rtol=1e-4) 
+#     @test isapprox(res2[6], [9.13190455e-03, 1.82638091e-02, 9.81000000e+00], rtol=1e-4) 
+#     @test isapprox(res2[5], [2.38000593e-03, 4.76001187e-03, 9.81000000e+00], rtol=1e-4) 
+#     @test isapprox(res2[2], [2.38418505e-03, 4.76837010e-03, 9.81000000e+00], rtol=1e-4)
+#     @test isapprox(res2[1], [0.0,0.0,0.0], rtol=1e-4)
 # end
-
-@testset "test_calc_loop       " begin
-    KPS3.clear(state)
-    state.c_spring=0.011
-    state.damping = 0.01
-    state.last_tether_drag = Vec3(5.0,6,7)
-    state.last_force = Vec3(-1.0, -2, -3)
-    state.v_app_perp = Vec3(0.1,0.22,0.33)
-    state.v_wind_tether .= [0.1, 0.2, 0.3]
-    state.length = 10.0
-    state.c_spring = KPS3.C_SPRING * KPS3.L_0 / state.length
-    state.damping  = KPS3.DAMPING  * KPS3.L_0 / state.length
-    pos  = zeros(SVector{SEGMENTS+1, Vec3})
-    for i in 1:SEGMENTS+1
-        pos[i][3] = 5.0 * (i-1)
-    end
-    vel  = zeros(SVector{SEGMENTS+1, Vec3})
-    posd = zeros(SVector{SEGMENTS+1, Vec3})
-    veld = zeros(SVector{SEGMENTS+1, Vec3})
-    res1 = zeros(SVector{SEGMENTS+1, Vec3})
-    res2 = zeros(SVector{SEGMENTS+1, Vec3})
-    KPS3.loop(state, pos, vel, posd, veld, res1, res2)
-    @test sum(res1) ≈ [0.0, 0.0, 0.0]
-    @test isapprox(res2[7], [5.03576566e-02, 1.00715313e-01, 7.81683430e+02], rtol=1e-4) 
-    @test isapprox(res2[6], [9.13190455e-03, 1.82638091e-02, 9.81000000e+00], rtol=1e-4) 
-    @test isapprox(res2[5], [2.38000593e-03, 4.76001187e-03, 9.81000000e+00], rtol=1e-4) 
-    @test isapprox(res2[2], [2.38418505e-03, 4.76837010e-03, 9.81000000e+00], rtol=1e-4)
-    @test isapprox(res2[1], [0.0,0.0,0.0], rtol=1e-4)
-end
+#=
 
 @testset "test_calc_alpha      " begin
     v_app = Vec3(10,2,3)
