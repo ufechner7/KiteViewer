@@ -49,47 +49,38 @@ export set_v_reel_out, set_depower_steering                                     
 
 # Constants
 @consts begin
-     G_EARTH = 9.81                # gravitational acceleration
-     PERIOD_TIME = 1.0 / se().sample_freq
-     C0 = -0.0032                  # steering offset
-     C2_COR =  0.93
-     CD_TETHER = se().cd_tether    # tether drag coefficient
-     SEGMENTS  = se().segments
-     D_TETHER = se().d_tether/1000 # tether diameter [m]
-     L_BRIDLE = se().l_bridle      # sum of the lengths of the bridle lines [m]
-     L_TOT_0  = 392.0              # initial tether length [m]
-     L_0      = L_TOT_0 / SEGMENTS # initial segment length [m]
-     C_SPRING = 6.146e5 / L_0      # initial spring constant  [N/m] 24584.0
-     DAMPING  = 2 * 473.0 / L_0    # initial damping constant [Ns/m]
-     MASS = 0.011 * L_0            # initial mass per particle: 1.1 kg per 100m = 0.011 kg/m for 4mm Dyneema
-     KITE_MASS = se().mass         # kite including sensor unit
-     KCU_MASS  =  8.4
-     REL_SIDE_AREA = 0.5
-     STEERING_COEFFICIENT = 0.6
-     BRIDLE_DRAG = 1.1
-     ALPHA = se().alpha
-     ALPHA_ZERO = 0.0
-     K_ds = 1.5                    # influence of the depower angle on the steering sensitivity
-     MAX_ALPHA_DEPOWER = 31.0
-     ELEVATION = 70.0              # initial elevation angle in degrees
-     V_REEL_OUT = 0.0              # initial reel out speed
+    set    = se()                 # settings from settings.yaml
+    G_EARTH = 9.81                # gravitational acceleration
+    PERIOD_TIME = 1.0 / set.sample_freq
+    C0 = -0.0032                  # steering offset
+    C2_COR =  0.93
+    KCU_MASS  =  8.4
+    REL_SIDE_AREA = 0.5
+    STEERING_COEFFICIENT = 0.6
+    BRIDLE_DRAG = 1.1
+    ALPHA = set.alpha
+    ALPHA_ZERO = 0.0
+    K_ds = 1.5                    # influence of the depower angle on the steering sensitivity
+    MAX_ALPHA_DEPOWER = 31.0
+    ELEVATION = 70.0              # initial elevation angle in degrees
+    V_REEL_OUT = 0.0              # initial reel out speed
 
-     ALPHA_CL = [-180.0, -160.0, -90.0, -20.0, -10.0,  -5.0,  0.0, 20.0, 40.0, 90.0, 160.0, 180.0]
-     CL_LIST  = [   0.0,    0.5,   0.0,  0.08, 0.125,  0.15,  0.2,  1.0,  1.0,  0.0,  -0.5,   0.0]
-     ALPHA_CD = [-180.0, -170.0, -140.0, -90.0, -20.0, 0.0, 20.0, 90.0, 140.0, 170.0, 180.0]
-     CD_LIST  = [   0.5,    0.5,    0.5,   1.0,   0.2, 0.1,  0.2,  1.0,   0.5,   0.5,   0.5]
-     calc_cl = Spline1D(ALPHA_CL, CL_LIST)
-     calc_cd = Spline1D(ALPHA_CD, CD_LIST)
+    ALPHA_CL = [-180.0, -160.0, -90.0, -20.0, -10.0,  -5.0,  0.0, 20.0, 40.0, 90.0, 160.0, 180.0]
+    CL_LIST  = [   0.0,    0.5,   0.0,  0.08, 0.125,  0.15,  0.2,  1.0,  1.0,  0.0,  -0.5,   0.0]
+    ALPHA_CD = [-180.0, -170.0, -140.0, -90.0, -20.0, 0.0, 20.0, 90.0, 140.0, 170.0, 180.0]
+    CD_LIST  = [   0.5,    0.5,    0.5,   1.0,   0.2, 0.1,  0.2,  1.0,   0.5,   0.5,   0.5]
+    calc_cl = Spline1D(ALPHA_CL, CL_LIST)
+    calc_cd = Spline1D(ALPHA_CD, CD_LIST)
 end
 
 # Type definitions
 const SimFloat = Float64
-const Vec3     = MVector{3, SimFloat}
+const Vec3     = MVector{3, SimFloat}                   
 
 @with_kw mutable struct State{S, T}
-    v_wind::T =           [se().v_wind, 0, 0]    # wind vector at the height of the kite
-    v_wind_gnd::T =       [se().v_wind, 0, 0]    # wind vector at reference height
-    v_wind_tether::T =    [se().v_wind, 0, 0]
+    v_wind::T =           [set.v_wind, 0, 0]    # wind vector at the height of the kite
+    v_wind_gnd::T =       [set.v_wind, 0, 0]    # wind vector at reference height
+    v_wind_tether::T =    [set.v_wind, 0, 0]
     v_apparent::T =       zeros(3)
     v_app_perp::T =       zeros(3)
     drag_force::T =       zeros(3)
@@ -108,11 +99,11 @@ const Vec3     = MVector{3, SimFloat}
     vec_z::T =            zeros(3)
     pos_kite::T =         zeros(3)
     v_kite::T =           zeros(3)        
-    res1::SVector{SEGMENTS+1, Vec3} = zeros(SVector{SEGMENTS+1, Vec3})
-    res2::SVector{SEGMENTS+1, Vec3} = zeros(SVector{SEGMENTS+1, Vec3})
+    res1::SVector{set.segments+1, Vec3} = zeros(SVector{set.segments+1, Vec3})
+    res2::SVector{set.segments+1, Vec3} = zeros(SVector{set.segments+1, Vec3})
     seg_area::S =         zero(S)   # area of one tether segment
     c_spring::S =         zero(S)   # depends on lenght of tether segement
-    length::S =           L_TOT_0
+    length::S =           set.l_tether
     damping::S =          zero(S)   # depends on lenght of tether segement
     area::S =             zero(S)
     last_v_app_norm_tether::S = zero(S)
@@ -128,11 +119,11 @@ const Vec3     = MVector{3, SimFloat}
     v_reel_out::S =        0.0
     last_v_reel_out::S =   0.0
     l_tether::S =          0.0
-    rho::S =               se().rho_0
+    rho::S =               set.rho_0
     depower::S =           0.0
     steering::S =          0.0
-    initial_masses::MVector{SEGMENTS+1, SimFloat} = ones(SEGMENTS+1) * MASS
-    masses::MVector{SEGMENTS+1, SimFloat}         = ones(SEGMENTS+1)
+    initial_masses::MVector{set.segments+1, SimFloat} = ones(set.segments+1) * 0.011 * set.l_tether / set.segments # Dyneema: 1.1 kg/ 100m
+    masses::MVector{set.segments+1, SimFloat}         = ones(set.segments+1)
 end
 
 const state = State{SimFloat, Vec3}()
@@ -143,18 +134,18 @@ function get_state()
 end
 
 # Calculate the air densisity as function of height
-calc_rho(height) = se().rho_0 * exp(-height / 8550.0)
+calc_rho(height) = set.rho_0 * exp(-height / 8550.0)
 
 # Calculate the wind speed at a given height and reference height.
-# Fast version of: (height / se().h_ref)^ALPHA
-calc_wind_factor(height) = exp(ALPHA * log((height / se().h_ref)))
+# Fast version of: (height / set.h_ref)^ALPHA
+calc_wind_factor(height) = exp(ALPHA * log((height / set.h_ref)))
 
 # calculate the drag of one tether segment
 function calc_drag(s, v_segment, unit_vector, rho, last_tether_drag, v_app_perp, area)
     s.v_apparent .= s.v_wind_tether - v_segment
     v_app_norm = norm(s.v_apparent)
     v_app_perp .= s.v_apparent .- dot(s.v_apparent, unit_vector) .* unit_vector
-    last_tether_drag .= -0.5 * CD_TETHER * rho * norm(v_app_perp) * area .* v_app_perp
+    last_tether_drag .= -0.5 * set.cd_tether * rho * norm(v_app_perp) * area .* v_app_perp
     v_app_norm
 end 
 
@@ -168,7 +159,7 @@ function calc_aero_forces(s, pos_kite, v_kite, rho, rel_steering)
     s.v_app_norm     = norm(s.v_apparent)
     s.drag_force    .= s.v_apparent ./ s.v_app_norm
     s.kite_y        .= normalize(cross(pos_kite, s.drag_force))
-    K                = 0.5 * rho * s.v_app_norm^2 * se().area
+    K                = 0.5 * rho * s.v_app_norm^2 * set.area
     s.lift_force    .= K * s.param_cl .* normalize(cross(s.drag_force, s.kite_y))   
     # some additional drag is created while steering
     s.drag_force    .*= K * s.param_cd * BRIDLE_DRAG * (1.0 + 0.6 * abs(rel_steering)) 
@@ -200,14 +191,14 @@ function calc_res(s, pos1, pos2, vel1, vel2, mass, veld, result, i)
         s.spring_force .= k2 * ((norm1 - s.length) + (s.damping * spring_vel)) .* s.unit_vector
     end
 
-    s.area = norm1 * D_TETHER
+    s.area = norm1 * set.d_tether/1000.0
     s.last_v_app_norm_tether = calc_drag(s, s.av_vel, s.unit_vector, rho, s.last_tether_drag, s.v_app_perp, s.area)
     
-    if i == SEGMENTS+1
-        s.area = L_BRIDLE * D_TETHER
+    if i == set.segments+1
+        s.area =  set.l_bridle * set.d_tether/1000.0
         s.last_v_app_norm_tether = calc_drag(s, s.av_vel, s.unit_vector, rho, s.last_tether_drag, s.v_app_perp, s.area)
         # TODO Check this equation
-        s.force .= s.spring_force + 0.5 * s.last_tether_drag     
+        s.force .= s.last_tether_drag + s.spring_force + 0.5 * s.last_tether_drag     
     else
         s.force .= s.spring_force + 0.5 * s.last_tether_drag
     end
@@ -222,14 +213,14 @@ end
 # Calculate the vector res1 using a vector expression, and calculate res2 using a loop
 # that iterates over all tether segments. 
 function loop(s, pos, vel, posd, veld, res1, res2)
-    s.masses               .= s.length ./ L_0 .* s.initial_masses
-    s.masses[SEGMENTS+1]   += (KITE_MASS + KCU_MASS)
+    s.masses               .= s.length ./ set.l_tether / set.segments .* s.initial_masses
+    s.masses[set.segments+1]   += (set.mass + KCU_MASS)
     res1[1] .= pos[1]
     res2[1] .= vel[1]
-    for i in 2:SEGMENTS+1
+    for i in 2:set.segments+1
         res1[i] .= vel[i] - posd[i]
     end
-    for i in SEGMENTS+1:-1:2
+    for i in set.segments+1:-1:2
         calc_res(s, pos[i], pos[i-1], vel[i], vel[i-1], s.masses[i], veld[i],  res2[i], i)
     end
     nothing
@@ -269,16 +260,16 @@ function clear(s)
     s.v_reel_out = 0.0
     s.last_v_reel_out = 0.0
     # self.sync_speed = 0.0
-    s.v_wind[1] = se().v_wind
-    s.l_tether = L_0 * SEGMENTS
+    s.v_wind[1] = set.v_wind
+    s.l_tether = set.l_tether / set.segments * set.segments
     s.pos_kite, s.v_kite = zeros(3), zeros(3)
-    s.rho = se().rho_0
+    s.rho = set.rho_0
 end
 
 function unpack(y)
-    part = reshape(SVector{6*(SEGMENTS+1)}(y),  Size(3, SEGMENTS+1, 2))
+    part = reshape(SVector{6*(set.segments+1)}(y),  Size(3, set.segments+1, 2))
     pos1 = part[:,:,1]
-    pos = SVector{SEGMENTS+1}(SVector(pos1[:,i]) for i in 1:SEGMENTS+1)
+    pos = SVector{set.segments+1}(SVector(pos1[:,i]) for i in 1:set.segments+1)
     return pos
 end
 
@@ -290,37 +281,37 @@ end
 # Residual     res = res1, res2 = pos1,  ..., vel1, ...
 function residual!(res, yd, y, p, time)
     # unpack the vectors y and yd
-    part = reshape(SVector{6*(SEGMENTS+1)}(y),  Size(3, SEGMENTS+1, 2))
-    partd = reshape(SVector{6*(SEGMENTS+1)}(yd),  Size(3, SEGMENTS+1, 2))
+    part = reshape(SVector{6*(set.segments+1)}(y),  Size(3, set.segments+1, 2))
+    partd = reshape(SVector{6*(set.segments+1)}(yd),  Size(3, set.segments+1, 2))
     pos1, vel1 = part[:,:,1], part[:,:,2]
-    pos = SVector{SEGMENTS+1}(SVector(pos1[:,i]) for i in 1:SEGMENTS+1)
-    vel = SVector{SEGMENTS+1}(SVector(vel1[:,i]) for i in 1:SEGMENTS+1)
+    pos = SVector{set.segments+1}(SVector(pos1[:,i]) for i in 1:set.segments+1)
+    vel = SVector{set.segments+1}(SVector(vel1[:,i]) for i in 1:set.segments+1)
     posd1, veld1 = partd[:,:,1], partd[:,:,2]
-    posd = SVector{SEGMENTS+1}(SVector(posd1[:,i]) for i in 1:SEGMENTS+1)
-    veld = SVector{SEGMENTS+1}(SVector(veld1[:,i]) for i in 1:SEGMENTS+1)
+    posd = SVector{set.segments+1}(SVector(posd1[:,i]) for i in 1:set.segments+1)
+    veld = SVector{set.segments+1}(SVector(veld1[:,i]) for i in 1:set.segments+1)
 
     # update parameters
     s = state
-    s.pos_kite .= pos[SEGMENTS+1]
-    s.v_kite   .= vel[SEGMENTS+1]
+    s.pos_kite .= pos[set.segments+1]
+    s.v_kite   .= vel[set.segments+1]
     delta_t = time - s.t_0
     delta_v = s.v_reel_out - s.last_v_reel_out
-    s.length = (s.l_tether + s.last_v_reel_out * delta_t + 0.5 * delta_v * delta_t^2) / SEGMENTS
-    s.c_spring = C_SPRING * L_0 / s.length
-    s.damping  = DAMPING  * L_0 / s.length
+    s.length = (s.l_tether + s.last_v_reel_out * delta_t + 0.5 * delta_v * delta_t^2) / set.segments
+    s.c_spring = set.c_spring / s.length
+    s.damping  = set.damping / s.length
 
     # call core calculation routines
-    vec_c = SVector{3, SimFloat}(pos[SEGMENTS] - s.pos_kite)     # convert to SVector to avoid allocations
+    vec_c = SVector{3, SimFloat}(pos[set.segments] - s.pos_kite)     # convert to SVector to avoid allocations
     v_app = SVector{3, SimFloat}(s.v_wind - s.v_kite)
     calc_set_cl_cd(s, vec_c, v_app)
     calc_aero_forces(s, s.pos_kite, s.v_kite, s.rho, s.steering) # force at the kite
     loop(s, pos, vel, posd, veld, s.res1, s.res2)
    
     # copy and flatten result
-    for i in 1:SEGMENTS+1
+    for i in 1:set.segments+1
         for j in 1:3
            @inbounds res[3*(i-1)+j] = s.res1[i][j]
-           @inbounds res[3*(SEGMENTS+1)+3*(i-1)+j] = s.res2[i][j]
+           @inbounds res[3*(set.segments+1)+3*(i-1)+j] = s.res2[i][j]
         end
     end
     nothing
@@ -372,8 +363,8 @@ end
 # Return an array of the scalar spring forces of all tether segements.
 # Input: The vector pos of the positions of the point masses that belong to the tether.
 function get_spring_forces(s, pos)
-    forces = zeros(SEGMENTS)
-    for i in 1:SEGMENTS
+    forces = zeros(set.segments)
+    for i in 1:set.segments
         forces[i] =  s.c_spring * (norm(pos[i+1] - pos[i]) - s.length)
     end
     forces
@@ -391,7 +382,7 @@ end
 # Set the vector of the wind-velocity at the height of the kite. As parameter the height,
 # the ground wind speed and the wind direction are needed.
 # Must be called every 50 ms.
-function set_v_wind_ground(s, height, v_wind_gnd=se().v_wind, wind_dir=0.0)
+function set_v_wind_ground(s, height, v_wind_gnd=set.v_wind, wind_dir=0.0)
     if height < 6.0
         height = 6.0
     end
@@ -416,14 +407,14 @@ function init(s, output=false)
     state_y = DELTA
     vel_incr = 0
     sin_el, cos_el = sin(ELEVATION / 180.0 * π), cos(ELEVATION / 180.0 * π)
-    for i in 0:SEGMENTS
-        radius =  -i * L_0*1.00293
+    for i in 0:set.segments
+        radius =  -i * set.l_tether / set.segments*1.00293
         if i == 0
             push!(pos, Vec3(-cos_el * radius, DELTA, -sin_el * radius))
             push!(vel, Vec3(DELTA, DELTA, DELTA))
         else
              push!(pos, Vec3(-cos_el * radius*(1.0+0.00002*i/7.0), state_y, -sin_el * radius*(1.0+0.00002*i/7.0)))
-             if i < SEGMENTS
+             if i < set.segments
                  push!(vel, Vec3(DELTA, DELTA, -sin_el * vel_incr*i))
              else
                 push!(vel, Vec3(DELTA, DELTA, -sin_el * vel_incr*(i-1.0)))
@@ -434,16 +425,16 @@ function init(s, output=false)
     forces = get_spring_forces(s, pos)
     println("Winch force: $(norm(forces[1])) N")
     state_y0, yd0 = Vec3[], Vec3[]
-    for i in 1:SEGMENTS+1
+    for i in 1:set.segments+1
         push!(state_y0,  pos[i]) # Initial state vector
         yd0 = push!(yd0, vel[i]) # Initial state vector derivative
     end
-    for i in 1:SEGMENTS+1
+    for i in 1:set.segments+1
         push!(state_y0, vel[i])  # Initial state vector
         push!(yd0, acc[i])       # Initial state vector derivative
     end
-    set_v_wind_ground(s, pos[SEGMENTS+1][3])
-    set_l_tether(s, L_0 *  SEGMENTS)
+    set_v_wind_ground(s, pos[set.segments+1][3])
+    set_l_tether(s, set.l_tether / set.segments *  set.segments)
     set_v_reel_out(s, V_REEL_OUT, 0.0)
     set_v_reel_out(s, V_REEL_OUT, 0.0)
     elements = length(reduce(vcat, state_y0))
