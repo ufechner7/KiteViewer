@@ -1,4 +1,4 @@
-using Test, BenchmarkTools, StaticArrays, Revise, LinearAlgebra, SciMLBase
+using Test, BenchmarkTools, StaticArrays, Revise, LinearAlgebra, SciMLBase, Optim
 
 if ! @isdefined KPS3
     includet("../src/KPS3.jl")
@@ -19,12 +19,25 @@ function set_defaults(state)
     KPS3.clear(state)
 end
 
+function get_state_392(pre_tension, p2)
+    my_state = KPS3.get_state()
+    KPS3.set.l_tether = 392.0
+    KPS3.set.elevation = 70.0
+    KPS3.set.area = 10.0
+    KPS3.set.v_wind = 9.1
+    KPS3.set.mass = 6.2
+    KPS3.clear(my_state)
+    y0, yd0 = KPS3.init(my_state; pre_tension=pre_tension, p2=p2)
+    return y0, yd0
+end
+
 if ! @isdefined state
     const state = State{SimFloat, Vec3}()
     const SEGMENTS  = se().segments
     set_defaults(state)
 end
 
+#=
 @testset "calc_rho             " begin
     @test isapprox(calc_rho(0.0), 1.225, atol=1e-5) 
     @test isapprox(calc_rho(100.0), 1.210756, atol=1e-5) 
@@ -198,24 +211,35 @@ end
     @test isapprox(my_state.param_cl, 0.574103590856, atol=1e-4)
     @test isapprox(my_state.param_cd, 0.125342896308, atol=1e-4)
 end
+=#
 
-@testset "test_initial_residual" begin
+function test_initial_condition(params)
+    # println(params)
     res1 = zeros(SVector{SEGMENTS+1, Vec3})
     res2 = deepcopy(res1)
     res = reduce(vcat, vcat(res1, res2))
-    my_state = KPS3.get_state()
-    KPS3.set.l_tether = 392.0
-    KPS3.set.elevation = 70.0
-    KPS3.set.area = 10.0
-    KPS3.set.v_wind = 9.1
-    KPS3.set.mass = 6.2
-    KPS3.clear(my_state)
-    y0, yd0 = KPS3.init(my_state; output=false)
-    @test my_state.l_tether ≈ 392.2
-
+    y0, yd0 = get_state_392(params[1], params[2])
     p = SciMLBase.NullParameters()
-    t = 0.0
-    residual!(res, yd0, y0, p, t)
+    residual!(res, yd0, y0, p, 0.0)
+    return norm(res[22:42]) # z component of force on all particles but the first
+end
+
+results = nothing
+@testset "test_initial_residual" begin
+    global results
+    lower = [1.0, 0.0]
+    upper = [1.01, 0.0001]
+    initial_x = [1.003, 0.00002]
+    inner_optimizer = GradientDescent()
+    results = optimize(test_initial_condition, lower, upper, initial_x, Fminbox(inner_optimizer))
+    params=(Optim.minimizer(results))
+    println("result: $params; minimum: $(Optim.minimum(results))")
+    res=test_initial_condition(params)
+
+    my_state = KPS3.get_state()
+    println("res2: "); display(my_state.res2)    
+
+    #=
     @test my_state.length ≈ 65.36666666666667
     @test my_state.c_spring ≈ 9402.345741968382
     @test my_state.damping  ≈  14.472208057113717
@@ -223,13 +247,13 @@ end
     @test isapprox(my_state.param_cd, 0.2, atol=1e-4) # [-275.31680793466865, -3.5309114469539753e-5, -873.0000830018812]
  
     @test sum(my_state.res1) ≈ [0.0, 1.0e-6, 0.0]
-    @test my_state.res2[1]   ≈ [1.00000000e-06,  1.00000000e-06,  1.00000000e-06]
+    @test my_state.res2[1]   ≈ [1.00000000e-06,  1.00000000e-06,  1.00000000e-06] =#
 
     # @test isapprox(my_state.res2[2], [8.83559075e+00, -4.72588546e-07, -5.10109289e+00], rtol=3e-2)
     # @test isapprox(my_state.res2[3], [8.81318565e+00, -4.68864292e-07, -5.08829453e+00], rtol=1e-3)
     # @test isapprox(my_state.res2[7], [1.49735632e+01,  2.71870215e-06,  4.51115984e+01], rtol=1e-3)
-    println("res2: "); display(my_state.res2)
-    println("lift force: $(norm(my_state.lift_force)) N")
+    # println("res2: "); display(my_state.res2)
+    # println("lift force: $(norm(my_state.lift_force)) N")
 end
 
 #=

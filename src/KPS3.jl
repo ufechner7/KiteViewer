@@ -199,6 +199,7 @@ function calc_res(s, pos1, pos2, vel1, vel2, mass, veld, result, i)
         s.last_v_app_norm_tether = calc_drag(s, s.av_vel, s.unit_vector, rho, s.last_tether_drag, s.v_app_perp, s.area)
         # TODO Check this equation
         s.force .= s.last_tether_drag + s.spring_force + 0.5 * s.last_tether_drag     
+        # s.force .= s.spring_force + 0.5 * s.last_tether_drag
     else
         s.force .= s.spring_force + 0.5 * s.last_tether_drag
     end
@@ -405,7 +406,7 @@ end
 
 # Calculate the initial conditions y0, yd0 and sw0. Tether with the given elevation angle,
 # particle zero fixed at origin. """
-function init(s; output=false, pre_tension=1.00293)
+function init(s; output=false, pre_tension=1.00293, p2=0.00002)
     DELTA = 1e-6
     set_cl_cd(s, 10.0/180.0 * π)
     pos, vel, acc = Vec3[], Vec3[], Vec3[]
@@ -419,7 +420,7 @@ function init(s; output=false, pre_tension=1.00293)
             push!(vel, Vec3(DELTA, DELTA, DELTA))
         else
             if pre_tension != 1.0
-                push!(pos, Vec3(-cos_el * radius*(1.0+0.00002*i/7.0), state_y, -sin_el * radius*(1.0+0.00002*i/7.0)))
+                push!(pos, Vec3(-cos_el * radius*(1.0+p2*i/7.0), state_y, -sin_el * radius*(1.0+p2*i/7.0)))
             else
                 push!(pos, Vec3(-cos_el * radius, state_y, -sin_el * radius))
             end
