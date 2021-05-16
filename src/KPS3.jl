@@ -418,8 +418,11 @@ function init(s; output=false, pre_tension=1.00293)
             push!(pos, Vec3(-cos_el * radius, DELTA, -sin_el * radius))
             push!(vel, Vec3(DELTA, DELTA, DELTA))
         else
-            # push!(pos, Vec3(-cos_el * radius*(1.0+0.00002*i/7.0), state_y, -sin_el * radius*(1.0+0.00002*i/7.0)))
-            push!(pos, Vec3(-cos_el * radius, state_y, -sin_el * radius))
+            if pre_tension != 1.0
+                push!(pos, Vec3(-cos_el * radius*(1.0+0.00002*i/7.0), state_y, -sin_el * radius*(1.0+0.00002*i/7.0)))
+            else
+                push!(pos, Vec3(-cos_el * radius, state_y, -sin_el * radius))
+            end
             if i < set.segments
                 push!(vel, Vec3(DELTA, DELTA, -sin_el * vel_incr*i))
             else
@@ -433,7 +436,7 @@ function init(s; output=false, pre_tension=1.00293)
         end
     end
     forces = get_spring_forces(s, pos)
-    println("Winch force: $(norm(forces[1])) N")
+    if output; println("Winch force: $(norm(forces[1])) N"); end
     state_y0, yd0 = Vec3[], Vec3[]
     for i in 1:set.segments+1
         push!(state_y0,  pos[i]) # Initial state vector
