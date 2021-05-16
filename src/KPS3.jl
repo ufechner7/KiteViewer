@@ -50,6 +50,7 @@ export set_v_reel_out, set_depower_steering                                     
 # Constants
 @consts begin
     set    = se()                 # settings from settings.yaml
+    SEGMENTS = se().segments
     G_EARTH = 9.81                # gravitational acceleration
     PERIOD_TIME = 1.0 / set.sample_freq
     C0 = -0.0032                  # steering offset
@@ -285,14 +286,14 @@ end
 # Residual     res = res1, res2 = pos1,  ..., vel1, ...
 function residual!(res, yd, y, p, time)
     # unpack the vectors y and yd
-    part = reshape(SVector{6*(set.segments+1)}(y),  Size(3, set.segments+1, 2))
-    partd = reshape(SVector{6*(set.segments+1)}(yd),  Size(3, set.segments+1, 2))
+    part = reshape(SVector{6*(SEGMENTS+1)}(y),  Size(3, SEGMENTS+1, 2))
+    partd = reshape(SVector{6*(SEGMENTS+1)}(yd),  Size(3, SEGMENTS+1, 2))
     pos1, vel1 = part[:,:,1], part[:,:,2]
-    pos = SVector{set.segments+1}(SVector(pos1[:,i]) for i in 1:set.segments+1)
-    vel = SVector{set.segments+1}(SVector(vel1[:,i]) for i in 1:set.segments+1)
+    pos = SVector{SEGMENTS+1}(SVector(pos1[:,i]) for i in 1:SEGMENTS+1)
+    vel = SVector{SEGMENTS+1}(SVector(vel1[:,i]) for i in 1:SEGMENTS+1)
     posd1, veld1 = partd[:,:,1], partd[:,:,2]
-    posd = SVector{set.segments+1}(SVector(posd1[:,i]) for i in 1:set.segments+1)
-    veld = SVector{set.segments+1}(SVector(veld1[:,i]) for i in 1:set.segments+1)
+    posd = SVector{SEGMENTS+1}(SVector(posd1[:,i]) for i in 1:SEGMENTS+1)
+    veld = SVector{SEGMENTS+1}(SVector(veld1[:,i]) for i in 1:SEGMENTS+1)
 
     # update parameters
     s = state
