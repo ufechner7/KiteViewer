@@ -221,14 +221,14 @@ function test_initial_condition(params)
     y0, yd0 = get_state_392(params[1], params[2])
     p = SciMLBase.NullParameters()
     residual!(res, yd0, y0, p, 0.0)
-    return norm(res[22:42]) # z component of force on all particles but the first
+    return norm(res) # z component of force on all particles but the first
 end
 
 results = nothing
 @testset "test_initial_residual" begin
     global results
-    lower = [1.0, 0.0]
-    upper = [1.01, 0.0001]
+    lower = [1.0, -1.0]
+    upper = [1.01, 1.0]
     initial_x = [1.003, 0.00002]
     inner_optimizer = GradientDescent()
     results = optimize(test_initial_condition, lower, upper, initial_x, Fminbox(inner_optimizer))

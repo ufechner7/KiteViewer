@@ -420,7 +420,10 @@ function init(s; output=false, pre_tension=1.00293, p2=0.00002)
             push!(vel, Vec3(DELTA, DELTA, DELTA))
         else
             if pre_tension != 1.0
-                push!(pos, Vec3(-cos_el * radius*(1.0+p2*i/7.0), state_y, -sin_el * radius*(1.0+p2*i/7.0)))
+                #push!(pos, Vec3(-cos_el * radius*(1.0+p2*i/7.0), state_y, -sin_el * radius*(1.0+p2*i/7.0)))
+                elevation = set.elevation # - p2 * (i/set.segments - 0.5)^2
+                sin_el, cos_el = sin(elevation / 180.0 * π), cos(elevation / 180.0 * π)
+                push!(pos, Vec3(-cos_el * radius, state_y, -sin_el * radius))
             else
                 push!(pos, Vec3(-cos_el * radius, state_y, -sin_el * radius))
             end
