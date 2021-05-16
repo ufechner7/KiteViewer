@@ -194,36 +194,41 @@ end
     @test isapprox(my_state.param_cd, 0.125342896308, atol=1e-4)
 end
 
-# @testset "test_initial_residual" begin
-#     res1 = zeros(SVector{SEGMENTS+1, Vec3})
-#     res2 = deepcopy(res1)
-#     res = reduce(vcat, vcat(res1, res2))
-#     my_state = KPS3.get_state()
-#     clear(my_state)
-#     y0, yd0 = KPS3.init(my_state)
-#     # @test my_state.l_tether ≈ 392.2
+@testset "test_initial_residual" begin
+    res1 = zeros(SVector{SEGMENTS+1, Vec3})
+    res2 = deepcopy(res1)
+    res = reduce(vcat, vcat(res1, res2))
+    my_state = KPS3.get_state()
+    # KPS3.set.l_tether = 392.0
+    KPS3.set.elevation = 60.0
+    KPS3.set.area = 10.0
+    KPS3.set.v_wind = 9.1
+    KPS3.set.mass = 
+    KPS3.clear(my_state)
+    y0, yd0 = KPS3.init(my_state, pre_tension=1.0)
+    # @test my_state.l_tether ≈ 392.2
 
-#     p = SciMLBase.NullParameters()
-#     t = 0.0
-#     residual!(res, yd0, y0, p, t)
-#     # @test my_state.length ≈ 25.03333333333333
-#     # @test my_state.c_spring ≈ 24551.26498
-#     # @test my_state.damping  ≈  37.7896138482
-#     # @test isapprox(my_state.param_cl, 1.11349300703, atol=1e-4)
-#     # @test isapprox(my_state.param_cd, 0.319248524333, atol=1e-4) # [-275.31680793466865, -3.5309114469539753e-5, -873.0000830018812]
+    p = SciMLBase.NullParameters()
+    t = 0.0
+    residual!(res, yd0, y0, p, t)
+    @test my_state.length ≈ 25.03333333333333
+    @test my_state.c_spring ≈ 24551.26498
+    @test my_state.damping  ≈  37.7896138482
+    @test isapprox(my_state.param_cl, 1.11349300703, atol=1e-4)
+    @test isapprox(my_state.param_cd, 0.319248524333, atol=1e-4) # [-275.31680793466865, -3.5309114469539753e-5, -873.0000830018812]
  
-#     @test sum(my_state.res1) ≈ [0.0, 1.0e-6, 0.0]
-#     @test my_state.res2[1]   ≈ [1.00000000e-06,  1.00000000e-06,  1.00000000e-06]
+    @test sum(my_state.res1) ≈ [0.0, 1.0e-6, 0.0]
+    @test my_state.res2[1]   ≈ [1.00000000e-06,  1.00000000e-06,  1.00000000e-06]
 
-#     # @test isapprox(my_state.res2[2], [8.83559075e+00, -4.72588546e-07, -5.10109289e+00], rtol=3e-2)
-#     # @test isapprox(my_state.res2[3], [8.81318565e+00, -4.68864292e-07, -5.08829453e+00], rtol=1e-3)
-#     # @test isapprox(my_state.res2[7], [1.49735632e+01,  2.71870215e-06,  4.51115984e+01], rtol=1e-3)
-#     ## println("res1: ", my_state.res1)
-#     println("res2: "); display(my_state.res2)
-#     println("lift force: $(norm(my_state.lift_force)) N")
-# end
+    # @test isapprox(my_state.res2[2], [8.83559075e+00, -4.72588546e-07, -5.10109289e+00], rtol=3e-2)
+    # @test isapprox(my_state.res2[3], [8.81318565e+00, -4.68864292e-07, -5.08829453e+00], rtol=1e-3)
+    # @test isapprox(my_state.res2[7], [1.49735632e+01,  2.71870215e-06,  4.51115984e+01], rtol=1e-3)
+    ## println("res1: ", my_state.res1)
+    println("res2: "); display(my_state.res2)
+    println("lift force: $(norm(my_state.lift_force)) N")
+end
 
-#= println("\ncalc_rho:")
+println("\ncalc_rho:")
 show(@benchmark calc_rho(height) setup=(height=1.0 + rand() * 200.0))
 println("\ncalc_wind_factor:")
 show(@benchmark calc_wind_factor(height) setup=(height=rand() * 200.0))
@@ -261,5 +266,5 @@ show(@benchmark residual!(res, yd, y, p, t) setup = (res1 = zeros(SVector{SEGMEN
                                                         res = reduce(vcat, vcat(res1, res2)); pos = deepcopy(res1);
                                                         pos[1] .= [1.0,2,3]; vel = deepcopy(res1); y = reduce(vcat, vcat(pos, vel));
                                                         der_pos = deepcopy(res1); der_vel = deepcopy(res1); yd = reduce(vcat, vcat(der_pos, der_vel));
-                                                        p = SciMLBase.NullParameters(); t = 0.0)) =#
+                                                        p = SciMLBase.NullParameters(); t = 0.0))
 nothing

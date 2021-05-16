@@ -62,7 +62,7 @@ export set_v_reel_out, set_depower_steering                                     
     ALPHA_ZERO = 0.0
     K_ds = 1.5                    # influence of the depower angle on the steering sensitivity
     MAX_ALPHA_DEPOWER = 31.0
-    V_REEL_OUT = 0.0              # initial reel out speed
+    V_REEL_OUT = 4.0              # initial reel out speed
 
     ALPHA_CL = [-180.0, -160.0, -90.0, -20.0, -10.0,  -5.0,  0.0, 20.0, 40.0, 90.0, 160.0, 180.0]
     CL_LIST  = [   0.0,    0.5,   0.0,  0.08, 0.125,  0.15,  0.2,  1.0,  1.0,  0.0,  -0.5,   0.0]
@@ -263,7 +263,7 @@ function clear(s)
     s.v_wind        .= [set.v_wind, 0, 0]    # wind vector at the height of the kite
     s.v_wind_gnd    .= [set.v_wind, 0, 0]    # wind vector at reference height
     s.v_wind_tether .= [set.v_wind, 0, 0]
-    s.l_tether = set.l_tether / set.segments * set.segments
+    s.l_tether = set.l_tether
     s.pos_kite, s.v_kite = zeros(3), zeros(3)
     # TODO: Check 
     s.initial_masses .= ones(set.segments+1) * 0.011 * set.l_tether / set.segments
@@ -443,7 +443,7 @@ function init(s; output=false, pre_tension=1.00293)
         push!(yd0, acc[i])       # Initial state vector derivative
     end
     set_v_wind_ground(s, pos[set.segments+1][3])
-    set_l_tether(s, set.l_tether / set.segments *  set.segments)
+    set_l_tether(s, set.l_tether)
     set_v_reel_out(s, V_REEL_OUT, 0.0)
     set_v_reel_out(s, V_REEL_OUT, 0.0)
     elements = length(reduce(vcat, state_y0))
