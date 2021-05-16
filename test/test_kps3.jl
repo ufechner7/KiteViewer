@@ -16,7 +16,7 @@ if ! @isdefined state
     KPS3.set.area = 20.0
     KPS3.set.v_wind = 8.0
     state.area = 20.0
-    state.v_wind[1] = 8.0
+    KPS3.clear(state)
 end
 
 @testset "calc_rho             " begin
@@ -121,7 +121,7 @@ end
 #     @test isapprox(res2[2], [2.38418505e-03, 4.76837010e-03, 9.81000000e+00], rtol=1e-4)
 #     @test isapprox(res2[1], [0.0,0.0,0.0], rtol=1e-4)
 # end
-#=
+
 
 @testset "test_calc_alpha      " begin
     v_app = Vec3(10,2,3)
@@ -143,7 +143,7 @@ end
 
 @testset "test_clear           " begin
     KPS3.clear(state)
-end 
+end
 
 # # Inputs:
 # # State vector state_y   = pos1, pos2, ..., posn, vel1, vel2, ..., veln
@@ -182,45 +182,44 @@ end
     set_depower_steering(state, depower, steering)
 end
 
-@testset "test_init            " begin
-    y0, yd0 = KPS3.init(state)
-    @test length(y0)  == (SEGMENTS+1) * 6
-    @test length(yd0) == (SEGMENTS+1) * 6
-    @test sum(y0)  ≈ 717.1633589868303
-    @test sum(yd0) ≈ -68.669971000000018
-    @test isapprox(state.param_cl, 0.574103590856, atol=1e-4)
-    @test isapprox(state.param_cd, 0.125342896308, atol=1e-4)
-end
-=#
+# @testset "test_init            " begin
+#     y0, yd0 = KPS3.init(state)
+#     @test length(y0)  == (SEGMENTS+1) * 6
+#     @test length(yd0) == (SEGMENTS+1) * 6
+#     @test sum(y0)  ≈ 717.1633589868303
+#     @test sum(yd0) ≈ -68.669971000000018
+#     @test isapprox(state.param_cl, 0.574103590856, atol=1e-4)
+#     @test isapprox(state.param_cd, 0.125342896308, atol=1e-4)
+# end
 
-@testset "test_initial_residual" begin
-    res1 = zeros(SVector{SEGMENTS+1, Vec3})
-    res2 = deepcopy(res1)
-    res = reduce(vcat, vcat(res1, res2))
-    my_state = KPS3.get_state()
-    clear(my_state)
-    y0, yd0 = KPS3.init(my_state)
-    # @test my_state.l_tether ≈ 392.2
+# @testset "test_initial_residual" begin
+#     res1 = zeros(SVector{SEGMENTS+1, Vec3})
+#     res2 = deepcopy(res1)
+#     res = reduce(vcat, vcat(res1, res2))
+#     my_state = KPS3.get_state()
+#     clear(my_state)
+#     y0, yd0 = KPS3.init(my_state)
+#     # @test my_state.l_tether ≈ 392.2
 
-    p = SciMLBase.NullParameters()
-    t = 0.0
-    residual!(res, yd0, y0, p, t)
-    # @test my_state.length ≈ 25.03333333333333
-    # @test my_state.c_spring ≈ 24551.26498
-    # @test my_state.damping  ≈  37.7896138482
-    # @test isapprox(my_state.param_cl, 1.11349300703, atol=1e-4)
-    # @test isapprox(my_state.param_cd, 0.319248524333, atol=1e-4) # [-275.31680793466865, -3.5309114469539753e-5, -873.0000830018812]
+#     p = SciMLBase.NullParameters()
+#     t = 0.0
+#     residual!(res, yd0, y0, p, t)
+#     # @test my_state.length ≈ 25.03333333333333
+#     # @test my_state.c_spring ≈ 24551.26498
+#     # @test my_state.damping  ≈  37.7896138482
+#     # @test isapprox(my_state.param_cl, 1.11349300703, atol=1e-4)
+#     # @test isapprox(my_state.param_cd, 0.319248524333, atol=1e-4) # [-275.31680793466865, -3.5309114469539753e-5, -873.0000830018812]
  
-    @test sum(my_state.res1) ≈ [0.0, 1.0e-6, 0.0]
-    @test my_state.res2[1]   ≈ [1.00000000e-06,  1.00000000e-06,  1.00000000e-06]
+#     @test sum(my_state.res1) ≈ [0.0, 1.0e-6, 0.0]
+#     @test my_state.res2[1]   ≈ [1.00000000e-06,  1.00000000e-06,  1.00000000e-06]
 
-    # @test isapprox(my_state.res2[2], [8.83559075e+00, -4.72588546e-07, -5.10109289e+00], rtol=3e-2)
-    # @test isapprox(my_state.res2[3], [8.81318565e+00, -4.68864292e-07, -5.08829453e+00], rtol=1e-3)
-    # @test isapprox(my_state.res2[7], [1.49735632e+01,  2.71870215e-06,  4.51115984e+01], rtol=1e-3)
-    ## println("res1: ", my_state.res1)
-    println("res2: "); display(my_state.res2)
-    println("lift force: $(norm(my_state.lift_force)) N")
-end
+#     # @test isapprox(my_state.res2[2], [8.83559075e+00, -4.72588546e-07, -5.10109289e+00], rtol=3e-2)
+#     # @test isapprox(my_state.res2[3], [8.81318565e+00, -4.68864292e-07, -5.08829453e+00], rtol=1e-3)
+#     # @test isapprox(my_state.res2[7], [1.49735632e+01,  2.71870215e-06,  4.51115984e+01], rtol=1e-3)
+#     ## println("res1: ", my_state.res1)
+#     println("res2: "); display(my_state.res2)
+#     println("lift force: $(norm(my_state.lift_force)) N")
+# end
 
 #= println("\ncalc_rho:")
 show(@benchmark calc_rho(height) setup=(height=1.0 + rand() * 200.0))
