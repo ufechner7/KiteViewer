@@ -13,9 +13,11 @@ end
 if ! @isdefined state
     const state = State{SimFloat, Vec3}()
     const SEGMENTS  = se().segments
+    KPS3.set.l_tether = 150.0
+    KPS3.set.elevation = 60.0
     KPS3.set.area = 20.0
     KPS3.set.v_wind = 8.0
-    state.area = 20.0
+    KPS3.set.mass = 11.4
     KPS3.clear(state)
 end
 
@@ -95,8 +97,6 @@ end
 
 @testset "test_calc_loop       " begin
     KPS3.clear(state)
-    state.c_spring=0.011
-    state.damping = 0.01
     state.last_tether_drag = Vec3(5.0,6,7)
     state.last_force = Vec3(-1.0, -2, -3)
     state.v_app_perp = Vec3(0.1,0.22,0.33)
@@ -113,15 +113,16 @@ end
     veld = zeros(SVector{SEGMENTS+1, Vec3})
     res1 = zeros(SVector{SEGMENTS+1, Vec3})
     res2 = zeros(SVector{SEGMENTS+1, Vec3})
+    @test state.c_spring ≈ 61460.0
+    @test state.damping  ≈    94.6
     KPS3.loop(state, pos, vel, posd, veld, res1, res2)
     @test sum(res1) ≈ [0.0, 0.0, 0.0]
-    # @test isapprox(res2[7], [5.03576566e-02, 1.00715313e-01, 7.81683430e+02], rtol=1e-4) 
-    # @test isapprox(res2[6], [9.13190455e-03, 1.82638091e-02, 9.81000000e+00], rtol=1e-4) 
-    # @test isapprox(res2[5], [2.38000593e-03, 4.76001187e-03, 9.81000000e+00], rtol=1e-4) 
-    # @test isapprox(res2[2], [2.38418505e-03, 4.76837010e-03, 9.81000000e+00], rtol=1e-4)
-    # @test isapprox(res2[1], [0.0,0.0,0.0], rtol=1e-4)
+    @test isapprox(res2[7], [5.03576566e-02, 1.00715313e-01, 7.81683430e+02], rtol=1e-4) 
+    @test isapprox(res2[6], [9.13190455e-03, 1.82638091e-02, 9.81000000e+00], rtol=1e-4) 
+    @test isapprox(res2[5], [2.38000593e-03, 4.76001187e-03, 9.81000000e+00], rtol=1e-4) 
+    @test isapprox(res2[2], [2.38418505e-03, 4.76837010e-03, 9.81000000e+00], rtol=1e-4)
+    @test isapprox(res2[1], [0.0,0.0,0.0], rtol=1e-4)
 end
-
 
 @testset "test_calc_alpha      " begin
     v_app = Vec3(10,2,3)
@@ -145,27 +146,27 @@ end
     KPS3.clear(state)
 end
 
-# # Inputs:
-# # State vector state_y   = pos1, pos2, ..., posn, vel1, vel2, ..., veln
-# # Derivative   der_yd    = vel1, vel2, ..., veln, acc1, acc2, ..., accn
-# # Output:
-# # Residual     res = res1, res2 = pos1,  ..., vel1, ...
-# @testset "test_residual!       " begin
-#     res1 = zeros(SVector{SEGMENTS+1, Vec3})
-#     res2 = deepcopy(res1)
-#     res = reduce(vcat, vcat(res1, res2))
-#     pos = deepcopy(res1)
-#     pos[1] .= [1.0,2,3]
-#     vel = deepcopy(res1) 
-#     y = reduce(vcat, vcat(pos, vel))
-#     der_pos = deepcopy(res1)
-#     der_vel = deepcopy(res1)
-#     yd = reduce(vcat, vcat(der_pos, der_vel))
-#     p = SciMLBase.NullParameters()
-#     t = 0.0
-#     clear(state)
-#     residual!(res, yd, y, p, t)
-# end
+# Inputs:
+# State vector state_y   = pos1, pos2, ..., posn, vel1, vel2, ..., veln
+# Derivative   der_yd    = vel1, vel2, ..., veln, acc1, acc2, ..., accn
+# Output:
+# Residual     res = res1, res2 = pos1,  ..., vel1, ...
+@testset "test_residual!       " begin
+    res1 = zeros(SVector{SEGMENTS+1, Vec3})
+    res2 = deepcopy(res1)
+    res = reduce(vcat, vcat(res1, res2))
+    pos = deepcopy(res1)
+    pos[1] .= [1.0,2,3]
+    vel = deepcopy(res1) 
+    y = reduce(vcat, vcat(pos, vel))
+    der_pos = deepcopy(res1)
+    der_vel = deepcopy(res1)
+    yd = reduce(vcat, vcat(der_pos, der_vel))
+    p = SciMLBase.NullParameters()
+    t = 0.0
+    clear(state)
+    residual!(res, yd, y, p, t)
+end
 
 @testset "test_set_v_reel_out  " begin
     v_reel_out = 1.1
@@ -182,15 +183,16 @@ end
     set_depower_steering(state, depower, steering)
 end
 
-# @testset "test_init            " begin
-#     y0, yd0 = KPS3.init(state)
-#     @test length(y0)  == (SEGMENTS+1) * 6
-#     @test length(yd0) == (SEGMENTS+1) * 6
-#     @test sum(y0)  ≈ 717.1633589868303
-#     @test sum(yd0) ≈ -68.669971000000018
-#     @test isapprox(state.param_cl, 0.574103590856, atol=1e-4)
-#     @test isapprox(state.param_cd, 0.125342896308, atol=1e-4)
-# end
+@testset "test_init            " begin
+    my_state = deepcopy(state)
+    y0, yd0 = KPS3.init(my_state, pre_tension=1.0)
+    @test length(y0)  == (SEGMENTS+1) * 6
+    @test length(yd0) == (SEGMENTS+1) * 6
+    @test sum(y0)  ≈ 717.1633589868303
+    @test sum(yd0) ≈ -68.669971000000018
+    @test isapprox(my_state.param_cl, 0.574103590856, atol=1e-4)
+    @test isapprox(my_state.param_cd, 0.125342896308, atol=1e-4)
+end
 
 # @testset "test_initial_residual" begin
 #     res1 = zeros(SVector{SEGMENTS+1, Vec3})

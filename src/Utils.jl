@@ -55,8 +55,9 @@ mutable struct Settings
     l_tether::Float64
     damping::Float64
     c_spring::Float64
+    elevation::Float64
 end
-const SETTINGS = [Settings("","",0,0,0,0,"",0,0,0,0,0,0,0,0,0,0,0,0)]
+const SETTINGS = [Settings("","",0,0,0,0,"",0,0,0,0,0,0,0,0,0,0,0,0,0)]
 
 # getter function for the Settings struct
 function se(project="settings.yaml")
@@ -70,22 +71,23 @@ function se(project="settings.yaml")
         SETTINGS[1].zoom        = dict["system"]["zoom"]
         SETTINGS[1].fixed_font  = dict["system"]["fixed_font"]
 
-        SETTINGS[1].l_tether= dict["initial"]["l_tether"]
+        SETTINGS[1].l_tether    = dict["initial"]["l_tether"]
+        SETTINGS[1].elevation   = dict["initial"]["elevation"]
 
-        SETTINGS[1].model= dict["kite"]["model"]
-        SETTINGS[1].area = dict["kite"]["area"]
-        SETTINGS[1].mass = dict["kite"]["mass"]
-        SETTINGS[1].l_bridle = dict["kite"]["l_bridle"]
+        SETTINGS[1].model       = dict["kite"]["model"]
+        SETTINGS[1].area        = dict["kite"]["area"]
+        SETTINGS[1].mass        = dict["kite"]["mass"]
+        SETTINGS[1].l_bridle    = dict["kite"]["l_bridle"]
 
-        SETTINGS[1].cd_tether = dict["tether"]["cd_tether"]
-        SETTINGS[1].d_tether  = dict["tether"]["d_tether"]
-        SETTINGS[1].damping   = dict["tether"]["damping"]
-        SETTINGS[1].damping   = dict["tether"]["c_spring"]
+        SETTINGS[1].cd_tether   = dict["tether"]["cd_tether"]
+        SETTINGS[1].d_tether    = dict["tether"]["d_tether"]
+        SETTINGS[1].damping     = dict["tether"]["damping"]
+        SETTINGS[1].c_spring    = dict["tether"]["c_spring"]
 
-        SETTINGS[1].v_wind = dict["environment"]["v_wind"]
-        SETTINGS[1].h_ref  = dict["environment"]["h_ref"]
-        SETTINGS[1].rho_0  = dict["environment"]["rho_0"]
-        SETTINGS[1].alpha  = dict["environment"]["alpha"]
+        SETTINGS[1].v_wind      = dict["environment"]["v_wind"]
+        SETTINGS[1].h_ref       = dict["environment"]["h_ref"]
+        SETTINGS[1].rho_0       = dict["environment"]["rho_0"]
+        SETTINGS[1].alpha       = dict["environment"]["alpha"]
     end
     return SETTINGS[1]
 end

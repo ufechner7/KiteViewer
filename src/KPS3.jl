@@ -62,7 +62,6 @@ export set_v_reel_out, set_depower_steering                                     
     ALPHA_ZERO = 0.0
     K_ds = 1.5                    # influence of the depower angle on the steering sensitivity
     MAX_ALPHA_DEPOWER = 31.0
-    ELEVATION = 70.0              # initial elevation angle in degrees
     V_REEL_OUT = 0.0              # initial reel out speed
 
     ALPHA_CL = [-180.0, -160.0, -90.0, -20.0, -10.0,  -5.0,  0.0, 20.0, 40.0, 90.0, 160.0, 180.0]
@@ -213,7 +212,7 @@ end
 # Calculate the vector res1 using a vector expression, and calculate res2 using a loop
 # that iterates over all tether segments. 
 function loop(s, pos, vel, posd, veld, res1, res2)
-    s.masses               .= s.length ./ set.l_tether / set.segments .* s.initial_masses
+    s.masses               .= s.length / (set.l_tether / set.segments) .* s.initial_masses
     s.masses[set.segments+1]   += (set.mass + KCU_MASS)
     res1[1] .= pos[1]
     res2[1] .= vel[1]
@@ -259,10 +258,15 @@ function clear(s)
     s.t_0 = 0.0                     # relative start time of the current time interval
     s.v_reel_out = 0.0
     s.last_v_reel_out = 0.0
+    s.area = set.area
     # self.sync_speed = 0.0
-    s.v_wind[1] = set.v_wind
+    s.v_wind        .= [set.v_wind, 0, 0]    # wind vector at the height of the kite
+    s.v_wind_gnd    .= [set.v_wind, 0, 0]    # wind vector at reference height
+    s.v_wind_tether .= [set.v_wind, 0, 0]
     s.l_tether = set.l_tether / set.segments * set.segments
     s.pos_kite, s.v_kite = zeros(3), zeros(3)
+    # TODO: Check 
+    s.initial_masses .= ones(set.segments+1) * 0.011 * set.l_tether / set.segments
     s.rho = set.rho_0
 end
 
@@ -400,27 +404,32 @@ end
 
 # Calculate the initial conditions y0, yd0 and sw0. Tether with the given elevation angle,
 # particle zero fixed at origin. """
-function init(s, output=false)
+function init(s; output=false, pre_tension=1.00293)
     DELTA = 1e-6
     set_cl_cd(s, 10.0/180.0 * π)
     pos, vel, acc = Vec3[], Vec3[], Vec3[]
     state_y = DELTA
     vel_incr = 0
-    sin_el, cos_el = sin(ELEVATION / 180.0 * π), cos(ELEVATION / 180.0 * π)
+    sin_el, cos_el = sin(set.elevation / 180.0 * π), cos(set.elevation / 180.0 * π)
     for i in 0:set.segments
-        radius =  -i * set.l_tether / set.segments*1.00293
+        radius =  -i * set.l_tether / set.segments*pre_tension
         if i == 0
             push!(pos, Vec3(-cos_el * radius, DELTA, -sin_el * radius))
             push!(vel, Vec3(DELTA, DELTA, DELTA))
         else
-             push!(pos, Vec3(-cos_el * radius*(1.0+0.00002*i/7.0), state_y, -sin_el * radius*(1.0+0.00002*i/7.0)))
-             if i < set.segments
-                 push!(vel, Vec3(DELTA, DELTA, -sin_el * vel_incr*i))
-             else
-                push!(vel, Vec3(DELTA, DELTA, -sin_el * vel_incr*(i-1.0)))
-             end
+            # push!(pos, Vec3(-cos_el * radius*(1.0+0.00002*i/7.0), state_y, -sin_el * radius*(1.0+0.00002*i/7.0)))
+            push!(pos, Vec3(-cos_el * radius, state_y, -sin_el * radius))
+            if i < set.segments
+                push!(vel, Vec3(DELTA, DELTA, -sin_el * vel_incr*i))
+            else
+            push!(vel, Vec3(DELTA, DELTA, -sin_el * vel_incr*(i-1.0)))
+            end
         end
-        push!(acc, Vec3(DELTA, DELTA, DELTA))
+        if pre_tension == 1.0
+            push!(acc, Vec3(DELTA, DELTA, -9.81))
+        else
+            push!(acc, Vec3(DELTA, DELTA, DELTA))
+        end
     end
     forces = get_spring_forces(s, pos)
     println("Winch force: $(norm(forces[1])) N")
