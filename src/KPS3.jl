@@ -420,23 +420,14 @@ function init(s; output=false, pre_tension=1.00293, p2=0.00002)
     sin_el, cos_el = sin(set.elevation / 180.0 * π), cos(set.elevation / 180.0 * π)
     for i in 0:set.segments
         radius =  -i * set.l_tether / set.segments*pre_tension
-        if i == 0
-            push!(pos, Vec3(-cos_el * radius, DELTA, -sin_el * radius))
-            pos1 = deepcopy(pos)
-        else
-            if pre_tension != 1.0
-                elevation = set.elevation # - p2 * (i/set.segments - 0.5)^2
-                sin_el, cos_el = sin(elevation / 180.0 * π), cos(elevation / 180.0 * π)
-                radius1 = radius*(1.0+p2*i/7.0)
-                push!(pos, Vec3(-cos_el * radius1, state_y, -sin_el * radius1))
-               
-                # radius2=radius1/extension
-                # push!(pos1, Vec3(-cos_el * radius2, state_y, -sin_el * radius2))
-                # pos = pos1
-            else
-                push!(pos, Vec3(-cos_el * radius, state_y, -sin_el * radius))
-            end
-        end
+        elevation = set.elevation - p2 * (i+1/(set.segments+1) - 0.5)^2
+        sin_el, cos_el = sin(elevation / 180.0 * π), cos(elevation / 180.0 * π)
+        radius1 = radius # *(1.0+p2*i/7.0)
+        push!(pos, Vec3(-cos_el * radius1, state_y, -sin_el * radius1))
+        
+        # radius2=radius1/extension
+        # push!(pos1, Vec3(-cos_el * radius2, state_y, -sin_el * radius2))
+        # pos = pos1
         push!(vel, Vec3(DELTA, DELTA, DELTA))
         push!(acc, Vec3(DELTA, DELTA, DELTA))
     end

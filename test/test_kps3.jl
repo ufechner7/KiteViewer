@@ -230,7 +230,7 @@ z= nothing
 @testset "test_initial_residual" begin
     global results, x, z
     lower = [1.0, -1.0]
-    upper = [1.01, 1.0]
+    upper = [1.01, 0.99]
     initial_x = [1.003, 0.00002]
     inner_optimizer = GradientDescent()
     results = optimize(test_initial_condition, lower, upper, initial_x, Fminbox(inner_optimizer))
@@ -239,8 +239,8 @@ z= nothing
     res=test_initial_condition(params)
 
     my_state = KPS3.get_state()
-    # println("res2: "); display(my_state.res2)
-    println("pos: "); display(my_state.pos)
+    println("res2: "); display(my_state.res2)
+    # println("pos: "); display(my_state.pos)
     x = Float64[] 
     z = Float64[]
     for i in 1:length(my_state.pos)
