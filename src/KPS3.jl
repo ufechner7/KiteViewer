@@ -401,6 +401,14 @@ function get_lod(s)
     return lift / drag
 end
 
+function tether_length(pos)
+    length = 0.0
+    for i in 1:SEGMENTS
+        length += norm(pos[i+1] - pos[i])
+    end
+    return length
+end
+
 # Calculate the initial conditions y0, yd0 and sw0. Tether with the given elevation angle,
 # particle zero fixed at origin. """
 function init(s; output=false, pre_tension=1.00293, p2=0.00002)
@@ -408,34 +416,32 @@ function init(s; output=false, pre_tension=1.00293, p2=0.00002)
     set_cl_cd(s, 10.0/180.0 * π)
     pos, vel, acc = Vec3[], Vec3[], Vec3[]
     state_y = DELTA
-    vel_incr = 0
     sin_el, cos_el = sin(set.elevation / 180.0 * π), cos(set.elevation / 180.0 * π)
     for i in 0:set.segments
         radius =  -i * set.l_tether / set.segments*pre_tension
         if i == 0
             push!(pos, Vec3(-cos_el * radius, DELTA, -sin_el * radius))
-            push!(vel, Vec3(DELTA, DELTA, DELTA))
+            pos1 = deepcopy(pos)
         else
             if pre_tension != 1.0
-                #push!(pos, Vec3(-cos_el * radius*(1.0+p2*i/7.0), state_y, -sin_el * radius*(1.0+p2*i/7.0)))
                 elevation = set.elevation # - p2 * (i/set.segments - 0.5)^2
                 sin_el, cos_el = sin(elevation / 180.0 * π), cos(elevation / 180.0 * π)
-                push!(pos, Vec3(-cos_el * radius, state_y, -sin_el * radius))
+                radius1 = radius*(1.0+p2*i/7.0)
+                push!(pos, Vec3(-cos_el * radius1, state_y, -sin_el * radius1))
+               
+                # radius2=radius1/extension
+                # push!(pos1, Vec3(-cos_el * radius2, state_y, -sin_el * radius2))
+                # pos = pos1
             else
                 push!(pos, Vec3(-cos_el * radius, state_y, -sin_el * radius))
             end
-            if i < set.segments
-                push!(vel, Vec3(DELTA, DELTA, -sin_el * vel_incr*i))
-            else
-            push!(vel, Vec3(DELTA, DELTA, -sin_el * vel_incr*(i-1.0)))
-            end
         end
-        if pre_tension == 1.0
-            push!(acc, Vec3(DELTA, DELTA, -9.81))
-        else
-            push!(acc, Vec3(DELTA, DELTA, DELTA))
-        end
+        push!(vel, Vec3(DELTA, DELTA, DELTA))
+        push!(acc, Vec3(DELTA, DELTA, DELTA))
     end
+    len = tether_length(pos)
+    extension = len / (set.l_tether*pre_tension)
+    # println("Extension: $extension")
     forces = get_spring_forces(s, pos)
     if output; println("Winch force: $(norm(forces[1])) N"); end
     state_y0, yd0 = Vec3[], Vec3[]
