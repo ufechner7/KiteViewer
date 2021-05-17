@@ -1,4 +1,4 @@
-using Test, BenchmarkTools, StaticArrays, Revise, LinearAlgebra, SciMLBase, Optim
+using Test, BenchmarkTools, StaticArrays, Revise, LinearAlgebra, SciMLBase, Optim, GLMakie
 
 if ! @isdefined KPS3
     includet("../src/KPS3.jl")
@@ -32,7 +32,7 @@ function get_state_392(pre_tension, p2)
 end
 
 if ! @isdefined state
-    const state = State{SimFloat, Vec3}()
+    const state = State{SimFloat, KPS3.Vec3}()
     const SEGMENTS  = se().segments
     set_defaults(state)
 end
@@ -215,7 +215,7 @@ end
 
 function test_initial_condition(params)
     # println(params)
-    res1 = zeros(SVector{SEGMENTS+1, Vec3})
+    res1 = zeros(SVector{SEGMENTS+1, KPS3.Vec3})
     res2 = deepcopy(res1)
     res = reduce(vcat, vcat(res1, res2))
     y0, yd0 = get_state_392(params[1], params[2])
@@ -225,8 +225,10 @@ function test_initial_condition(params)
 end
 
 results = nothing
+x= nothing
+z= nothing
 @testset "test_initial_residual" begin
-    global results
+    global results, x, z
     lower = [1.0, -1.0]
     upper = [1.01, 1.0]
     initial_x = [1.003, 0.00002]
@@ -237,7 +239,14 @@ results = nothing
     res=test_initial_condition(params)
 
     my_state = KPS3.get_state()
-    println("res2: "); display(my_state.res2)    
+    # println("res2: "); display(my_state.res2)
+    println("pos: "); display(my_state.pos)
+    x = Float64[] 
+    z = Float64[]
+    for i in 1:length(my_state.pos)
+        push!(x, my_state.pos[i][1])
+        push!(z, my_state.pos[i][3])
+    end  
 
     #=
     @test my_state.length ≈ 65.36666666666667
@@ -255,6 +264,7 @@ results = nothing
     # println("res2: "); display(my_state.res2)
     # println("lift force: $(norm(my_state.lift_force)) N")
 end
+lines(x, z)
 
 #=
 println("\ncalc_rho:")
@@ -297,4 +307,3 @@ show(@benchmark residual!(res, yd, y, p, t) setup = (res1 = zeros(SVector{SEGMEN
                                                         der_pos = deepcopy(res1); der_vel = deepcopy(res1); yd = reduce(vcat, vcat(der_pos, der_vel));
                                                         p = SciMLBase.NullParameters(); t = 0.0))
 =#
-nothing

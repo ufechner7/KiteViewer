@@ -101,6 +101,7 @@ const Vec3     = MVector{3, SimFloat}
     v_kite::T =           zeros(3)        
     res1::SVector{set.segments+1, Vec3} = zeros(SVector{set.segments+1, Vec3})
     res2::SVector{set.segments+1, Vec3} = zeros(SVector{set.segments+1, Vec3})
+    pos::SVector{set.segments+1, Vec3} = zeros(SVector{set.segments+1, Vec3})
     seg_area::S =         zero(S)   # area of one tether segment
     bridle_area::S =      zero(S)
     c_spring::S =         zero(S)   # depends on lenght of tether segement
@@ -440,6 +441,9 @@ function init(s; output=false, pre_tension=1.00293, p2=0.00002)
         push!(acc, Vec3(DELTA, DELTA, DELTA))
     end
     len = tether_length(pos)
+    for i in 1:length(pos)
+        s.pos[i] .= pos[i]
+    end
     extension = len / (set.l_tether*pre_tension)
     # println("Extension: $extension")
     forces = get_spring_forces(s, pos)
