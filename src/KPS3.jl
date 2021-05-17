@@ -412,7 +412,7 @@ end
 
 # Calculate the initial conditions y0, yd0 and sw0. Tether with the given elevation angle,
 # particle zero fixed at origin. """
-function init(s; output=false, pre_tension=1.00293, p2=0.00002)
+function init(s; output=false, pre_tension=1.00293, p2=0.00002, X, Z)
     DELTA = 1e-6
     set_cl_cd(s, 10.0/180.0 * π)
     pos, vel, acc = Vec3[], Vec3[], Vec3[]
@@ -423,7 +423,7 @@ function init(s; output=false, pre_tension=1.00293, p2=0.00002)
         elevation = set.elevation - p2 * (i+1/(set.segments+1) - 0.5)^2
         sin_el, cos_el = sin(elevation / 180.0 * π), cos(elevation / 180.0 * π)
         radius1 = radius # *(1.0+p2*i/7.0)
-        push!(pos, Vec3(-cos_el * radius1, state_y, -sin_el * radius1))
+        push!(pos, Vec3(-cos_el * radius1+X[i+1], state_y, -sin_el * radius1+Z[i+1]))
         
         # radius2=radius1/extension
         # push!(pos1, Vec3(-cos_el * radius2, state_y, -sin_el * radius2))

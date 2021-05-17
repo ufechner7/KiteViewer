@@ -19,7 +19,7 @@ function set_defaults(state)
     KPS3.clear(state)
 end
 
-function get_state_392(pre_tension, p2)
+function get_state_392(pre_tension, p2, X, Z)
     my_state = KPS3.get_state()
     KPS3.set.l_tether = 392.0
     KPS3.set.elevation = 70.0
@@ -27,7 +27,7 @@ function get_state_392(pre_tension, p2)
     KPS3.set.v_wind = 9.1
     KPS3.set.mass = 6.2
     KPS3.clear(my_state)
-    y0, yd0 = KPS3.init(my_state; pre_tension=pre_tension, p2=p2)
+    y0, yd0 = KPS3.init(my_state; pre_tension=pre_tension, p2=p2, X=X, Z=Z)
     return y0, yd0
 end
 
@@ -218,7 +218,7 @@ function test_initial_condition(params)
     res1 = zeros(SVector{SEGMENTS+1, KPS3.Vec3})
     res2 = deepcopy(res1)
     res = reduce(vcat, vcat(res1, res2))
-    y0, yd0 = get_state_392(params[1], params[2])
+    y0, yd0 = get_state_392(params[1], params[2], params[3:3+SEGMENTS], params[3+SEGMENTS+1:end])
     p = SciMLBase.NullParameters()
     residual!(res, yd0, y0, p, 0.0)
     return norm(res) # z component of force on all particles but the first
@@ -229,11 +229,11 @@ x= nothing
 z= nothing
 @testset "test_initial_residual" begin
     global results, x, z
-    lower = [1.0, -1.0]
-    upper = [1.01, 0.99]
-    initial_x = [1.003, 0.00002]
+    lower = [1.0, -1.0, -10, -10, -10, -10, -10, -10, -10, -10.0, -10, -10, -10, -10, -10, -10]
+    upper = [1.01, 0.99, 10,  10,  10,  10,  10,  10,  10, 10,  10,  10,  10,  10,  10,  10]
+    initial_x = [1.0028, -0.045, -0.023, 0.017, 0.003384, 0.0073, 0.0126, -0.0134, -0.0042, -0.016, -0.0134, 0.008, 0.02, 0.022564022967192558, 0.02, -0.017]
     inner_optimizer = GradientDescent()
-    results = optimize(test_initial_condition, lower, upper, initial_x, Fminbox(inner_optimizer))
+    results = optimize(test_initial_condition, lower, upper, initial_x, Fminbox(inner_optimizer), Optim.Options(outer_iterations = 16))
     params=(Optim.minimizer(results))
     println("result: $params; minimum: $(Optim.minimum(results))")
     res=test_initial_condition(params)
