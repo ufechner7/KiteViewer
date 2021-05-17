@@ -197,8 +197,8 @@ function calc_res(s, pos1, pos2, vel1, vel2, mass, veld, result, i)
     s.force .= s.spring_force + 0.5 * s.last_tether_drag
     if i == set.segments+1
         s.bridle_area =  set.l_bridle * set.d_tether/1000.0
-        s.last_v_app_norm_tether = calc_drag(s, s.av_vel, s.unit_vector, rho, s.last_tether_drag, s.v_app_perp, s.area)
-        s.force .+= s.spring_force + 0.5 * s.last_tether_drag     
+        s.last_v_app_norm_tether = calc_drag(s, s.av_vel, s.unit_vector, rho, s.last_tether_drag, s.v_app_perp, s.bridle_area)
+        s.force .+= s.last_tether_drag     
     end
    
     s.total_forces .= s.force + s.last_force
