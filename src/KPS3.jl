@@ -102,6 +102,7 @@ const Vec3     = MVector{3, SimFloat}
     res1::SVector{set.segments+1, Vec3} = zeros(SVector{set.segments+1, Vec3})
     res2::SVector{set.segments+1, Vec3} = zeros(SVector{set.segments+1, Vec3})
     seg_area::S =         zero(S)   # area of one tether segment
+    bridle_area::S =      zero(S)
     c_spring::S =         zero(S)   # depends on lenght of tether segement
     length::S =           set.l_tether
     damping::S =          zero(S)   # depends on lenght of tether segement
@@ -190,18 +191,14 @@ function calc_res(s, pos1, pos2, vel1, vel2, mass, veld, result, i)
     else
         s.spring_force .= k2 * ((norm1 - s.length) + (s.damping * spring_vel)) .* s.unit_vector
     end
-
-    s.area = norm1 * set.d_tether/1000.0
-    s.last_v_app_norm_tether = calc_drag(s, s.av_vel, s.unit_vector, rho, s.last_tether_drag, s.v_app_perp, s.area)
+    s.seg_area = norm1 * set.d_tether/1000.0
+    s.last_v_app_norm_tether = calc_drag(s, s.av_vel, s.unit_vector, rho, s.last_tether_drag, s.v_app_perp, s.seg_area)
     
+    s.force .= s.spring_force + 0.5 * s.last_tether_drag
     if i == set.segments+1
-        s.area =  set.l_bridle * set.d_tether/1000.0
+        s.bridle_area =  set.l_bridle * set.d_tether/1000.0
         s.last_v_app_norm_tether = calc_drag(s, s.av_vel, s.unit_vector, rho, s.last_tether_drag, s.v_app_perp, s.area)
-        # TODO Check this equation
-        s.force .= s.last_tether_drag + s.spring_force + 0.5 * s.last_tether_drag     
-        # s.force .= s.spring_force + 0.5 * s.last_tether_drag
-    else
-        s.force .= s.spring_force + 0.5 * s.last_tether_drag
+        s.force .+= s.spring_force + 0.5 * s.last_tether_drag     
     end
    
     s.total_forces .= s.force + s.last_force
