@@ -316,8 +316,8 @@ function residual!(res, yd, y, p, time)
     # copy and flatten result
     for i in 2:set.segments+1
         for j in 1:3
-           res[3*(i-2)+j] = s.res1[i][j]
-           res[3*(set.segments)+3*(i-2)+j] = s.res2[i][j]
+           @inbounds res[3*(i-2)+j] = s.res1[i][j]
+           @inbounds res[3*(set.segments)+3*(i-2)+j] = s.res2[i][j]
         end
     end
     # println(norm(res))

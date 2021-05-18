@@ -19,21 +19,22 @@ my_state = KPS3.get_state()
 clear(my_state)
 y0, yd0 = KPS3.init(my_state)
 
-tspan = (0.0, 0.01)         # time span
+tspan = (0.0, 0.034)         # time span
 
 differential_vars =  ones(Bool, 36)
 prob = DAEProblem(residual!, yd0, y0, tspan, differential_vars=differential_vars)
 
 sol = solve(prob, IDA(), saveat=0.001, abstol=0.01, reltol=0.001)
-println("state.param_cl: $(my_state.param_cl), state.param_cd: $(my_state.param_cd)")
-println("state.length: $(my_state.length)")
+# println("state.param_cl: $(my_state.param_cl), state.param_cd: $(my_state.param_cd)")
+# println("state.length: $(my_state.length)")
 
 time = sol.t
-sol.retcode
-# y = sol.u
+println(sol.retcode)
+y = sol.u
+println(length(y))
 
-# pos_z = sol[3, :]
-# vel_z = sol[6, :]
+pos_x = sol[3*5+1, :]
+pos_z = sol[3*5+3, :]
 
 # # plot the result
 # f = Figure()
