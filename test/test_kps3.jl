@@ -1,4 +1,4 @@
-using Test, BenchmarkTools, StaticArrays, Revise, LinearAlgebra, SciMLBase, Optim, GLMakie
+using Test, BenchmarkTools, StaticArrays, Revise, LinearAlgebra, SciMLBase, Optim, GLMakie, LineSearches
 
 if ! @isdefined KPS3
     includet("../src/KPS3.jl")
@@ -19,7 +19,7 @@ function set_defaults(state)
     KPS3.clear(state)
 end
 
-function get_state_392(pre_tension, p2, X, Z)
+function get_state_392(X, Z)
     my_state = KPS3.get_state()
     KPS3.set.l_tether = 392.0
     KPS3.set.elevation = 70.0
@@ -27,7 +27,7 @@ function get_state_392(pre_tension, p2, X, Z)
     KPS3.set.v_wind = 9.1
     KPS3.set.mass = 6.2
     KPS3.clear(my_state)
-    y0, yd0 = KPS3.init(my_state; pre_tension=pre_tension, p2=p2, X=X, Z=Z)
+    y0, yd0 = KPS3.init(my_state; X=X, Z=Z)
     return y0, yd0
 end
 
@@ -218,7 +218,7 @@ function test_initial_condition(params)
     res1 = zeros(SVector{SEGMENTS+1, KPS3.Vec3})
     res2 = deepcopy(res1)
     res = reduce(vcat, vcat(res1, res2))
-    y0, yd0 = get_state_392(params[1], params[2], params[3:3+SEGMENTS], params[3+SEGMENTS+1:end])
+    y0, yd0 = get_state_392(params[1:SEGMENTS], params[SEGMENTS+1:end])
     p = SciMLBase.NullParameters()
     residual!(res, yd0, y0, p, 0.0)
     return norm(res) # z component of force on all particles but the first
@@ -229,16 +229,18 @@ x= nothing
 z= nothing
 @testset "test_initial_residual" begin
     global results, x, z
-    lower = [1.0, -1.0, -10, -10, -10, -10, -10, -10, -10, -10.0, -10, -10, -10, -10, -10, -10]
-    upper = [1.01, 0.99, 10,  10,  10,  10,  10,  10,  10, 10,  10,  10,  10,  10,  10,  10]
-    initial_x = [1.0028, -0.045, -0.023, 0.017, 0.003384, 0.0073, 0.0126, -0.0134, -0.0042, -0.016, -0.0134, 0.008, 0.02, 0.022564022967192558, 0.02, -0.017]
-    inner_optimizer = GradientDescent()
-    results = optimize(test_initial_condition, lower, upper, initial_x, Fminbox(inner_optimizer), Optim.Options(outer_iterations = 16))
+    lower = [-20, -20, -20, -20, -20, -20.0, -20, -20, -20, -20, -20, -20]
+    upper = [ 20,  20,  20,  20,  20,  20.0,  20,  20,  20,  20,  20,  20]
+    initial_x =  [-1.4959445608305126, -3.624383044083223, -5.4462734309877465, -6.006262834161782, -4.32584707837671, 0.9902106377946402, 0.391580043672023, 0.9615178921064966, 1.3570436450889214, 1.2667003147716651, 0.4464575557089651, -1.3379859666130836] 
+    inner_optimizer = BFGS(linesearch=LineSearches.BackTracking(order=3)) # GradientDescent()
+    results = optimize(test_initial_condition, lower, upper, initial_x, Fminbox(inner_optimizer))
+    # results = optimize(test_initial_condition, initial_x, BFGS(), Optim.Options(iterations=10000))
     params=(Optim.minimizer(results))
     println("result: $params; minimum: $(Optim.minimum(results))")
     res=test_initial_condition(params)
 
     my_state = KPS3.get_state()
+    println("state.param_cl: $(my_state.param_cl), state.param_cd: $(my_state.param_cd)")
     println("res2: "); display(my_state.res2)
     # println("pos: "); display(my_state.pos)
     x = Float64[] 

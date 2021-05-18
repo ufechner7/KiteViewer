@@ -69,6 +69,8 @@ export set_v_reel_out, set_depower_steering                                     
     CL_LIST  = [   0.0,    0.5,   0.0,  0.08, 0.125,  0.15,  0.2,  1.0,  1.0,  0.0,  -0.5,   0.0]
     ALPHA_CD = [-180.0, -170.0, -140.0, -90.0, -20.0, 0.0, 20.0, 90.0, 140.0, 170.0, 180.0]
     CD_LIST  = [   0.5,    0.5,    0.5,   1.0,   0.2, 0.1,  0.2,  1.0,   0.5,   0.5,   0.5]
+    X0 = [-1.4962096521590122, -3.6249102162709073, -5.44692405654348, -6.006660022747197, -4.325489148131378, 0.9917145466514695]
+    Z0 = [0.39169104896945933, 0.9617323710591927, 1.3573151484924326, 1.2669265143195232, 0.44652484026603106, -1.338149942549073] 
     calc_cl = Spline1D(ALPHA_CL, CL_LIST)
     calc_cd = Spline1D(ALPHA_CD, CD_LIST)
 end
@@ -105,7 +107,7 @@ const Vec3     = MVector{3, SimFloat}
     seg_area::S =         zero(S)   # area of one tether segment
     bridle_area::S =      zero(S)
     c_spring::S =         zero(S)   # depends on lenght of tether segement
-    length::S =           set.l_tether
+    length::S =           set.l_tether / set.segments
     damping::S =          zero(S)   # depends on lenght of tether segement
     area::S =             zero(S)
     last_v_app_norm_tether::S = zero(S)
@@ -318,6 +320,7 @@ function residual!(res, yd, y, p, time)
            @inbounds res[3*(set.segments+1)+3*(i-1)+j] = s.res2[i][j]
         end
     end
+    println(norm(res))
     nothing
 end
 
@@ -412,7 +415,11 @@ end
 
 # Calculate the initial conditions y0, yd0 and sw0. Tether with the given elevation angle,
 # particle zero fixed at origin. """
-function init(s; output=false, pre_tension=1.00293, p2=0.00002, X, Z)
+function init(s; output=false, X=X0, Z=Z0)
+    pre_tension =  1.0045245863143872
+    p2          = -0.14953723916589248
+    X = vcat([0],X)
+    Z = vcat([0],Z)
     DELTA = 1e-6
     set_cl_cd(s, 10.0/180.0 * π)
     pos, vel, acc = Vec3[], Vec3[], Vec3[]
@@ -422,21 +429,14 @@ function init(s; output=false, pre_tension=1.00293, p2=0.00002, X, Z)
         radius =  -i * set.l_tether / set.segments*pre_tension
         elevation = set.elevation - p2 * (i+1/(set.segments+1) - 0.5)^2
         sin_el, cos_el = sin(elevation / 180.0 * π), cos(elevation / 180.0 * π)
-        radius1 = radius # *(1.0+p2*i/7.0)
+        radius1 = radius
         push!(pos, Vec3(-cos_el * radius1+X[i+1], state_y, -sin_el * radius1+Z[i+1]))
-        
-        # radius2=radius1/extension
-        # push!(pos1, Vec3(-cos_el * radius2, state_y, -sin_el * radius2))
-        # pos = pos1
         push!(vel, Vec3(DELTA, DELTA, DELTA))
         push!(acc, Vec3(DELTA, DELTA, DELTA))
     end
-    len = tether_length(pos)
     for i in 1:length(pos)
         s.pos[i] .= pos[i]
     end
-    extension = len / (set.l_tether*pre_tension)
-    # println("Extension: $extension")
     forces = get_spring_forces(s, pos)
     if output; println("Winch force: $(norm(forces[1])) N"); end
     state_y0, yd0 = Vec3[], Vec3[]
