@@ -10,12 +10,12 @@ my_state = KPS3.get_state()
 clear(my_state)
 y0, yd0 = KPS3.init(my_state)
 
-tspan = (0.0, 0.036)         # time span; fails when changed to (0.0, 0.04)
+tspan = (0.0, 0.05)         # time span; fails when changed to (0.0, 0.06)
 
 differential_vars =  ones(Bool, 36)
 prob = DAEProblem(residual!, yd0, y0, tspan, differential_vars=differential_vars)
 
-sol = solve(prob, IDA(), saveat=0.001, abstol=0.01, reltol=0.001)
+@time sol = solve(prob, IDA(), saveat=0.001, abstol=0.01, reltol=0.001)
 
 time = sol.t
 println(sol.retcode)
