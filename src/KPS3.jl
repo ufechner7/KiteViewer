@@ -287,14 +287,14 @@ end
 # Residual     res = res1, res2 = pos1,  ..., vel1, ...
 function residual!(res, yd, y, p, time)
     # unpack the vectors y and yd
-    part = reshape(SVector{6*(SEGMENTS+1)}(y),  Size(3, SEGMENTS+1, 2))
-    partd = reshape(SVector{6*(SEGMENTS+1)}(yd),  Size(3, SEGMENTS+1, 2))
+    part = reshape(SVector{6*(SEGMENTS)}(y),  Size(3, SEGMENTS, 2))
+    partd = reshape(SVector{6*(SEGMENTS)}(yd),  Size(3, SEGMENTS, 2))
     pos1, vel1 = part[:,:,1], part[:,:,2]
-    pos = SVector{SEGMENTS+1}(SVector(pos1[:,i]) for i in 1:SEGMENTS+1)
-    vel = SVector{SEGMENTS+1}(SVector(vel1[:,i]) for i in 1:SEGMENTS+1)
+    pos = SVector{SEGMENTS+1}(if i==1 SVector(0.0,0,0) else SVector(pos1[:,i-1]) end for i in 1:SEGMENTS+1)
+    vel = SVector{SEGMENTS+1}(if i==1 SVector(0.0,0,0) else SVector(vel1[:,i-1]) end for i in 1:SEGMENTS+1)
     posd1, veld1 = partd[:,:,1], partd[:,:,2]
-    posd = SVector{SEGMENTS+1}(SVector(posd1[:,i]) for i in 1:SEGMENTS+1)
-    veld = SVector{SEGMENTS+1}(SVector(veld1[:,i]) for i in 1:SEGMENTS+1)
+    posd = SVector{SEGMENTS+1}(if i==1 SVector(0.0,0,0) else SVector(posd1[:,i-1]) end for i in 1:SEGMENTS+1)
+    veld = SVector{SEGMENTS+1}(if i==1 SVector(0.0,0,0) else SVector(veld1[:,i-1]) end for i in 1:SEGMENTS+1)
 
     # update parameters
     s = state
@@ -314,13 +314,13 @@ function residual!(res, yd, y, p, time)
     loop(s, pos, vel, posd, veld, s.res1, s.res2)
    
     # copy and flatten result
-    for i in 1:set.segments+1
+    for i in 2:set.segments+1
         for j in 1:3
-           @inbounds res[3*(i-1)+j] = s.res1[i][j]
-           @inbounds res[3*(set.segments+1)+3*(i-1)+j] = s.res2[i][j]
+           res[3*(i-2)+j] = s.res1[i][j]
+           res[3*(set.segments)+3*(i-2)+j] = s.res2[i][j]
         end
     end
-    println(norm(res))
+    # println(norm(res))
     nothing
 end
 
@@ -440,11 +440,11 @@ function init(s; output=false, X=X0, Z=Z0)
     forces = get_spring_forces(s, pos)
     if output; println("Winch force: $(norm(forces[1])) N"); end
     state_y0, yd0 = Vec3[], Vec3[]
-    for i in 1:set.segments+1
+    for i in 2:set.segments+1
         push!(state_y0,  pos[i]) # Initial state vector
         yd0 = push!(yd0, vel[i]) # Initial state vector derivative
     end
-    for i in 1:set.segments+1
+    for i in 2:set.segments+1
         push!(state_y0, vel[i])  # Initial state vector
         push!(yd0, acc[i])       # Initial state vector derivative
     end

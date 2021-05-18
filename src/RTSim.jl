@@ -17,14 +17,11 @@ const Vec3     = MVector{3, SimFloat}
 
 my_state = KPS3.get_state()
 clear(my_state)
-y0, yd0 = KPS3.init(my_state; output=true)
+y0, yd0 = KPS3.init(my_state)
 
-# println(y0)
-# println(yd0)
+tspan = (0.0, 0.01)         # time span
 
-tspan = (0.0, 10.2)         # time span
-
-differential_vars =  vcat(true, ones(Bool, 41))
+differential_vars =  ones(Bool, 36)
 prob = DAEProblem(residual!, yd0, y0, tspan, differential_vars=differential_vars)
 
 sol = solve(prob, IDA(), saveat=0.001, abstol=0.01, reltol=0.001)
@@ -32,6 +29,7 @@ println("state.param_cl: $(my_state.param_cl), state.param_cd: $(my_state.param_
 println("state.length: $(my_state.length)")
 
 time = sol.t
+sol.retcode
 # y = sol.u
 
 # pos_z = sol[3, :]
