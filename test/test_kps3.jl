@@ -231,10 +231,9 @@ z= nothing
     global results, x, z
     lower = [-20, -20, -20, -20, -20, -20.0, -20, -20, -20, -20, -20, -20]
     upper = [ 20,  20,  20,  20,  20,  20.0,  20,  20,  20,  20,  20,  20]
-    initial_x =  [-1.4959445608305126, -3.624383044083223, -5.4462734309877465, -6.006262834161782, -4.32584707837671, 0.9902106377946402, 0.391580043672023, 0.9615178921064966, 1.3570436450889214, 1.2667003147716651, 0.4464575557089651, -1.3379859666130836] 
+    initial_x =  [-1.4665866297620287, -3.5561543609716884, -5.328280757163652, -5.825432425624137, -4.06758438870819, 1.3365850018520555, 0.34726455461348643, 0.8708697538110506, 1.2180971705802224, 1.077432049937649, 0.20510584981238655, -1.6322406908860976]
     inner_optimizer = BFGS(linesearch=LineSearches.BackTracking(order=3)) # GradientDescent()
-    results = optimize(test_initial_condition, lower, upper, initial_x, Fminbox(inner_optimizer))
-    # results = optimize(test_initial_condition, initial_x, BFGS(), Optim.Options(iterations=10000))
+    results = optimize(test_initial_condition, lower, upper, initial_x, Fminbox(inner_optimizer), Optim.Options(iterations=10000))
     params=(Optim.minimizer(results))
     println("result: $params; minimum: $(Optim.minimum(results))")
     res=test_initial_condition(params)
@@ -249,6 +248,7 @@ z= nothing
         push!(x, my_state.pos[i][1])
         push!(z, my_state.pos[i][3])
     end  
+    println(results)
 
     #=
     @test my_state.length ≈ 65.36666666666667
