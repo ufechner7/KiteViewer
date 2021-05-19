@@ -21,7 +21,7 @@ kite:
 tether:
     d_tether:  4           # tether diameter [mm]
     cd_tether: 0.958       # drag coefficient of the tether
-    damping: 946.0         # 2 * 473.0 damping coefficient for 1 m tether [Ns/m]
+    damping: 473.0         # 2 * 473.0 damping coefficient for 1 m tether [Ns/m] 946.0
     c_spring: 614600.0     # spring constant coefficient for 1 m tether [N/m]
 
 environment:
