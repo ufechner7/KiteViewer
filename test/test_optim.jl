@@ -17,10 +17,7 @@ function get_state_392(X, Z)
     return y0, yd0
 end
 
-if ! @isdefined state
-    const state = State{SimFloat, KPS3.Vec3}()
-    const SEGMENTS  = 6
-end
+const SEGMENTS  = 6
 
 function test_initial_condition(params)
     res1 = zeros(SVector{SEGMENTS+1, KPS3.Vec3})
