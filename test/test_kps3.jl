@@ -224,21 +224,21 @@ function test_initial_condition(params)
     return norm(res) # z component of force on all particles but the first
 end
 
-results = nothing
+res = nothing
 x= nothing
 z= nothing
 @testset "test_initial_residual" begin
-    global results, x, z
-    lower = [-20, -20, -20, -20, -20, -20.0, -20, -20, -20, -20, -20, -20]
-    upper = [ 20,  20,  20,  20,  20,  20.0,  20,  20,  20,  20,  20,  20]
-    initial_x =  [-1.4665866297620287, -3.5561543609716884, -5.328280757163652, -5.825432425624137, -4.06758438870819, 1.3365850018520555, 0.34726455461348643, 0.8708697538110506, 1.2180971705802224, 1.077432049937649, 0.20510584981238655, -1.6322406908860976]
-    inner_optimizer = BFGS(linesearch=LineSearches.BackTracking(order=3)) # GradientDescent()
-    results = optimize(test_initial_condition, lower, upper, initial_x, Fminbox(inner_optimizer), Optim.Options(iterations=10000))
-    params=(Optim.minimizer(results))
-    println("result: $params; minimum: $(Optim.minimum(results))")
-    res=test_initial_condition(params)
+    global res, x, z
+    initial_x =  [-1.52505,  -3.67761,  -5.51761,  -6.08916,  -4.41371,  0.902124,  0.366393,  0.909132,  1.27537,  1.1538,  0.300657,  -1.51768]
+    res=test_initial_condition(initial_x)
 
     my_state = KPS3.get_state()
+    KPS3.set.l_tether = 392.0
+    KPS3.set.elevation = 70.0
+    KPS3.set.area = 10.0
+    KPS3.set.v_wind = 9.1
+    KPS3.set.mass = 6.2
+    KPS3.clear(my_state)
     println("state.param_cl: $(my_state.param_cl), state.param_cd: $(my_state.param_cd)")
     println("res2: "); display(my_state.res2)
     # println("pos: "); display(my_state.pos)
@@ -248,7 +248,7 @@ z= nothing
         push!(x, my_state.pos[i][1])
         push!(z, my_state.pos[i][3])
     end  
-    println(results)
+    println(norm(res))
 
     #=
     @test my_state.length ≈ 65.36666666666667
