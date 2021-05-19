@@ -1,4 +1,12 @@
 TODO
+On Simulator
+1. Test NlOpt.jl for finding the initial solution
+2. Add extra springs from point 1 to 3, 3 to 5 and 5 to 7
+3. print the ground force as function of the pos vectors
+4. add winch model
+5. add 4 point kite model
+
+On KiteViewer
 1. add button x, y, z and energy
 2. add slider controlling the time
 3. add FPS display
