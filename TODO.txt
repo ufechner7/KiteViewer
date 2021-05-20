@@ -1,10 +1,12 @@
 TODO
 On Simulator
 
-1. Add extra springs from point 1 to 3, 3 to 5 and 5 to 7
-2. print the ground force as function of the pos vectors
-3. add winch model
-4. add 4 point kite model
+==> 1. Add extra springs from point 1 to 3, 3 to 5 and 5 to 7 !!!
+
+2. add script plot_wind_profile.jl
+3. print the ground force as function of the pos vectors
+4. add winch model
+5. add 4 point kite model
 
 On KiteViewer
 1. add button x, y, z and energy

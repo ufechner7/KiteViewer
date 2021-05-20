@@ -1,4 +1,4 @@
-using Test, BenchmarkTools, StaticArrays, Revise, LinearAlgebra, SciMLBase, Optim, LineSearches
+using Test, BenchmarkTools, StaticArrays, Revise, LinearAlgebra, SciMLBase, Optim, LineSearches, GLMakie
 
 if ! @isdefined KPS3
     includet("../src/KPS3.jl")
@@ -48,3 +48,4 @@ for i in 1:length(my_state.pos)
 end  
 println(results)
 
+lines(x, z)
