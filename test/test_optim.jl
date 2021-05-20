@@ -30,7 +30,7 @@ function test_initial_condition(params::Vector)
     return norm(res) # z component of force on all particles but the first
 end
 
-function optim_inital_state(plot=false, prn=false)
+function optim_inital_state(;plot=false, prn=false)
     lower = [-10, -10, -20, -20, -10, -10.0, -5, -5, -5, -5, -5, -5]
     upper = [ 10,  10,  20,  20,  10,  10.0,  5,  5,  5,  5,  5,  5]
     initial_x =  zeros(12)
@@ -55,9 +55,9 @@ function optim_inital_state(plot=false, prn=false)
     if prn println(results) end
 
     if plot 
-        lines(x, z) 
+        return lines(x, z)
     end
-    return
+    return nothing
 end
 
 end
