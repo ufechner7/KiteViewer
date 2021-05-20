@@ -437,28 +437,30 @@ function init(s; output=false, X=X0, Z=Z0)
     for i in 1:length(pos)
         s.pos[i] .= pos[i]
     end
-    forces = get_spring_forces(s, pos)
+    # forces = get_spring_forces(s, pos)
     if output; println("Winch force: $(norm(forces[1])) N"); end
-    state_y0, yd0 = Vec3[], Vec3[]
+    
+    state_y0 = zeros(SVector{2*set.segments, Vec3})
+    yd0 = zeros(SVector{2*set.segments, Vec3})
     for i in 2:set.segments+1
-        push!(state_y0,  pos[i]) # Initial state vector
-        yd0 = push!(yd0, vel[i]) # Initial state vector derivative
+        state_y0[i-1] .= pos[i]  # Initial state vector
+        yd0[i-1]      .= vel[i]  # Initial state vector derivative
     end
+
     for i in 2:set.segments+1
-        push!(state_y0, vel[i])  # Initial state vector
-        push!(yd0, acc[i])       # Initial state vector derivative
+        state_y0[set.segments+i-1] .= vel[i]  # Initial state vector
+        yd0[set.segments+i-1]      .= acc[i]  # Initial state vector derivative
     end
     set_v_wind_ground(s, pos[set.segments+1][3])
     set_l_tether(s, set.l_tether)
     set_v_reel_out(s, V_REEL_OUT, 0.0)
-    elements = length(reduce(vcat, state_y0))
     if output
         print("y0: ")
         display(state_y0)
         print("yd0: ")
         display(yd0)
     end
-    return MVector{elements, SimFloat}(reduce(vcat, state_y0)), MVector{elements, SimFloat}(reduce(vcat, yd0))
+    return reduce(vcat, state_y0), reduce(vcat, yd0)
 end
 
 end

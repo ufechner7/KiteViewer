@@ -213,15 +213,15 @@ end
 end
 =#
 
+res1 = zeros(SVector{SEGMENTS+1, KPS3.Vec3})
+res2 = deepcopy(res1)
+const res3 = reduce(vcat, vcat(res1, res2))
 function test_initial_condition(params)
     # println(params)
-    res1 = zeros(SVector{SEGMENTS+1, KPS3.Vec3})
-    res2 = deepcopy(res1)
-    res = reduce(vcat, vcat(res1, res2))
     y0, yd0 = get_state_392(params[1:SEGMENTS], params[SEGMENTS+1:end])
     p = SciMLBase.NullParameters()
-    residual!(res, yd0, y0, p, 0.0)
-    return norm(res) # z component of force on all particles but the first
+    residual!(res3, yd0, y0, p, 0.0)
+    return norm(res3) # z component of force on all particles but the first
 end
 
 res = nothing
@@ -266,7 +266,7 @@ z= nothing
     # println("res2: "); display(my_state.res2)
     # println("lift force: $(norm(my_state.lift_force)) N")
 end
-lines(x, z)
+# lines(x, z)
 
 #=
 println("\ncalc_rho:")
@@ -309,3 +309,4 @@ show(@benchmark residual!(res, yd, y, p, t) setup = (res1 = zeros(SVector{SEGMEN
                                                         der_pos = deepcopy(res1); der_vel = deepcopy(res1); yd = reduce(vcat, vcat(der_pos, der_vel));
                                                         p = SciMLBase.NullParameters(); t = 0.0))
 =#
+display(@benchmark res=test_initial_condition(initial_x) setup = (initial_x = SVector{2*SEGMENTS}(zeros(12))))
