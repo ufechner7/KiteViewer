@@ -77,7 +77,8 @@ end
 
 # Type definitions
 const SimFloat = Float64
-const Vec3     = MVector{3, SimFloat}                   
+const Vec3     = MVector{3, SimFloat}
+const SVec3     = MVector{3, SimFloat}                   
 
 @with_kw mutable struct State{S, T}
     v_wind::T =           [set.v_wind, 0, 0]    # wind vector at the height of the kite
@@ -415,24 +416,27 @@ end
 
 # Calculate the initial conditions y0, yd0 and sw0. Tether with the given elevation angle,
 # particle zero fixed at origin. """
-function init(s; output=false, X=X0, Z=Z0)
+function init(s, X; output=false)
     pre_tension =  1.0045245863143872
     p2          = -0.14953723916589248
-    X = vcat([0],X)
-    Z = vcat([0],Z)
+
     DELTA = 1e-6
     set_cl_cd(s, 10.0/180.0 * π)
-    pos, vel, acc = Vec3[], Vec3[], Vec3[]
-    state_y = DELTA
-    sin_el, cos_el = sin(set.elevation / 180.0 * π), cos(set.elevation / 180.0 * π)
+    pos = zeros(SVector{SEGMENTS+1, Vec3})
+    vel = zeros(SVector{SEGMENTS+1, Vec3})
+    acc = zeros(SVector{SEGMENTS+1, Vec3})
     for i in 0:set.segments
         radius =  -i * set.l_tether / set.segments*pre_tension
         elevation = set.elevation - p2 * (i+1/(set.segments+1) - 0.5)^2
         sin_el, cos_el = sin(elevation / 180.0 * π), cos(elevation / 180.0 * π)
         radius1 = radius
-        push!(pos, Vec3(-cos_el * radius1+X[i+1], state_y, -sin_el * radius1+Z[i+1]))
-        push!(vel, Vec3(DELTA, DELTA, DELTA))
-        push!(acc, Vec3(DELTA, DELTA, DELTA))
+        if i==0
+            pos[i+1] .= SVec3(0.0, DELTA, 0.0)
+        else
+            pos[i+1] .= SVec3(-cos_el * radius1+X[i], DELTA, -sin_el * radius1+X[SEGMENTS+i])
+        end
+        vel[i+1] .= SVec3(DELTA, DELTA, DELTA)
+        acc[i+1] .= SVec3(DELTA, DELTA, DELTA)
     end
     for i in 1:length(pos)
         s.pos[i] .= pos[i]
@@ -440,8 +444,8 @@ function init(s; output=false, X=X0, Z=Z0)
     # forces = get_spring_forces(s, pos)
     if output; println("Winch force: $(norm(forces[1])) N"); end
     
-    state_y0 = zeros(SVector{2*set.segments, Vec3})
-    yd0 = zeros(SVector{2*set.segments, Vec3})
+    state_y0 = zeros(SVector{2*SEGMENTS, Vec3})
+    yd0 = zeros(SVector{2*SEGMENTS, Vec3})
     for i in 2:set.segments+1
         state_y0[i-1] .= pos[i]  # Initial state vector
         yd0[i-1]      .= vel[i]  # Initial state vector derivative

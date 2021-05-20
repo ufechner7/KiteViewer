@@ -19,7 +19,7 @@ function set_defaults(state)
     KPS3.clear(state)
 end
 
-function get_state_392(X, Z)
+function init_392()
     my_state = KPS3.get_state()
     KPS3.set.l_tether = 392.0
     KPS3.set.elevation = 70.0
@@ -27,8 +27,6 @@ function get_state_392(X, Z)
     KPS3.set.v_wind = 9.1
     KPS3.set.mass = 6.2
     KPS3.clear(my_state)
-    y0, yd0 = KPS3.init(my_state; X=X, Z=Z)
-    return y0, yd0
 end
 
 if ! @isdefined state
@@ -216,11 +214,11 @@ end
 res1 = zeros(SVector{SEGMENTS+1, KPS3.Vec3})
 res2 = deepcopy(res1)
 const res3 = reduce(vcat, vcat(res1, res2))
-function test_initial_condition(params)
-    # println(params)
-    y0, yd0 = get_state_392(params[1:SEGMENTS], params[SEGMENTS+1:end])
-    p = SciMLBase.NullParameters()
-    residual!(res3, yd0, y0, p, 0.0)
+
+function test_initial_condition(params::Vector)
+    my_state = KPS3.get_state()
+    y0, yd0 = KPS3.init(my_state, params)
+    residual!(res3, yd0, y0, 0.0, 0.0)
     return norm(res3) # z component of force on all particles but the first
 end
 
@@ -229,6 +227,7 @@ x= nothing
 z= nothing
 @testset "test_initial_residual" begin
     global res, x, z
+    init_392()
     initial_x =  [-1.52505,  -3.67761,  -5.51761,  -6.08916,  -4.41371,  0.902124,  0.366393,  0.909132,  1.27537,  1.1538,  0.300657,  -1.51768]
     res=test_initial_condition(initial_x)
 
@@ -309,4 +308,4 @@ show(@benchmark residual!(res, yd, y, p, t) setup = (res1 = zeros(SVector{SEGMEN
                                                         der_pos = deepcopy(res1); der_vel = deepcopy(res1); yd = reduce(vcat, vcat(der_pos, der_vel));
                                                         p = SciMLBase.NullParameters(); t = 0.0))
 =#
-display(@benchmark res=test_initial_condition(initial_x) setup = (initial_x = SVector{2*SEGMENTS}(zeros(12))))
+display(@benchmark res=test_initial_condition(initial_x) setup = (initial_x = (zeros(12))))
