@@ -31,7 +31,6 @@ end
 lower = SVector{2*SEGMENTS}(-10, -10, -20, -20, -10, -10.0, -5, -5, -5, -5, -5, -5)
 upper = SVector{2*SEGMENTS}( 10,  10,  20,  20,  10,  10.0,  5,  5,  5,  5,  5,  5)
 initial_x = MVector{2*SEGMENTS}(zeros(12))
-# initial_x = [-1.5249315586385417, -3.677357678429133, -5.517193630804955, -6.088578528215787, -4.41292866775792, 0.9031095636714606, 0.36635378638566213, 0.9090515219653894, 1.275247708663531, 1.153628000233964, 0.3004452881238335, -1.5179358797834548]
 init_392()
 # working: :GD_STOGO 1803, :GD_STOGO_RAND 1403, :GN_ESCH 378, :GN_DIRECT_L 122, :GN_DIRECT_L_RAND 116, :GN_ISRES 82.8, :GN_CRS2_LM 60; not working: GN_AGS
 # in 15 min: GN_CRS2_LM: 27; LN_BOBYQA 0.000189
@@ -43,7 +42,7 @@ opt.lower_bounds = lower
 opt.upper_bounds = upper
 # opt.xtol_rel = 1e-5
 # opt.xtol_abs = 0.001
-# opt.stopval = 10.0
+opt.stopval = 0.01
 # opt.maxtime = 60.0
 opt.min_objective = test_initial_condition
 (minf, minx, ret) = optimize(opt, initial_x)
