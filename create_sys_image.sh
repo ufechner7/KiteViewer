@@ -1,6 +1,6 @@
 #!/bin/bash -eu
 if test -f "MakieSys.so"; then
-    cp MakieSys.so MakieSys.so.bak
+    mv MakieSys.so MakieSys.so.bak
 fi
 rm -f Manifest.toml
 julia --project -e "include(\"./test/update_packages.jl\");"
