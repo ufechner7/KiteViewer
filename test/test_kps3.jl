@@ -308,5 +308,7 @@ function run_benchmarks()
                                                             pos[1] .= [1.0,2,3]; vel = deepcopy(res1); y = reduce(vcat, vcat(pos, vel));
                                                             der_pos = deepcopy(res1); der_vel = deepcopy(res1); yd = reduce(vcat, vcat(der_pos, der_vel));
                                                             p = SciMLBase.NullParameters(); t = 0.0))
+    println("\ntest_initial_condition")
     show(@benchmark res=test_initial_condition(initial_x) setup = (initial_x = (zeros(12))))
+    println()
 end

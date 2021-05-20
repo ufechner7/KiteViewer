@@ -1,9 +1,11 @@
+module OptimInitialState
+
 using Test, BenchmarkTools, StaticArrays, Revise, LinearAlgebra, SciMLBase, Optim, LineSearches, GLMakie
 
-if ! @isdefined KPS3
-    includet("../src/KPS3.jl")
-    using .KPS3
-end
+export optim_inital_state
+
+include("../src/KPS3.jl")
+using .KPS3
 
 function init_392()
     my_state = KPS3.get_state()
@@ -28,24 +30,35 @@ function test_initial_condition(params::Vector)
     return norm(res) # z component of force on all particles but the first
 end
 
-lower = [-10, -10, -20, -20, -10, -10.0, -5, -5, -5, -5, -5, -5]
-upper = [ 10,  10,  20,  20,  10,  10.0,  5,  5,  5,  5,  5,  5]
-initial_x =  zeros(12)
-init_392()
-inner_optimizer = BFGS(linesearch=LineSearches.BackTracking(order=3)) # GradientDescent()
-results = optimize(test_initial_condition, lower, upper, initial_x, Fminbox(inner_optimizer), Optim.Options(iterations=10000))
-params=(Optim.minimizer(results))
-println("result: $params; minimum: $(Optim.minimum(results))")
-res4=test_initial_condition(params)
+function optim_inital_state(plot=false, prn=false)
+    lower = [-10, -10, -20, -20, -10, -10.0, -5, -5, -5, -5, -5, -5]
+    upper = [ 10,  10,  20,  20,  10,  10.0,  5,  5,  5,  5,  5,  5]
+    initial_x =  zeros(12)
+    init_392()
+    inner_optimizer = BFGS(linesearch=LineSearches.BackTracking(order=3)) # GradientDescent()
+    results = optimize(test_initial_condition, lower, upper, initial_x, Fminbox(inner_optimizer), Optim.Options(iterations=10000))
+    params=(Optim.minimizer(results))
+    println("result: $params; minimum: $(Optim.minimum(results))")
+    res4=test_initial_condition(params)
+    show(@test res4 < 0.3)
 
-my_state = KPS3.get_state()
-println("res2: "); display(my_state.res2)
-x = Float64[] 
-z = Float64[]
-for i in 1:length(my_state.pos)
-    push!(x, my_state.pos[i][1])
-    push!(z, my_state.pos[i][3])
-end  
-println(results)
+    my_state = KPS3.get_state()
+    if prn
+        println("res2: "); display(my_state.res2)
+    end
+    x = Float64[] 
+    z = Float64[]
+    for i in 1:length(my_state.pos)
+        push!(x, my_state.pos[i][1])
+        push!(z, my_state.pos[i][3])
+    end  
+    if prn println(results) end
 
-lines(x, z)
+    if plot 
+        lines(x, z) 
+    end
+    return
+end
+
+end
+nothing
