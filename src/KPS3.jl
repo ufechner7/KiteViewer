@@ -69,8 +69,7 @@ export set_v_reel_out, set_depower_steering                                     
     CL_LIST  = [   0.0,    0.5,   0.0,  0.08, 0.125,  0.15,  0.2,  1.0,  1.0,  0.0,  -0.5,   0.0]
     ALPHA_CD = [-180.0, -170.0, -140.0, -90.0, -20.0, 0.0, 20.0, 90.0, 140.0, 170.0, 180.0]
     CD_LIST  = [   0.5,    0.5,    0.5,   1.0,   0.2, 0.1,  0.2,  1.0,   0.5,   0.5,   0.5]
-    X0 = [-1.52505, -3.67761, -5.51761, -6.08916, -4.41371,   0.902124]
-    Z0 = [ 0.366393, 0.909132, 1.27537,  1.1538,   0.300657, -1.51768]
+    X0 = [-1.52505, -3.67761, -5.51761, -6.08916, -4.41371,   0.902124, 0.366393, 0.909132, 1.27537,  1.1538,   0.300657, -1.51768]
     calc_cl = Spline1D(ALPHA_CL, CL_LIST)
     calc_cd = Spline1D(ALPHA_CD, CD_LIST)
 end
@@ -422,7 +421,7 @@ const yd0 = zeros(SVector{2*SEGMENTS, Vec3})
 
 # Calculate the initial conditions y0, yd0 and sw0. Tether with the given elevation angle,
 # particle zero fixed at origin. """
-function init(s, X; output=false)
+function init(s, X=X0; output=false)
     global pos, vel, acc, state_y0, yd0
 
     pre_tension =  1.0045245863143872
