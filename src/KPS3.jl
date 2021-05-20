@@ -414,17 +414,23 @@ function tether_length(pos)
     return length
 end
 
+const pos = zeros(SVector{SEGMENTS+1, Vec3})
+const vel = zeros(SVector{SEGMENTS+1, Vec3})
+const acc = zeros(SVector{SEGMENTS+1, Vec3})
+const state_y0 = zeros(SVector{2*SEGMENTS, Vec3})
+const yd0 = zeros(SVector{2*SEGMENTS, Vec3})
+
 # Calculate the initial conditions y0, yd0 and sw0. Tether with the given elevation angle,
 # particle zero fixed at origin. """
 function init(s, X; output=false)
+    global pos, vel, acc, state_y0, yd0
+
     pre_tension =  1.0045245863143872
     p2          = -0.14953723916589248
 
     DELTA = 1e-6
     set_cl_cd(s, 10.0/180.0 * π)
-    pos = zeros(SVector{SEGMENTS+1, Vec3})
-    vel = zeros(SVector{SEGMENTS+1, Vec3})
-    acc = zeros(SVector{SEGMENTS+1, Vec3})
+
     for i in 0:set.segments
         radius =  -i * set.l_tether / set.segments*pre_tension
         elevation = set.elevation - p2 * (i+1/(set.segments+1) - 0.5)^2
@@ -444,8 +450,6 @@ function init(s, X; output=false)
     # forces = get_spring_forces(s, pos)
     if output; println("Winch force: $(norm(forces[1])) N"); end
     
-    state_y0 = zeros(SVector{2*SEGMENTS, Vec3})
-    yd0 = zeros(SVector{2*SEGMENTS, Vec3})
     for i in 2:set.segments+1
         state_y0[i-1] .= pos[i]  # Initial state vector
         yd0[i-1]      .= vel[i]  # Initial state vector derivative

@@ -37,7 +37,7 @@ init_392()
 # in 15 min: GN_CRS2_LM: 27; LN_BOBYQA 0.000189
 # in  1 min :LN_SBPLX 9.96 in 15 min: 1.13
 # in 1 min :LN_BOBYQA 0.31; LN_COBYLA 25; LD_MMA 6046; not working: LD_SLSQP
-# without time limit: 0.00016056070408139176 ROUNDOFF_LIMITED; took 533s, 39628692 numevals or 18 us per numeval
+# without time limit: 0.00016056070408139176 ROUNDOFF_LIMITED; took 503s, 39628692 numevals or 18 us per numeval
 opt = Opt(:LN_BOBYQA, 12) 
 opt.lower_bounds = lower
 opt.upper_bounds = upper
