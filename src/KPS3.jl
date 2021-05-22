@@ -59,7 +59,6 @@ export set_v_reel_out, set_depower_steering                                     
     REL_SIDE_AREA = 0.5
     STEERING_COEFFICIENT = 0.6
     BRIDLE_DRAG = 1.1
-    ALPHA = set.alpha
     ALPHA_ZERO = 0.0
     K_ds = 1.5                    # influence of the depower angle on the steering sensitivity
     MAX_ALPHA_DEPOWER = 31.0
@@ -140,16 +139,12 @@ end
 # Calculate the air densisity as function of height
 calc_rho(height) = set.rho_0 * exp(-height / 8550.0)
 
-# Calculate the wind speed at a given height and reference height.
-# Fast version of: (height / set.h_ref)^ALPHA
-# calc_wind_factor(height) = exp(ALPHA * log((height / set.h_ref)))
-
 @enum ProfileLaw EXP=1 LOG=2 EXPLOG=3
 
 # Calculate the wind speed at a given height and reference height.
 function calc_wind_factor(height, profile_law=EXPLOG)
     if profile_law == EXP
-        return (height / set.h_ref)^ALPHA
+        return (height / set.h_ref)^set.alpha
     elseif profile_law == LOG
         # z_0 = 0.07
         z_0 = 0.0002

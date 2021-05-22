@@ -1,7 +1,8 @@
 TODO
 On Simulator
 
-1. Write log file for KiteViewer
+0. add z0 and profile_law to settings struct
+1. write log file for KiteViewer
 2. add winch model
 3. add 4 point kite model
 
