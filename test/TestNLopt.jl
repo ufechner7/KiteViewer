@@ -74,4 +74,3 @@ function test_nlopt(;plot=false, prn=false, maxtime=60.0)
 end
 
 end
-using .TestNLopt 

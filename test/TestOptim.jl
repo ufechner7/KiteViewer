@@ -62,4 +62,3 @@ function test_optim(;plot=false, prn=false)
 end
 
 end
-using .TestOptim
