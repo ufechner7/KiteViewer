@@ -50,7 +50,7 @@ export set_v_reel_out, set_depower_steering                                     
 # Constants
 @consts begin
     set    = se()                 # settings from settings.yaml
-    SEGMENTS = se().segments
+    SEGMENTS = set.segments
     G_EARTH = 9.81                # gravitational acceleration
     PERIOD_TIME = 1.0 / set.sample_freq
     C0 = -0.0032                  # steering offset
@@ -69,7 +69,7 @@ export set_v_reel_out, set_depower_steering                                     
     CL_LIST  = [   0.0,    0.5,   0.0,  0.08, 0.125,  0.15,  0.2,  1.0,  1.0,  0.0,  -0.5,   0.0]
     ALPHA_CD = [-180.0, -170.0, -140.0, -90.0, -20.0, 0.0, 20.0, 90.0, 140.0, 170.0, 180.0]
     CD_LIST  = [   0.5,    0.5,    0.5,   1.0,   0.2, 0.1,  0.2,  1.0,   0.5,   0.5,   0.5]
-    X0 = [-1.8601629413402536, -4.281060033586524, -6.188163289956693, -6.48726108577071, -4.055784150883979, 2.6816066179318607, 0.580892488279436, 1.303238697729603, 1.7701033447306727, 1.6394289691317234, 0.6584471569758358, -1.3872892651753215]
+    X0 = [5.617795661354737, 9.772611715290157, 13.022291733915383, 15.935976948656158, 19.09694756793568, 23.551538766911197, -2.352886990371982, -4.02292215355265, -5.266718413260247, -6.3274306314250595, -7.424895614880417, -8.87131859427559]
     calc_cl = Spline1D(ALPHA_CL, CL_LIST)
     calc_cd = Spline1D(ALPHA_CD, CD_LIST)
 end
@@ -223,13 +223,13 @@ function calc_res(s, pos1, pos2, vel1, vel2, mass, veld, result, i)
     if i == set.segments+1
         s.bridle_area =  set.l_bridle * set.d_tether/1000.0
         s.last_v_app_norm_tether = calc_drag(s, s.av_vel, s.unit_vector, rho, s.last_tether_drag, s.v_app_perp, s.bridle_area)
-        s.force .+= s.last_tether_drag     
+        s.force .+= s.last_tether_drag  
     end
    
     s.total_forces .= s.force + s.last_force
     s.last_force .= 0.5 * s.last_tether_drag - s.spring_force
     s.acc .= s.total_forces ./ mass # create the vector of the spring acceleration
-    result .= veld - (s.acc - SVector(0, 0, G_EARTH))
+    result .= veld - (SVector(0, 0, -G_EARTH) - s.acc)
     nothing
 end
 
@@ -336,7 +336,7 @@ function residual!(res, yd, y, p, time)
     calc_set_cl_cd(s, vec_c, v_app)
     calc_aero_forces(s, s.pos_kite, s.v_kite, s.rho, s.steering) # force at the kite
     loop(s, pos, vel, posd, veld, s.res1, s.res2)
-   
+  
     # copy and flatten result
     for i in 2:set.segments+1
         for j in 1:3
@@ -344,6 +344,12 @@ function residual!(res, yd, y, p, time)
            @inbounds res[3*(set.segments)+3*(i-2)+j] = s.res2[i][j]
         end
     end
+    if norm(res) < 10.0
+        for i in 1:length(pos)
+            @inbounds s.pos[i] .= pos[i]
+        end
+    end
+
     # println(norm(res))
     nothing
 end
@@ -449,9 +455,9 @@ function init(s, X=X0; output=false)
     global pos, vel, acc, state_y0, yd0
 
     # pre_tension =  1.0045245863143872
-    pre_tension =    1.00225
+    pre_tension =    1.0025
     # p2          = -0.14953723916589248
-    p2          = -0.14953723916589248*1.15
+    p2          = -0.14953723916589248*0.6
 
     DELTA = 1e-6
     set_cl_cd(s, 10.0/180.0 * π)
