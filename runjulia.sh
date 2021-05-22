@@ -1,6 +1,7 @@
 #!/bin/bash
-if test -f "MakieSys.so"; then
-    julia -J MakieSys.so --project -e "using Revise" -i
+branch=$(git rev-parse --abbrev-ref HEAD)
+if test -f "MakieSys${branch}.so"; then
+    julia -J MakieSys${branch}.so --project -e "using Revise" -i
 else
     julia --project -e "using Revise" -i
 fi
