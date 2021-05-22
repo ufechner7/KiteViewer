@@ -1,6 +1,6 @@
 #!/bin/bash -eu
 branch=$(git rev-parse --abbrev-ref HEAD)
-if [[ $branch == "main" ]]
+if [[ $branch == "main" ]]; then
     branch=""
 fi
 if test -f "MakieSys${branch}.so"; then
