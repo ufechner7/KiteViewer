@@ -10,9 +10,9 @@ using .KPS3
 function init_392()
     my_state = KPS3.get_state()
     KPS3.set.l_tether = 392.0
-    KPS3.set.elevation = 70.0
-    KPS3.set.area = 10.0
-    KPS3.set.v_wind = 9.1
+    KPS3.set.elevation = 70.7
+    KPS3.set.area = 10.18
+    KPS3.set.v_wind = 9.51
     KPS3.set.mass = 6.2
     KPS3.clear(my_state)
 end
@@ -31,9 +31,10 @@ function test_initial_condition(params::Vector, grad::Vector)
 end
 
 function test_nlopt(;plot=false, prn=false, maxtime=60.0)
-    lower = SVector{2*SEGMENTS}(-10, -10, -20, -20, -10, -10.0, -5, -5, -5, -5, -5, -5)
-    upper = SVector{2*SEGMENTS}( 10,  10,  20,  20,  10,  10.0,  5,  5,  5,  5,  5,  5)
-    initial_x = MVector{2*SEGMENTS}(zeros(12))
+    lower = SVector{2*SEGMENTS}(-10, -20, -20, -20, -30, -30.0, -10, -10, -10, -10, -10, -10)
+    upper = SVector{2*SEGMENTS}( 10,  20,  20,  20,  30,  30.0,  10,  10,  10,  10,  10,  10)
+    # initial_x = MVector{2*SEGMENTS}(zeros(12))
+    initial_x = MVector{2*SEGMENTS}(5.617362076915606, 9.771638917941374, 13.020673644344296, 15.933607680730749, 19.09372236996475, 23.54738098020864, -2.3526927098618553, -4.0225056446785326, -5.266058932795173, -6.326514623100387, -7.423716705063102, -8.869877563202282)
     init_392()
     # working: :GD_STOGO 1803, :GD_STOGO_RAND 1403, :GN_ESCH 378, :GN_DIRECT_L 122, :GN_DIRECT_L_RAND 116, :GN_ISRES 82.8, :GN_CRS2_LM 60; not working: GN_AGS
     # in 15 min :GN_CRS2_LM: 27;
@@ -51,7 +52,7 @@ function test_nlopt(;plot=false, prn=false, maxtime=60.0)
     opt.min_objective = test_initial_condition
     (minf, minx, ret) = optimize(opt, initial_x)
     if maxtime >= 60.0
-        show(@test minf < 0.5)
+        show(@test minf < 0.004)
     end
     println("\nresult: $minx; minimum: $minf")
 
@@ -67,6 +68,9 @@ function test_nlopt(;plot=false, prn=false, maxtime=60.0)
         println(ret)
         println("minf: $minf")
     end
+    forces = KPS3.get_spring_forces(my_state, my_state.pos)
+    println("\nForces in N:")
+    println(forces)
     
     if plot
         lines(x, z)

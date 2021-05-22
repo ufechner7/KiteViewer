@@ -1,18 +1,18 @@
 module TestOptim
 
-using Test, BenchmarkTools, StaticArrays, Revise, LinearAlgebra, SciMLBase, Optim, LineSearches, GLMakie
+using Test, BenchmarkTools, StaticArrays, Revise, LinearAlgebra, SciMLBase, Optim, LineSearches, GLMakie, Reexport
 
 export test_optim
 
 include("../src/KPS3.jl")
-using .KPS3
+@reexport using .KPS3
 
 function init_392()
     my_state = KPS3.get_state()
     KPS3.set.l_tether = 392.0
-    KPS3.set.elevation = 70.0
-    KPS3.set.area = 10.0
-    KPS3.set.v_wind = 9.1
+    KPS3.set.elevation = 70.7
+    KPS3.set.area = 10.18
+    KPS3.set.v_wind = 9.51
     KPS3.set.mass = 6.2
     KPS3.clear(my_state)
 end
@@ -31,8 +31,8 @@ function test_initial_condition(params::Vector)
 end
 
 function test_optim(;plot=false, prn=false)
-    lower = [-10, -10, -20, -20, -10, -10.0, -5, -5, -5, -5, -5, -5]
-    upper = [ 10,  10,  20,  20,  10,  10.0,  5,  5,  5,  5,  5,  5]
+    lower = [-10, -20, -20, -20, -30, -30.0, -10, -10, -10, -10, -10, -10]
+    upper = [ 10,  20,  20,  20,  30,  30.0,  10,  10,  10,  10,  10,  10]
     initial_x =  zeros(12)
     init_392()
     inner_optimizer = BFGS(linesearch=LineSearches.BackTracking(order=3)) # GradientDescent()
@@ -41,7 +41,7 @@ function test_optim(;plot=false, prn=false)
     params=(Optim.minimizer(results))
     println("result: $params; minimum: $(Optim.minimum(results))")
     res4=test_initial_condition(params)
-    show(@test res4 < 0.4)
+    show(@test res4 < 3.0)
 
     my_state = KPS3.get_state()
     if prn
@@ -54,6 +54,10 @@ function test_optim(;plot=false, prn=false)
         push!(z, my_state.pos[i][3])
     end  
     if prn println(results) end
+
+    forces = KPS3.get_spring_forces(my_state, my_state.pos)
+    println("\nForces in N:")
+    println(forces)
 
     if plot 
         return lines(x, z)

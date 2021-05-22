@@ -8,7 +8,7 @@ system:
 
 initial:
     l_tether: 392.0        # initial tether length   [m]
-    elevation: 70.0        # initial elevation angle [deg]
+    elevation: 70.7        # initial elevation angle [deg]
     v_reel_out: 0.0        # initial reel out speed  [m/s]
     
 kite:
@@ -25,7 +25,7 @@ tether:
     c_spring: 614600.0     # spring constant coefficient for 1 m tether [N/m]
 
 environment:
-    v_wind: 9.1      # wind speed at reference height      [m/s]
+    v_wind: 9.51     # wind speed at reference height      [m/s]
     h_ref:  6.0      # reference height for the wind speed   [m]
     rho_0:  1.225    # air density at the ground         [kg/m³]
     alpha:  0.142857 # exponent of the wind profile law
