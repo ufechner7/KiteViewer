@@ -1,10 +1,10 @@
 TODO
 On Simulator
-
-0. add z0 and profile_law to settings struct
-1. write log file for KiteViewer
-2. add winch model
-3. add 4 point kite model
+1. add z0, profile_law and kcu_mass to settings struct
+2. determine pre_tension and p2 automatically
+3. write log file for KiteViewer
+4. add winch model
+5. add 4 point kite model
 
 On KiteViewer
 1. add button x, y, z and energy
@@ -15,7 +15,7 @@ On KiteViewer
 6. add simulator from FreeKiteSim (work in progress in branch sim)
 
 DONE (sim branch)
-1. Add module TestNLopt for finding the initial solution
+1. Add modules TestOpt and TestNLopt for finding the initial solution
 2. Add module TestWindProfile for plotting EXP, LOG and EXPLOG profiles
 3. Fixed KPS3.jl, now working stable and correctly
 
