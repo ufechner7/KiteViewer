@@ -43,7 +43,7 @@ if ! @isdefined KCU_Sim
     using .KCU_Sim
 end
 
-export State, Vec3, SimFloat                                                            # types
+export State, Vec3, SimFloat, ProfileLaw, EXP, LOG, EXPLOG                              # types
 export calc_cl, calc_rho, calc_wind_factor, calc_drag, calc_set_cl_cd, clear, residual! # functions
 export set_v_reel_out, set_depower_steering                                             # setters  
 
@@ -142,7 +142,29 @@ calc_rho(height) = set.rho_0 * exp(-height / 8550.0)
 
 # Calculate the wind speed at a given height and reference height.
 # Fast version of: (height / set.h_ref)^ALPHA
-calc_wind_factor(height) = exp(ALPHA * log((height / set.h_ref)))
+# calc_wind_factor(height) = exp(ALPHA * log((height / set.h_ref)))
+
+@enum ProfileLaw EXP=1 LOG=2 EXPLOG=3
+
+# Calculate the wind speed at a given height and reference height.
+function calc_wind_factor(height, profile_law=EXP)
+    if profile_law == EXP
+        return (height / set.h_ref)^ALPHA
+    elseif profile_law == LOG
+        # z_0 = 0.07
+        z_0 = 0.0002
+        return log(height / z_0) / log(set.h_ref / z_0)
+    else
+        K = 1.0
+        z_0 = 0.0002
+        ALPHA_TUNED = 0.0816301549404
+        log1 = log(height / z_0) / log(set.h_ref / z_0)
+        println(log1)
+        exp1 = (height / set.h_ref)^ALPHA_TUNED
+        println(exp1)
+        return log1 +  K * (log1 - exp1)
+    end
+end
 
 # calculate the drag of one tether segment
 function calc_drag(s, v_segment, unit_vector, rho, last_tether_drag, v_app_perp, area)
@@ -446,8 +468,11 @@ function init(s, X=X0; output=false)
     for i in 1:length(pos)
         s.pos[i] .= pos[i]
     end
-    # forces = get_spring_forces(s, pos)
-    if output; println("Winch force: $(norm(forces[1])) N"); end
+    
+    if output
+        forces = get_spring_forces(s, pos)
+        println("Winch force: $(norm(forces[1])) N"); 
+    end
     
     for i in 2:set.segments+1
         state_y0[i-1] .= pos[i]  # Initial state vector
