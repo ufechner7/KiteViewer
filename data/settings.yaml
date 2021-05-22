@@ -18,6 +18,10 @@ kite:
     lod:   5.0             # max lift over drag
     l_bridle: 33.4         # sum of the lengths of the bridle lines [m]
 
+bridle:
+    d_line:   2.5          # bridle line diameter            [mm]
+    height:   4.9          # height of bridle                 [m]
+
 kcu:
     mass: 8.4              # mass of the kite control unit   [kg]
 
