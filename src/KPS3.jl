@@ -146,17 +146,13 @@ function calc_wind_factor(height, profile_law=EXPLOG)
     if profile_law == EXP
         return (height / set.h_ref)^set.alpha
     elseif profile_law == LOG
-        # z_0 = 0.07
         z_0 = 0.0002
         return log(height / z_0) / log(set.h_ref / z_0)
     else
         K = 1.0
         z_0 = 0.0002
-        ALPHA_TUNED = 0.0816301549404
         log1 = log(height / z_0) / log(set.h_ref / z_0)
-        # println(log1)
-        exp1 = (height / set.h_ref)^ALPHA_TUNED
-        # println(exp1)
+        exp1 = (height / set.h_ref)^set.alpha
         return log1 +  K * (log1 - exp1)
     end
 end
