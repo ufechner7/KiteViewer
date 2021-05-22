@@ -1,12 +1,9 @@
 TODO
 On Simulator
 
-==> 1. add module TestWindProfile.jl
-
-2. Add extra springs from point 1 to 3, 3 to 5 and 5 to 7 !!!
-3. print the ground force as function of the pos vectors
-4. add winch model
-5. add 4 point kite model
+1. Write log file for KiteViewer
+2. add winch model
+3. add 4 point kite model
 
 On KiteViewer
 1. add button x, y, z and energy
@@ -17,10 +14,13 @@ On KiteViewer
 6. add simulator from FreeKiteSim (work in progress in branch sim)
 
 DONE (sim branch)
-1. Test NlOpt.jl for finding the initial solution
+1. Add module TestNLopt for finding the initial solution
+2. Add module TestWindProfile for plotting EXP, LOG and EXPLOG profiles
+3. Fixed KPS3.jl, now working stable and correctly
 
 DONE (main branch)
 1. add toggle "Repeat" for endless replay
+2. limit version of GLMakie
 
 DONE (Version 0.4)
 1. Implemented single window mode, one 3D and two 2D plots
