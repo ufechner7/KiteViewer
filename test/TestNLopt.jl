@@ -51,7 +51,7 @@ function test_nlopt(;plot=false, prn=false, maxtime=60.0)
     opt.min_objective = test_initial_condition
     (minf, minx, ret) = optimize(opt, initial_x)
     if maxtime >= 60.0
-        show(@test minf < 0.18)
+        show(@test minf < 0.5)
     end
     println("\nresult: $minx; minimum: $minf")
 

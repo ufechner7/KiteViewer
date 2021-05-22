@@ -41,7 +41,7 @@ function test_optim(;plot=false, prn=false)
     params=(Optim.minimizer(results))
     println("result: $params; minimum: $(Optim.minimum(results))")
     res4=test_initial_condition(params)
-    show(@test res4 < 0.3)
+    show(@test res4 < 0.4)
 
     my_state = KPS3.get_state()
     if prn

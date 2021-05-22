@@ -69,7 +69,7 @@ export set_v_reel_out, set_depower_steering                                     
     CL_LIST  = [   0.0,    0.5,   0.0,  0.08, 0.125,  0.15,  0.2,  1.0,  1.0,  0.0,  -0.5,   0.0]
     ALPHA_CD = [-180.0, -170.0, -140.0, -90.0, -20.0, 0.0, 20.0, 90.0, 140.0, 170.0, 180.0]
     CD_LIST  = [   0.5,    0.5,    0.5,   1.0,   0.2, 0.1,  0.2,  1.0,   0.5,   0.5,   0.5]
-    X0 = [-1.52505, -3.67761, -5.51761, -6.08916, -4.41371,   0.902124, 0.366393, 0.909132, 1.27537,  1.1538,   0.300657, -1.51768]
+    X0 = [-1.8601629413402536, -4.281060033586524, -6.188163289956693, -6.48726108577071, -4.055784150883979, 2.6816066179318607, 0.580892488279436, 1.303238697729603, 1.7701033447306727, 1.6394289691317234, 0.6584471569758358, -1.3872892651753215]
     calc_cl = Spline1D(ALPHA_CL, CL_LIST)
     calc_cd = Spline1D(ALPHA_CD, CD_LIST)
 end
@@ -147,7 +147,7 @@ calc_rho(height) = set.rho_0 * exp(-height / 8550.0)
 @enum ProfileLaw EXP=1 LOG=2 EXPLOG=3
 
 # Calculate the wind speed at a given height and reference height.
-function calc_wind_factor(height, profile_law=EXP)
+function calc_wind_factor(height, profile_law=EXPLOG)
     if profile_law == EXP
         return (height / set.h_ref)^ALPHA
     elseif profile_law == LOG
@@ -159,9 +159,9 @@ function calc_wind_factor(height, profile_law=EXP)
         z_0 = 0.0002
         ALPHA_TUNED = 0.0816301549404
         log1 = log(height / z_0) / log(set.h_ref / z_0)
-        println(log1)
+        # println(log1)
         exp1 = (height / set.h_ref)^ALPHA_TUNED
-        println(exp1)
+        # println(exp1)
         return log1 +  K * (log1 - exp1)
     end
 end
@@ -292,6 +292,8 @@ function clear(s)
     # TODO: Check 
     s.initial_masses .= ones(set.segments+1) * 0.011 * set.l_tether / set.segments
     s.rho = set.rho_0
+    s.c_spring = set.c_spring / s.length
+    s.damping  = set.damping / s.length
 end
 
 function unpack(y)
@@ -446,8 +448,10 @@ const yd0 = zeros(SVector{2*SEGMENTS, Vec3})
 function init(s, X=X0; output=false)
     global pos, vel, acc, state_y0, yd0
 
-    pre_tension =  1.0045245863143872
-    p2          = -0.14953723916589248
+    # pre_tension =  1.0045245863143872
+    pre_tension =    1.00225
+    # p2          = -0.14953723916589248
+    p2          = -0.14953723916589248*1.15
 
     DELTA = 1e-6
     set_cl_cd(s, 10.0/180.0 * π)
@@ -468,7 +472,7 @@ function init(s, X=X0; output=false)
     for i in 1:length(pos)
         s.pos[i] .= pos[i]
     end
-    
+
     if output
         forces = get_spring_forces(s, pos)
         println("Winch force: $(norm(forces[1])) N"); 

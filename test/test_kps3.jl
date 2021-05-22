@@ -43,9 +43,9 @@ end
 end
 
 @testset "calc_wind_factor     " begin
-    @test isapprox(calc_wind_factor(6.0),   1.0, atol=1e-5) 
-    @test isapprox(calc_wind_factor(10.0),  1.0757037, atol=1e-5) 
-    @test isapprox(calc_wind_factor(100.0), 1.494685, atol=1e-5)
+    @test isapprox(calc_wind_factor(6.0, EXP),   1.0, atol=1e-5) 
+    @test isapprox(calc_wind_factor(10.0, EXP),  1.0757037, atol=1e-5) 
+    @test isapprox(calc_wind_factor(100.0, EXP), 1.494685, atol=1e-5)
 end
 
 @testset "calc_cl              " begin
@@ -204,7 +204,7 @@ end
     y0, yd0 = KPS3.init(my_state)
     @test length(y0)  == (SEGMENTS) * 6
     @test length(yd0) == (SEGMENTS) * 6
-    @test sum(y0)  ≈ 692.4142736270749
+    @test sum(y0)  ≈ 689.1017881555151
     @test sum(yd0) ≈ 3.6e-5
     @test isapprox(my_state.param_cl, 0.574103590856, atol=1e-4)
     @test isapprox(my_state.param_cd, 0.125342896308, atol=1e-4)

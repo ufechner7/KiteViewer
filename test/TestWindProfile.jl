@@ -1,11 +1,11 @@
 module TestWindProfile
 
-using Test, BenchmarkTools, GLMakie
+using Test, BenchmarkTools, GLMakie, LinearAlgebra, Reexport
 
 include("../src/KPS3.jl")
-using .KPS3
+@reexport using .KPS3
 
-export test_wind_profile, test_force, ProfileLaw, EXP, LOG, EXPLOG
+export test_wind_profile, test_force
 
 function init_392()
     my_state = KPS3.get_state()
@@ -24,7 +24,11 @@ end
 function test_force()
     state=KPS3.get_state()
     init_392()
-    KPS3.init(state, output=true)
+    KPS3.init(state)
+    forces = KPS3.get_spring_forces(state, state.pos)
+    winch_force=forces[1]
+    println("Winch force: $(winch_force) N")
+    return state
 end
 
 end
