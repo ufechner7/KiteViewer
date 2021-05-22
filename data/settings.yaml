@@ -14,12 +14,15 @@ initial:
 kite:
     model: "data/kite.obj" # 3D model of the kite
     mass:  6.2             # kit mass incl. sensor unit [kg]
-    area:  10.0            # [m^2]
+    area:  10.0            # projected kite area       [m^2]
     lod:   5.0             # max lift over drag
     l_bridle: 33.4         # sum of the lengths of the bridle lines [m]
 
+kcu:
+    mass: 8.4              # mass of the kite control unit   [kg]
+
 tether:
-    d_tether:  4           # tether diameter [mm]
+    d_tether:  4           # tether diameter                 [mm]
     cd_tether: 0.958       # drag coefficient of the tether
     damping: 473.0         # unit damping coefficient        [Ns]
     c_spring: 614600.0     # unit spring constant coefficient [N]
