@@ -1,4 +1,4 @@
 include("test_kps3.jl")
 run_benchmarks()
 include("test_optim.jl")
-OptimInitialState.optim_inital_state()
+test_optim()
