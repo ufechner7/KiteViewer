@@ -52,7 +52,6 @@ export set_v_reel_out, set_depower_steering                                     
     set    = se()                 # settings from settings.yaml
     SEGMENTS = set.segments
     G_EARTH = 9.81                # gravitational acceleration
-    PERIOD_TIME = 1.0 / set.sample_freq
     C2_COR =  0.93
     STEERING_COEFFICIENT = 0.6
     BRIDLE_DRAG = 1.1             # should probably be removed
@@ -334,7 +333,7 @@ end
 # Setter for the reel-out speed. Must be called every 50 ms (before each simulation).
 # It also updates the tether length, therefore it must be called even if v_reelout has
 # not changed.
-function set_v_reel_out(s, v_reel_out, t_0, period_time = PERIOD_TIME)
+function set_v_reel_out(s, v_reel_out, t_0, period_time = 1.0 / set.sample_freq)
     s.l_tether += 0.5 * (v_reel_out + s.last_v_reel_out) * period_time
     s.last_v_reel_out = s.v_reel_out
     s.v_reel_out = v_reel_out
