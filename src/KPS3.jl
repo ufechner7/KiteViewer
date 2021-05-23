@@ -54,7 +54,6 @@ export set_v_reel_out, set_depower_steering                                     
     G_EARTH = 9.81                # gravitational acceleration
     PERIOD_TIME = 1.0 / set.sample_freq
     C2_COR =  0.93
-    REL_SIDE_AREA = 0.5
     STEERING_COEFFICIENT = 0.6
     BRIDLE_DRAG = 1.1
     ALPHA_ZERO = 0.0
@@ -176,7 +175,7 @@ function calc_aero_forces(s, pos_kite, v_kite, rho, rel_steering)
     # some additional drag is created while steering
     s.drag_force    .*= K * s.param_cd * BRIDLE_DRAG * (1.0 + 0.6 * abs(rel_steering)) 
     s.cor_steering    = C2_COR / s.v_app_norm * sin(s.psi) * cos(s.beta)
-    s.steering_force .= -K * REL_SIDE_AREA * STEERING_COEFFICIENT * (rel_steering + s.cor_steering) .* s.kite_y
+    s.steering_force .= -K * set.rel_side_area/100.0 * STEERING_COEFFICIENT * (rel_steering + s.cor_steering) .* s.kite_y
     s.last_force     .= -(s.lift_force + s.drag_force + s.steering_force) 
     nothing
 end

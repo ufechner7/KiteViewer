@@ -14,6 +14,7 @@ function set_defaults(state)
     KPS3.set.l_tether = 150.0
     KPS3.set.elevation = 60.0
     KPS3.set.area = 20.0
+    KPS3.set.rel_side_area = 50.0
     KPS3.set.v_wind = 8.0
     KPS3.set.mass = 11.4
     KPS3.set.damping =  2 * 473.0
@@ -26,6 +27,7 @@ function init_392()
     KPS3.set.l_tether = 392.0
     KPS3.set.elevation = 70.0
     KPS3.set.area = 10.0
+    KPS3.set.rel_side_area = 50.0
     KPS3.set.v_wind = 9.1
     KPS3.set.mass = 6.2
     KPS3.clear(my_state)

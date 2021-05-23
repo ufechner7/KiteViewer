@@ -19,7 +19,8 @@ steering:
 kite:
     model: "data/kite.obj" # 3D model of the kite
     mass:  6.2             # kit mass incl. sensor unit [kg]
-    area: 10.0             # projected kite area       [m^2]
+    area: 10.18            # projected kite area       [m^2]
+    rel_side_area: 30.6    # relative side area          [%]
     lod:   5.0             # max lift over drag
     
 bridle:

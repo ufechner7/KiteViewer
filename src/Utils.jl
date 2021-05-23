@@ -47,6 +47,7 @@ mutable struct Settings
     c0::Float64
     area::Float64
     mass::Float64
+    rel_side_area::Float64
     kcu_mass::Float64
     v_wind::Float64
     h_ref::Float64
@@ -63,7 +64,7 @@ mutable struct Settings
     c_spring::Float64
     elevation::Float64
 end
-const SETTINGS = [Settings("","",0,0,0,0,"",0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)]
+const SETTINGS = [Settings("","",0,0,0,0,"",0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)]
 
 # getter function for the Settings struct
 function se(project="settings.yaml")
@@ -85,6 +86,7 @@ function se(project="settings.yaml")
 
         SETTINGS[1].model       = dict["kite"]["model"]
         SETTINGS[1].area        = dict["kite"]["area"]
+        SETTINGS[1].rel_side_area = dict["kite"]["rel_side_area"]
         SETTINGS[1].mass        = dict["kite"]["mass"]
 
         SETTINGS[1].l_bridle    = dict["bridle"]["l_bridle"]
