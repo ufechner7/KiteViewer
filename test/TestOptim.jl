@@ -36,6 +36,10 @@ function test_optim(;plot=false, prn=false)
     initial_x =  zeros(12)
     init_392()
     inner_optimizer = BFGS(linesearch=LineSearches.BackTracking(order=3)) # GradientDescent()
+    my_state = KPS3.get_state()
+    test_initial_condition(initial_x)
+    res = KPS3.calc_pre_tension(my_state)
+    println("\nres: $res")
     println("\nStarted function test_optim...")
     results = optimize(test_initial_condition, lower, upper, initial_x, Fminbox(inner_optimizer), Optim.Options(iterations=10000))
     params=(Optim.minimizer(results))
@@ -43,9 +47,10 @@ function test_optim(;plot=false, prn=false)
     res4=test_initial_condition(params)
     show(@test res4 < 3.0)
 
-    my_state = KPS3.get_state()
+    res = KPS3.calc_pre_tension(my_state)
+    println("\nres: $res")
     if prn
-        println("res2: "); display(my_state.res2)
+        println("\nres2: "); display(my_state.res2)
     end
     x = Float64[] 
     z = Float64[]

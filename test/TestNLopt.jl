@@ -31,10 +31,10 @@ function test_initial_condition(params::Vector, grad::Vector)
 end
 
 function test_nlopt(;plot=false, prn=false, maxtime=60.0)
-    lower = SVector{2*SEGMENTS}(-10, -20, -20, -20, -30, -30.0, -10, -10, -10, -10, -10, -10)
-    upper = SVector{2*SEGMENTS}( 10,  20,  20,  20,  30,  30.0,  10,  10,  10,  10,  10,  10)
+    lower = SVector{2*SEGMENTS}(-10, -20, -20, -20, -30, -40.0, -10, -10, -10, -10, -10, -10)
+    upper = SVector{2*SEGMENTS}( 10,  20,  20,  20,  30,  40.0,  10,  10,  10,  10,  10,  10)
     # initial_x = MVector{2*SEGMENTS}(zeros(12))
-    initial_x = MVector{2*SEGMENTS}(5.617362076915606, 9.771638917941374, 13.020673644344296, 15.933607680730749, 19.09372236996475, 23.54738098020864, -2.3526927098618553, -4.0225056446785326, -5.266058932795173, -6.326514623100387, -7.423716705063102, -8.869877563202282)
+    initial_x = MVector{2*SEGMENTS}(5.618083476172813, 9.773261943568968, 13.023379620950557, 15.937577610500837, 19.099135374283534, 23.554368433547925, -2.3530156818608026, -4.023199974859325, -5.267160821877448, -6.328047970350107, -7.425693131285292, -8.872296363202333)
     init_392()
     # working: :GD_STOGO 1803, :GD_STOGO_RAND 1403, :GN_ESCH 378, :GN_DIRECT_L 122, :GN_DIRECT_L_RAND 116, :GN_ISRES 82.8, :GN_CRS2_LM 60; not working: GN_AGS
     # in 15 min :GN_CRS2_LM: 27;
@@ -52,11 +52,15 @@ function test_nlopt(;plot=false, prn=false, maxtime=60.0)
     opt.min_objective = test_initial_condition
     (minf, minx, ret) = optimize(opt, initial_x)
     if maxtime >= 60.0
-        show(@test minf < 0.004)
+        show(@test minf < 0.002)
     end
+    
     println("\nresult: $minx; minimum: $minf")
 
     my_state = KPS3.get_state()
+    res = KPS3.calc_pre_tension(my_state)
+    println("\npre_tension: $res")
+
     if prn println("res2: "); display(my_state.res2) end
     x = Float64[] 
     z = Float64[]
