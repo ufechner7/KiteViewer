@@ -336,12 +336,13 @@ function residual!(res, yd, y, p, time)
         end
     end
     if norm(res) < 10.0
+        # println(norm(res))
         for i in 1:length(pos)
             @inbounds s.pos[i] .= pos[i]
         end
     end
 
-    # println(norm(res))
+  
     nothing
 end
 
@@ -440,14 +441,25 @@ const acc = zeros(SVector{SEGMENTS+1, Vec3})
 const state_y0 = zeros(SVector{2*SEGMENTS, Vec3})
 const yd0 = zeros(SVector{2*SEGMENTS, Vec3})
 
+function calc_pre_tension(s)
+    forces = get_spring_forces(s, s.pos)
+    av_force = 0.0
+    for i in 1:SEGMENTS
+        av_force += forces[i]
+    end
+    av_force /= SEGMENTS
+    res=av_force/set.c_spring
+    if res < 0.0 res = 0.0 end
+    if isnan(res) res = 0.0 end
+    return res+1.0
+end
+
 # Calculate the initial conditions y0, yd0 and sw0. Tether with the given elevation angle,
 # particle zero fixed at origin. """
 function init(s, X=X0; output=false)
     global pos, vel, acc, state_y0, yd0
 
-    # pre_tension =  1.0045245863143872
     pre_tension =    1.0025
-    # p2          = -0.14953723916589248
     p2          = -0.14953723916589248*0.6
 
     DELTA = 1e-6
