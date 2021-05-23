@@ -56,14 +56,9 @@ export set_v_reel_out, set_depower_steering                                     
     C2_COR =  0.93
     STEERING_COEFFICIENT = 0.6
     BRIDLE_DRAG = 1.1             # should probably be removed
-
-    ALPHA_CL = [-180.0, -160.0, -90.0, -20.0, -10.0,  -5.0,  0.0, 20.0, 40.0, 90.0, 160.0, 180.0]
-    CL_LIST  = [   0.0,    0.5,   0.0,  0.08, 0.125,  0.15,  0.2,  1.0,  1.0,  0.0,  -0.5,   0.0]
-    ALPHA_CD = [-180.0, -170.0, -140.0, -90.0, -20.0, 0.0, 20.0, 90.0, 140.0, 170.0, 180.0]
-    CD_LIST  = [   0.5,    0.5,    0.5,   1.0,   0.2, 0.1,  0.2,  1.0,   0.5,   0.5,   0.5]
     X0 = [5.3506365772036615, 9.200200773784072, 12.106325985815378, 14.638292099163197, 17.379867429065342, 21.56465630857364, -2.232627620821657, -3.77671345226395, -4.891355444812783, -5.822234551550322, -6.7917091935113945, -8.16300817107152]
-    calc_cl = Spline1D(ALPHA_CL, CL_LIST)
-    calc_cd = Spline1D(ALPHA_CD, CD_LIST)
+    calc_cl = Spline1D(set.alpha_cl, set.cl_list)
+    calc_cd = Spline1D(set.alpha_cd, set.cd_list)
 end
 
 # Type definitions

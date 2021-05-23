@@ -48,6 +48,10 @@ mutable struct Settings
     k_ds::Float64
     area::Float64            # projected kite area            [m^2]
     mass::Float64            # kite mass incl. sensor unit     [kg]
+    alpha_cl::Vector{Float64}
+    cl_list::Vector{Float64}
+    alpha_cd::Vector{Float64}
+    cd_list::Vector{Float64}
     rel_side_area::Float64   # relative side area               [%]
     alpha_d_max::Float64     # max depower angle              [deg]
     kcu_mass::Float64        # mass of the kite control unit   [kg]
@@ -66,7 +70,7 @@ mutable struct Settings
     c_spring::Float64
     elevation::Float64
 end
-const SETTINGS = [Settings("","",0,0,0,0,"",0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)]
+const SETTINGS = [Settings("","",0,0,0,0,"",0,0,0,0,0,[],[],[],[],0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)]
 
 # getter function for the Settings struct
 function se(project="settings.yaml")
@@ -93,6 +97,10 @@ function se(project="settings.yaml")
         SETTINGS[1].area        = dict["kite"]["area"]
         SETTINGS[1].rel_side_area = dict["kite"]["rel_side_area"]
         SETTINGS[1].mass        = dict["kite"]["mass"]
+        SETTINGS[1].alpha_cl    = dict["kite"]["alpha_cl"]
+        SETTINGS[1].cl_list     = dict["kite"]["cl_list"]
+        SETTINGS[1].alpha_cd    = dict["kite"]["alpha_cd"]
+        SETTINGS[1].cd_list     = dict["kite"]["cd_list"]
 
         SETTINGS[1].l_bridle    = dict["bridle"]["l_bridle"]
         SETTINGS[1].d_line      = dict["bridle"]["d_line"]
