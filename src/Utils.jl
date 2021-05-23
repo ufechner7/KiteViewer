@@ -38,17 +38,18 @@ const DATA_PATH = "./data"            # path for log files and other data
 mutable struct Settings
     log_file::String
     model::String
-    segments::Int64       # number of tether segments
+    segments::Int64          # number of tether segments
     sample_freq::Int64
     time_lapse::Float64
     zoom::Float64
     fixed_font::String
     v_reel_out::Float64
     c0::Float64
-    area::Float64
-    mass::Float64
-    rel_side_area::Float64
-    kcu_mass::Float64
+    area::Float64            # projected kite area            [m^2]
+    mass::Float64            # kite mass incl. sensor unit     [kg]
+    rel_side_area::Float64   # relative side area               [%]
+    alpha_d_max::Float64     # max depower angle              [deg]
+    kcu_mass::Float64        # mass of the kite control unit   [kg]
     v_wind::Float64
     h_ref::Float64
     rho_0::Float64
@@ -64,7 +65,7 @@ mutable struct Settings
     c_spring::Float64
     elevation::Float64
 end
-const SETTINGS = [Settings("","",0,0,0,0,"",0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)]
+const SETTINGS = [Settings("","",0,0,0,0,"",0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)]
 
 # getter function for the Settings struct
 function se(project="settings.yaml")
@@ -83,6 +84,8 @@ function se(project="settings.yaml")
         SETTINGS[1].elevation   = dict["initial"]["elevation"]
 
         SETTINGS[1].c0          = dict["steering"]["c0"]
+
+        SETTINGS[1].alpha_d_max = dict["depower"]["alpha_d_max"]
 
         SETTINGS[1].model       = dict["kite"]["model"]
         SETTINGS[1].area        = dict["kite"]["area"]

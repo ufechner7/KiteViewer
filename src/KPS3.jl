@@ -58,7 +58,6 @@ export set_v_reel_out, set_depower_steering                                     
     BRIDLE_DRAG = 1.1
     ALPHA_ZERO = 0.0
     K_ds = 1.5                    # influence of the depower angle on the steering sensitivity
-    MAX_ALPHA_DEPOWER = 31.0
 
     ALPHA_CL = [-180.0, -160.0, -90.0, -20.0, -10.0,  -5.0,  0.0, 20.0, 40.0, 90.0, 160.0, 180.0]
     CL_LIST  = [   0.0,    0.5,   0.0,  0.08, 0.125,  0.15,  0.2,  1.0,  1.0,  0.0,  -0.5,   0.0]
@@ -354,8 +353,8 @@ end
 function set_depower_steering(s, depower, steering)
     s.steering = steering
     s.depower  = depower
-    s.alpha_depower = calc_alpha_depower(depower) * (MAX_ALPHA_DEPOWER / 31.0)
-    s.steering = (steering - set.c0) / (1.0 + K_ds * (s.alpha_depower / deg2rad(MAX_ALPHA_DEPOWER)))
+    s.alpha_depower = calc_alpha_depower(depower) * (set.alpha_d_max / 31.0)
+    s.steering = (steering - set.c0) / (1.0 + K_ds * (s.alpha_depower / deg2rad(set.alpha_d_max)))
     nothing
 end
 
