@@ -10,9 +10,9 @@ export test_wind_profile, test_force
 function init_392()
     my_state = KPS3.get_state()
     KPS3.set.l_tether = 392.0
-    KPS3.set.elevation = 70.0
-    KPS3.set.area = 10.0
-    KPS3.set.v_wind = 9.1
+    KPS3.set.elevation = 70.7
+    KPS3.set.area = 10.18
+    KPS3.set.v_wind = 9.51
     KPS3.set.mass = 6.2
     KPS3.clear(my_state)
 end

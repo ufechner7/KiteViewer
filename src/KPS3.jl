@@ -183,7 +183,6 @@ function calc_aero_forces(s, pos_kite, v_kite, rho, rel_steering)
     s.cor_steering    = C2_COR / s.v_app_norm * sin(s.psi) * cos(s.beta)
     s.steering_force .= -K * REL_SIDE_AREA * STEERING_COEFFICIENT * (rel_steering + s.cor_steering) .* s.kite_y
     s.last_force     .= -(s.lift_force + s.drag_force + s.steering_force) 
-    # println(s.last_force) # [ -2.75319859e+02  -3.53069933e-05  -8.72978299e+02]
     nothing
 end
 

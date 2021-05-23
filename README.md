@@ -24,20 +24,20 @@ If you are using Windows, read [Windows.md](./doc/Windows.md) first.
 
 After installing julia, create a work folder:
 
-```
+```Bash
 cd
 mkdir repos
 cd repos
 ```
 Check out the source code:
-```
+```Bash
 git clone https://github.com/ufechner7/KiteViewer.git
 cd KiteViewer
 ```
 
 Launch Julia and install the dependencies:
 
-```
+```Julia
 julia --project
 using Pkg
 Pkg.instantiate()
@@ -48,7 +48,7 @@ required packages when using Julia 1.6 on Windows, longer with Julia 1.5 and sho
 
 Run the program and show the GUI:
 
-```
+```Julia
 include("src/KiteViewer.jl")
 main()
 ```
@@ -60,8 +60,8 @@ When you run KiteViewer for the first time the flight data is imported
 and converted to the .arrow format.
 
 With the following commands you can import csv flight data manually:
-```
-./runjulia
+```Julia
+./runjulia.sh
 include("src/Importer.jl")
 ```
 If you have your own .csv log files you need to extend the importer
@@ -69,7 +69,7 @@ for your data format.
 
 ## Update from version 0.2
 Run the following commands:
-```
+```Bash
 cd repos/KiteViewer
 rm Manifest.toml
 rm data/log_8700W_8ms.arrow # not needed when updating from 0.3
@@ -80,14 +80,14 @@ git pull
 ## Fixing OpenGL problems
 On a computer with Ubuntu 20.04 and Intel integrated graphics the following steps were needed to make OpenGL work:
 
-```
+```Bash
 sudo apt install libglfw3
 cd ~/packages/julias/julia-1.5.3/lib/julia/
 rm libstdc++.so.6 
 ```
 After implementing this fix rebuild GLMakie with the following command from within Julia:
 
-```
+```Bash
 cd ~/repos/KiteViewer
 julia --project
 ] 
@@ -98,7 +98,7 @@ Removing the version of libstdc++.so.6 supplied with Julia is only needed for Ju
 
 ## Hacking the code
 Use the package [Revise](https://timholy.github.io/Revise.jl/stable/) to speed up testing of code changes:
-```
+```Julia
 julia --project
 using Revise
 includet("src/KiteViewer.jl")
@@ -121,6 +121,9 @@ If you do not want to make changes to the code you can also run the app by typin
 
 More detailed explaination here: [SystemImage.md](./doc/SystemImage.md)
 (Tested on Windows10 and Linux.)
+
+## Tests of the Simulator
+The simulator is tested against the results of the paper [Dynamic Model of a Pumping Kite Power System](http://arxiv.org/abs/1406.6218). For details of the tests see:  [Tests.md](./doc/Tests.md) 
 
 ## Scientific background
 See: [Research Fechner](https://research.tudelft.nl/en/publications/?search=Uwe+Fechner&pageSize=50&ordering=rating&descending=true) for the scientic background of this code.
