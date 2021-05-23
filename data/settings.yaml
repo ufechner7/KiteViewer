@@ -12,6 +12,7 @@ initial:
     v_reel_out: 0.0        # initial reel out speed  [m/s]
 
 steering:
+    c0:      -0.0032       # steering offset           [-]
     c1:       0.264        # first coefficient of the turn rate law
     c2:       6.2          # second coefficient of the turn rate law
     

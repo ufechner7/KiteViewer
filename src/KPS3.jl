@@ -53,7 +53,6 @@ export set_v_reel_out, set_depower_steering                                     
     SEGMENTS = set.segments
     G_EARTH = 9.81                # gravitational acceleration
     PERIOD_TIME = 1.0 / set.sample_freq
-    C0 = -0.0032                  # steering offset
     C2_COR =  0.93
     REL_SIDE_AREA = 0.5
     STEERING_COEFFICIENT = 0.6
@@ -357,10 +356,7 @@ function set_depower_steering(s, depower, steering)
     s.steering = steering
     s.depower  = depower
     s.alpha_depower = calc_alpha_depower(depower) * (MAX_ALPHA_DEPOWER / 31.0)
-    # print "depower, alpha_depower", form(depower), form(degrees(self.scalars[Alpha_depower]))
-    # print "v_app_norm, CL, rho: ", form(self.scalars[V_app_norm]),form(self.scalars[ParamCL]), form(self.rho)
-    s.steering = (steering - C0) / (1.0 + K_ds * (s.alpha_depower / deg2rad(MAX_ALPHA_DEPOWER)))
-    # println("LoD: ", s.param_cl/ s.param_cd)
+    s.steering = (steering - set.c0) / (1.0 + K_ds * (s.alpha_depower / deg2rad(MAX_ALPHA_DEPOWER)))
     nothing
 end
 
