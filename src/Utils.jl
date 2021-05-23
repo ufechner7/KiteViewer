@@ -45,6 +45,7 @@ mutable struct Settings
     fixed_font::String
     v_reel_out::Float64
     c0::Float64
+    c2_cor::Float64
     k_ds::Float64
     area::Float64            # projected kite area            [m^2]
     mass::Float64            # kite mass incl. sensor unit     [kg]
@@ -70,7 +71,7 @@ mutable struct Settings
     c_spring::Float64
     elevation::Float64
 end
-const SETTINGS = [Settings("","",0,0,0,0,"",0,0,0,0,0,[],[],[],[],0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)]
+const SETTINGS = [Settings("","",0,0,0,0,"",0,0,0,0,0,0,[],[],[],[],0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)]
 
 # getter function for the Settings struct
 function se(project="settings.yaml")
@@ -89,6 +90,7 @@ function se(project="settings.yaml")
         SETTINGS[1].elevation   = dict["initial"]["elevation"]
 
         SETTINGS[1].c0          = dict["steering"]["c0"]
+        SETTINGS[1].c2_cor      = dict["steering"]["c2_cor"]
         SETTINGS[1].k_ds        = dict["steering"]["k_ds"]
 
         SETTINGS[1].alpha_d_max = dict["depower"]["alpha_d_max"]

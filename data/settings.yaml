@@ -13,8 +13,8 @@ initial:
 
 steering:
     c0:      -0.0032       # steering offset             [-]
-    c1:       0.264        # first coefficient of the turn rate law
-    c2:       6.2          # second coefficient of the turn rate law
+    c_s:      2.59         # steering coefficient one point model
+    c2_cor:   0.93         # correction factor one point model
     k_ds:     1.5          # influence of the depower angle on the steering sensitivity
 
 depower:

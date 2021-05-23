@@ -52,8 +52,7 @@ export set_v_reel_out, set_depower_steering                                     
     set    = se()                 # settings from settings.yaml
     SEGMENTS = set.segments
     G_EARTH = 9.81                # gravitational acceleration
-    C2_COR =  0.93
-    STEERING_COEFFICIENT = 0.6
+    STEERING_COEFFICIENT = 0.6    # 2.59: was 0.6; TODO: check if it must be divided by kite_area
     BRIDLE_DRAG = 1.1             # should probably be removed
     X0 = [5.3506365772036615, 9.200200773784072, 12.106325985815378, 14.638292099163197, 17.379867429065342, 21.56465630857364, -2.232627620821657, -3.77671345226395, -4.891355444812783, -5.822234551550322, -6.7917091935113945, -8.16300817107152]
     calc_cl = Spline1D(set.alpha_cl, set.cl_list)
@@ -63,7 +62,7 @@ end
 # Type definitions
 const SimFloat = Float64
 const Vec3     = MVector{3, SimFloat}
-const SVec3     = MVector{3, SimFloat}                   
+const SVec3    = MVector{3, SimFloat}                   
 
 @with_kw mutable struct State{S, T}
     v_wind::T =           [set.v_wind, 0, 0]    # wind vector at the height of the kite
@@ -165,7 +164,7 @@ function calc_aero_forces(s, pos_kite, v_kite, rho, rel_steering)
     s.lift_force    .= K * s.param_cl .* normalize(cross(s.drag_force, s.kite_y))   
     # some additional drag is created while steering
     s.drag_force    .*= K * s.param_cd * BRIDLE_DRAG * (1.0 + 0.6 * abs(rel_steering)) 
-    s.cor_steering    = C2_COR / s.v_app_norm * sin(s.psi) * cos(s.beta)
+    s.cor_steering    = set.c2_cor / s.v_app_norm * sin(s.psi) * cos(s.beta) # in paper named i_(s,c), Eq. 30
     s.steering_force .= -K * set.rel_side_area/100.0 * STEERING_COEFFICIENT * (rel_steering + s.cor_steering) .* s.kite_y
     s.last_force     .= -(s.lift_force + s.drag_force + s.steering_force) 
     nothing
