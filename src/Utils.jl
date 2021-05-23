@@ -45,9 +45,12 @@ mutable struct Settings
     fixed_font::String
     area::Float64
     mass::Float64
+    kcu_mass::Float64
     v_wind::Float64
     h_ref::Float64
     rho_0::Float64
+    z0::Float64
+    profile_law::Int64
     alpha::Float64
     cd_tether::Float64
     d_tether::Float64
@@ -57,7 +60,7 @@ mutable struct Settings
     c_spring::Float64
     elevation::Float64
 end
-const SETTINGS = [Settings("","",0,0,0,0,"",0,0,0,0,0,0,0,0,0,0,0,0,0)]
+const SETTINGS = [Settings("","",0,0,0,0,"",0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)]
 
 # getter function for the Settings struct
 function se(project="settings.yaml")
@@ -79,6 +82,8 @@ function se(project="settings.yaml")
         SETTINGS[1].mass        = dict["kite"]["mass"]
         SETTINGS[1].l_bridle    = dict["kite"]["l_bridle"]
 
+        SETTINGS[1].kcu_mass    = dict["kcu"]["mass"]
+
         SETTINGS[1].cd_tether   = dict["tether"]["cd_tether"]
         SETTINGS[1].d_tether    = dict["tether"]["d_tether"]
         SETTINGS[1].damping     = dict["tether"]["damping"]
@@ -87,7 +92,9 @@ function se(project="settings.yaml")
         SETTINGS[1].v_wind      = dict["environment"]["v_wind"]
         SETTINGS[1].h_ref       = dict["environment"]["h_ref"]
         SETTINGS[1].rho_0       = dict["environment"]["rho_0"]
+        SETTINGS[1].z0          = dict["environment"]["z0"]
         SETTINGS[1].alpha       = dict["environment"]["alpha"]
+        SETTINGS[1].profile_law = dict["environment"]["profile_law"]
     end
     return SETTINGS[1]
 end

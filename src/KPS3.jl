@@ -55,7 +55,6 @@ export set_v_reel_out, set_depower_steering                                     
     PERIOD_TIME = 1.0 / set.sample_freq
     C0 = -0.0032                  # steering offset
     C2_COR =  0.93
-    KCU_MASS  =  8.4
     REL_SIDE_AREA = 0.5
     STEERING_COEFFICIENT = 0.6
     BRIDLE_DRAG = 1.1
@@ -142,16 +141,14 @@ calc_rho(height) = set.rho_0 * exp(-height / 8550.0)
 @enum ProfileLaw EXP=1 LOG=2 EXPLOG=3
 
 # Calculate the wind speed at a given height and reference height.
-function calc_wind_factor(height, profile_law=EXPLOG)
+function calc_wind_factor(height, profile_law=set.profile_law)
     if profile_law == EXP
         return (height / set.h_ref)^set.alpha
     elseif profile_law == LOG
-        z_0 = 0.0002
-        return log(height / z_0) / log(set.h_ref / z_0)
+        return log(height / set.z0) / log(set.h_ref / set.z0)
     else
         K = 1.0
-        z_0 = 0.0002
-        log1 = log(height / z_0) / log(set.h_ref / z_0)
+        log1 = log(height / set.z0) / log(set.h_ref / set.z0)
         exp1 = (height / set.h_ref)^set.alpha
         return log1 +  K * (log1 - exp1)
     end
@@ -227,7 +224,7 @@ end
 # that iterates over all tether segments. 
 function loop(s, pos, vel, posd, veld, res1, res2)
     s.masses               .= s.length / (set.l_tether / set.segments) .* s.initial_masses
-    s.masses[set.segments+1]   += (set.mass + KCU_MASS)
+    s.masses[set.segments+1]   += (set.mass + set.kcu_mass)
     res1[1] .= pos[1]
     res2[1] .= vel[1]
     for i in 2:set.segments+1
