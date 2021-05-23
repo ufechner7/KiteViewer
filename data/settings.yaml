@@ -25,7 +25,10 @@ kite:
     mass:  6.2             # kite mass incl. sensor unit [kg]
     area: 10.18            # projected kite area        [m^2]
     rel_side_area: 30.6    # relative side area           [%]
-    lod:   5.0             # max lift over drag (unused)
+    alpha_cl:  [-180.0, -160.0, -90.0, -20.0, -10.0,  -5.0,  0.0, 20.0, 40.0, 90.0, 160.0, 180.0]
+    cl_list:   [   0.0,    0.5,   0.0,  0.08, 0.125,  0.15,  0.2,  1.0,  1.0,  0.0,  -0.5,   0.0]
+    alpha_cd:  [-180.0, -170.0, -140.0, -90.0, -20.0, 0.0, 20.0, 90.0, 140.0, 170.0, 180.0]
+    cd_list:   [   0.5,    0.5,    0.5,   1.0,   0.2, 0.1,  0.2,  1.0,   0.5,   0.5,   0.5]
     
 bridle:
     d_line:    2.5         # bridle line diameter            [mm]
