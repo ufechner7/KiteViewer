@@ -34,13 +34,13 @@ function test_nlopt(;plot=false, prn=false, maxtime=60.0)
     lower = SVector{2*SEGMENTS}(-10, -20, -20, -20, -30, -40.0, -10, -10, -10, -10, -10, -10)
     upper = SVector{2*SEGMENTS}( 10,  20,  20,  20,  30,  40.0,  10,  10,  10,  10,  10,  10)
     # initial_x = MVector{2*SEGMENTS}(zeros(12))
-    initial_x = MVector{2*SEGMENTS}(5.618083476172813, 9.773261943568968, 13.023379620950557, 15.937577610500837, 19.099135374283534, 23.554368433547925, -2.3530156818608026, -4.023199974859325, -5.267160821877448, -6.328047970350107, -7.425693131285292, -8.872296363202333)
+    initial_x = MVector{2*SEGMENTS}(5.3506365772036615, 9.200200773784072, 12.106325985815378, 14.638292099163197, 17.379867429065342, 21.56465630857364, -2.232627620821657, -3.77671345226395, -4.891355444812783, -5.822234551550322, -6.7917091935113945, -8.16300817107152)
     init_392()
     # working: :GD_STOGO 1803, :GD_STOGO_RAND 1403, :GN_ESCH 378, :GN_DIRECT_L 122, :GN_DIRECT_L_RAND 116, :GN_ISRES 82.8, :GN_CRS2_LM 60; not working: GN_AGS
     # in 15 min :GN_CRS2_LM: 27;
     # in  1 min :LN_SBPLX 9.96 in 15 min: 1.13
     # in  1 min :LN_BOBYQA 0.31; LN_COBYLA 25; LD_MMA 6046; not working: LD_SLSQP
-    # without time limit: 0.0001699365589509266 ROUNDOFF_LIMITED; took 495s, 39628692 numevals or 12.5 us per numeval
+    # without time limit: 0.00159 ROUNDOFF_LIMITED; took 495s, 39628692 numevals or 12.5 us per numeval
     opt = Opt(:LN_BOBYQA, 12) 
     opt.lower_bounds = lower
     opt.upper_bounds = upper

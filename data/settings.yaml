@@ -10,17 +10,21 @@ initial:
     l_tether: 392.0        # initial tether length     [m]
     elevation: 70.7        # initial elevation angle [deg]
     v_reel_out: 0.0        # initial reel out speed  [m/s]
+
+steering:
+    c1:       0.264        # first coefficient of the turn rate law
+    c2:       6.2          # second coefficient of the turn rate law
     
 kite:
     model: "data/kite.obj" # 3D model of the kite
     mass:  6.2             # kit mass incl. sensor unit [kg]
-    area:  10.0            # projected kite area       [m^2]
+    area: 10.0             # projected kite area       [m^2]
     lod:   5.0             # max lift over drag
-    l_bridle: 33.4         # sum of the lengths of the bridle lines [m]
-
+    
 bridle:
-    d_line:   2.5          # bridle line diameter            [mm]
-    height:   4.9          # height of bridle                 [m]
+    d_line:    2.5         # bridle line diameter            [mm]
+    l_bridle: 33.4         # sum of the lengths of the bridle lines [m]
+    height:    4.9         # height of bridle                 [m]
 
 kcu:
     mass: 8.4              # mass of the kite control unit   [kg]

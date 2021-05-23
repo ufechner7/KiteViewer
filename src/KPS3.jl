@@ -67,7 +67,7 @@ export set_v_reel_out, set_depower_steering                                     
     CL_LIST  = [   0.0,    0.5,   0.0,  0.08, 0.125,  0.15,  0.2,  1.0,  1.0,  0.0,  -0.5,   0.0]
     ALPHA_CD = [-180.0, -170.0, -140.0, -90.0, -20.0, 0.0, 20.0, 90.0, 140.0, 170.0, 180.0]
     CD_LIST  = [   0.5,    0.5,    0.5,   1.0,   0.2, 0.1,  0.2,  1.0,   0.5,   0.5,   0.5]
-    X0 = [5.617795661354737, 9.772611715290157, 13.022291733915383, 15.935976948656158, 19.09694756793568, 23.551538766911197, -2.352886990371982, -4.02292215355265, -5.266718413260247, -6.3274306314250595, -7.424895614880417, -8.87131859427559]
+    X0 = [5.3506365772036615, 9.200200773784072, 12.106325985815378, 14.638292099163197, 17.379867429065342, 21.56465630857364, -2.232627620821657, -3.77671345226395, -4.891355444812783, -5.822234551550322, -6.7917091935113945, -8.16300817107152]
     calc_cl = Spline1D(ALPHA_CL, CL_LIST)
     calc_cd = Spline1D(ALPHA_CD, CD_LIST)
 end
@@ -208,7 +208,7 @@ function calc_res(s, pos1, pos2, vel1, vel2, mass, veld, result, i)
     
     s.force .= s.spring_force + 0.5 * s.last_tether_drag
     if i == set.segments+1
-        s.bridle_area =  set.l_bridle * set.d_tether/1000.0
+        s.bridle_area =  set.l_bridle * set.d_line/1000.0
         s.last_v_app_norm_tether = calc_drag(s, s.av_vel, s.unit_vector, rho, s.last_tether_drag, s.v_app_perp, s.bridle_area)
         s.force .+= s.last_tether_drag  
     end

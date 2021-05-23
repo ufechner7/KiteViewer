@@ -1,6 +1,5 @@
 TODO
 On Simulator
-
 1. write log file for KiteViewer
 2. add winch model
 3. add 4 point kite model

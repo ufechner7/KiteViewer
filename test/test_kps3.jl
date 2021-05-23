@@ -209,7 +209,7 @@ end
     y0, yd0 = KPS3.init(my_state)
     @test length(y0)  == (SEGMENTS) * 6
     @test length(yd0) == (SEGMENTS) * 6
-    @test sum(y0)  ≈ 765.8597778238425
+    @test sum(y0)  ≈ 761.6911185671187
     @test sum(yd0) ≈ 3.6e-5
     @test isapprox(my_state.param_cl, 0.574103590856, atol=1e-4)
     @test isapprox(my_state.param_cd, 0.125342896308, atol=1e-4)
