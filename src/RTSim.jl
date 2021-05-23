@@ -19,7 +19,7 @@ differential_vars =  ones(Bool, 36)
 prob = DAEProblem(residual!, yd0, y0, tspan, differential_vars=differential_vars)
 solver = IDA(linear_solver=:Dense, max_order=4, max_convergence_failures=10, max_nonlinear_iters=5, init_all=false) # :BCG :GMRES :Dense :TFQMR :LapackDense
 
-@time sol = solve(prob, solver, maxord = 3, saveat=0.025, abstol=0.0000001, reltol=0.001) # inith = 0.002, maxord = 3, abstol=0.0000001
+@time sol = solve(prob, solver, maxord = 5, saveat=0.025, abstol=0.000001, reltol=0.001) # inith = 0.002, maxord = 3, abstol=0.0000001
 
 time = sol.t
 println(sol.retcode)
