@@ -4,6 +4,7 @@ On Simulator
 2. add winch model
 3. add 4 point kite model
 4. determine pre_tension and p2 automatically
+5. add C2_CORR and STEERING_COEFFICIENT to settings.yaml
 
 On KiteViewer
 1. add button x, y, z and energy

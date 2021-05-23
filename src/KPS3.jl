@@ -61,7 +61,6 @@ export set_v_reel_out, set_depower_steering                                     
     ALPHA_ZERO = 0.0
     K_ds = 1.5                    # influence of the depower angle on the steering sensitivity
     MAX_ALPHA_DEPOWER = 31.0
-    V_REEL_OUT = 0.0              # initial reel out speed
 
     ALPHA_CL = [-180.0, -160.0, -90.0, -20.0, -10.0,  -5.0,  0.0, 20.0, 40.0, 90.0, 160.0, 180.0]
     CL_LIST  = [   0.0,    0.5,   0.0,  0.08, 0.125,  0.15,  0.2,  1.0,  1.0,  0.0,  -0.5,   0.0]
@@ -494,7 +493,7 @@ function init(s, X=X0; output=false)
     end
     set_v_wind_ground(s, pos[set.segments+1][3])
     set_l_tether(s, set.l_tether)
-    set_v_reel_out(s, V_REEL_OUT, 0.0)
+    set_v_reel_out(s, set.v_reel_out, 0.0)
     if output
         print("y0: ")
         display(state_y0)

@@ -43,6 +43,7 @@ mutable struct Settings
     time_lapse::Float64
     zoom::Float64
     fixed_font::String
+    v_reel_out::Float64
     area::Float64
     mass::Float64
     kcu_mass::Float64
@@ -61,7 +62,7 @@ mutable struct Settings
     c_spring::Float64
     elevation::Float64
 end
-const SETTINGS = [Settings("","",0,0,0,0,"",0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)]
+const SETTINGS = [Settings("","",0,0,0,0,"",0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)]
 
 # getter function for the Settings struct
 function se(project="settings.yaml")
@@ -76,6 +77,7 @@ function se(project="settings.yaml")
         SETTINGS[1].fixed_font  = dict["system"]["fixed_font"]
 
         SETTINGS[1].l_tether    = dict["initial"]["l_tether"]
+        SETTINGS[1].v_reel_out   = dict["initial"]["v_reel_out"]
         SETTINGS[1].elevation   = dict["initial"]["elevation"]
 
         SETTINGS[1].model       = dict["kite"]["model"]
