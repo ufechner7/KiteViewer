@@ -19,6 +19,7 @@ function set_defaults(state)
     KPS3.set.mass = 11.4
     KPS3.set.damping =  2 * 473.0
     KPS3.set.alpha = 1.0/7
+    KPS3.set.c_s = 0.6
     KPS3.clear(state)
 end
 
@@ -30,6 +31,7 @@ function init_392()
     KPS3.set.rel_side_area = 50.0
     KPS3.set.v_wind = 9.1
     KPS3.set.mass = 6.2
+    KPS3.set.c_s = 0.6
     KPS3.clear(my_state)
 end
 

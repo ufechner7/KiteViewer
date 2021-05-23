@@ -13,7 +13,7 @@ initial:
 
 steering:
     c0:      -0.0032       # steering offset             [-]
-    c_s:      2.59         # steering coefficient one point model
+    c_s:      2.59         # steering coefficient one point model; 2.59 was 0.6; TODO: check if it must be divided by kite_area
     c2_cor:   0.93         # correction factor one point model
     k_ds:     1.5          # influence of the depower angle on the steering sensitivity
 
