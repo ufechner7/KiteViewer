@@ -56,7 +56,6 @@ export set_v_reel_out, set_depower_steering                                     
     C2_COR =  0.93
     STEERING_COEFFICIENT = 0.6
     BRIDLE_DRAG = 1.1
-    ALPHA_ZERO = 0.0
 
     ALPHA_CL = [-180.0, -160.0, -90.0, -20.0, -10.0,  -5.0,  0.0, 20.0, 40.0, 90.0, 160.0, 180.0]
     CL_LIST  = [   0.0,    0.5,   0.0,  0.08, 0.125,  0.15,  0.2,  1.0,  1.0,  0.0,  -0.5,   0.0]
@@ -233,7 +232,7 @@ end
 
 # Calculate the lift and drag coefficient as a function of the relative depower setting.
 function set_cl_cd(s, alpha)   
-    angle =  alpha * 180.0 / π + ALPHA_ZERO
+    angle =  alpha * 180.0 / π
     if angle > 180.0
         angle -= 360.0
     end
