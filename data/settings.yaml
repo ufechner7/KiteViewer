@@ -15,6 +15,7 @@ steering:
     c0:      -0.0032       # steering offset             [-]
     c1:       0.264        # first coefficient of the turn rate law
     c2:       6.2          # second coefficient of the turn rate law
+    k_ds:     1.5          # influence of the depower angle on the steering sensitivity
 
 depower:
     alpha_d_max: 31.00     # max depower angle          [deg]
@@ -24,7 +25,7 @@ kite:
     mass:  6.2             # kite mass incl. sensor unit [kg]
     area: 10.18            # projected kite area        [m^2]
     rel_side_area: 30.6    # relative side area           [%]
-    lod:   5.0             # max lift over drag
+    lod:   5.0             # max lift over drag (unused)
     
 bridle:
     d_line:    2.5         # bridle line diameter            [mm]
