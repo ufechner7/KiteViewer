@@ -1,4 +1,4 @@
-using DifferentialEquations, Sundials, GLMakie, StaticArrays
+using Sundials, GLMakie, StaticArrays
 # Tutorial example showing how to use an implicit solver 
 # It simulates a falling mass.
 
