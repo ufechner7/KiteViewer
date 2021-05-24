@@ -1,6 +1,6 @@
 module TestNLsolve
 
-using Test, BenchmarkTools, StaticArrays, Revise, LinearAlgebra, SciMLBase, NLsolve, GLMakie, Reexport, LineSearches
+using Test, BenchmarkTools, StaticArrays, Revise, LinearAlgebra, SciMLBase, NLsolve, GLMakie, Reexport
 
 export test_nlsolve, test_nlsolve2
 

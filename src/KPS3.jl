@@ -485,7 +485,7 @@ function init(s, X=X0; output=false)
     return reduce(vcat, state_y0), reduce(vcat, yd0)
 end
 
-const res = zeros(MVector{2*(SEGMENTS)*3, Float64})
+const res = zeros(MVector{6*SEGMENTS, Float64})
 
 # helper function for the steady state finder
 function test_initial_condition(F, x::Vector)

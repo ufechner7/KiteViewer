@@ -1,4 +1,4 @@
-using Test, BenchmarkTools, StaticArrays, Revise, LinearAlgebra, SciMLBase, Optim, GLMakie, LineSearches
+using Test, BenchmarkTools, StaticArrays, Revise, LinearAlgebra, SciMLBase, GLMakie
 
 if ! @isdefined KPS3
     includet("../src/KPS3.jl")
@@ -213,8 +213,8 @@ end
     y0, yd0 = KPS3.init(my_state)
     @test length(y0)  == (SEGMENTS) * 6
     @test length(yd0) == (SEGMENTS) * 6
-    @test sum(y0)  ≈ 761.6911185671187
-    @test sum(yd0) ≈ 3.6e-5
+    @test sum(y0)  ≈ 717.1633369868302
+    @test sum(yd0) ≈ 0.0 # 3.6e-5
     @test isapprox(my_state.param_cl, 0.574103590856, atol=1e-4)
     @test isapprox(my_state.param_cd, 0.125342896308, atol=1e-4)
 end
