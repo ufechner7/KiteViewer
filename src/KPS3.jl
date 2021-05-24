@@ -439,7 +439,7 @@ end
 function init(s, X=X0; output=false)
     global pos, vel, acc, state_y0, yd0
 
-    DELTA = 0.0 # 1e-6
+    DELTA = 1e-6
     set_cl_cd(s, 10.0/180.0 * π)
 
     for i in 0:set.segments
