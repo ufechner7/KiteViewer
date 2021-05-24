@@ -6,40 +6,63 @@ if ! @isdefined KPS3
     using .KPS3
 end
 
-my_state = KPS3.get_state()
-clear(my_state)
-y0, yd0 = KPS3.find_steady_state(my_state)
-
-forces = KPS3.get_spring_forces(my_state, my_state.pos)
-println(forces)
-
-differential_vars =  ones(Bool, 36)
-solver = IDA(linear_solver=:Dense)
-dt = 0.5
-t_start = 0.0
-t_end   = 5*dt
-tspan = (t_start, t_end) 
-
-prob = DAEProblem(residual!, yd0, y0, tspan, differential_vars=differential_vars)
-integrator = init(prob, solver, abstol=0.000001, reltol=0.001)
-
-for i in 1:5
-    step!(integrator, dt, stop_at_tdt=true)
-    # println(check_error(integrator))
-    for (u,t) in tuples(integrator)
-        # y = u[end][1:3*KPS3.SEGMENTS]
-        @show u[18], t
-    end
-    # @time global sol = solve(prob, solver, saveat=0.025, abstol=0.000001, reltol=0.001)
-    # y0  .= sol.u[end][1:3*KPS3.SEGMENTS]
-    # yd0 .= sol.u[end][3*KPS3.SEGMENTS+1:end]
-    # println(y[end])
+if ! @isdefined Utils
+    include("Utils.jl")
+    using .Utils
 end
 
-# time = sol.t
-# println(sol.retcode)
-# y = sol.u
-# println(length(y))
+heights=Float64[]
+times=Float64[]
+
+# create a SysState struct form the state vector u
+function SysState(u)
+end
+
+function init_sim(t_end)
+    my_state = KPS3.get_state()
+    clear(my_state)
+    y0, yd0 = KPS3.find_steady_state(my_state)
+
+    forces = KPS3.get_spring_forces(my_state, my_state.pos)
+    println(forces)
+
+    differential_vars =  ones(Bool, 36)
+    solver = IDA(linear_solver=:Dense)
+    dt = 0.05
+    tspan = (0.0, t_end) 
+
+    prob = DAEProblem(residual!, yd0, y0, tspan, differential_vars=differential_vars)
+    integrator = init(prob, solver, abstol=0.000001, reltol=0.001)
+    return integrator, dt
+end
+
+function next_step(integrator, dt)
+    step!(integrator, dt, true)
+    u = integrator.u
+    t = integrator.t
+    # @show round(u[18],digits=6), round(t,digits=2)
+    push!(heights, u[18])
+    push!(times, t)
+    if iseven(Int64(round(t)))
+        v_ro = -1.0
+    else
+        v_ro = 1.0
+    end
+    my_state = KPS3.get_state()
+    KPS3.set_v_reel_out(my_state, v_ro, t)
+    # TODO: return a SysState object
+end
+
+function rt_sim()
+    t_end = 100.0
+    integrator, dt = init_sim(t_end)
+
+    @time for i in 1:round(t_end/dt)
+        next_step(integrator, dt)
+    end
+end
+
+
 
 # pos_x = sol[3*5+1, :]
 # pos_z = sol[3*5+3, :]
@@ -47,12 +70,8 @@ end
 # println(forces)
 # x=[my_state.pos[i][1] for i in 1:7]
 # z=[my_state.pos[i][3] for i in 1:7]
-# lines(x,z)
+rt_sim()
 
-# # plot the result
-# f = Figure()
-# ax1 = Axis(f[1, 1], yticklabelcolor = :blue, xlabel="time [s]", ylabel = "pos_z [m]")
-# ax2 = Axis(f[1, 1], yticklabelcolor = :red, yaxisposition = :right, ylabel = "vel_z [m/s]")
-# lines!(ax1, time, pos_z, color=:green)
-# lines!(ax2, time, vel_z, color=:red)
+lines(times,heights)
+
 # current_figure()
