@@ -500,13 +500,11 @@ function test_initial_condition(F, x::Vector)
     return nothing 
 end
 
-function find_steady_state(s)
-    initial_x =  zeros(12)
-    println("\nStarted function test_nlsolve...")
-    @time results = nlsolve(test_initial_condition, initial_x)
-    println("\nresult: $results")
-    params=results.zero
-    KPS3.init(s, params)
+function find_steady_state(s, prn=false)
+    if prn println("\nStarted function test_nlsolve...") end
+    results = nlsolve(test_initial_condition, zeros(2*SEGMENTS))
+    if prn println("\nresult: $results") end
+    init(s, results.zero)
 end
 
 end
