@@ -1,6 +1,6 @@
 module TestNLsolve
 
-using Test, BenchmarkTools, StaticArrays, Revise, LinearAlgebra, SciMLBase, NLsolve, GLMakie, Reexport
+using Test, BenchmarkTools, StaticArrays, Revise, LinearAlgebra, SciMLBase, NLsolve, GLMakie, Reexport, LineSearches
 
 export test_nlsolve
 
@@ -27,8 +27,6 @@ function test_initial_condition(F, x::Vector)
     my_state = KPS3.get_state()
     y0, yd0 = KPS3.init(my_state, x)
     residual!(res, yd0, y0, 0.0, 0.0)
-    # println("x: $x")
-    println("res: $(norm(res))")
     for i in 1:SEGMENTS
         F[i] = res[1+3*(i-1)+18]
         F[i+SEGMENTS] = res[3+3*(i-1)+18]
@@ -36,21 +34,28 @@ function test_initial_condition(F, x::Vector)
     return nothing 
 end
 
+function test_final_condition(params::Vector)
+    my_state = KPS3.get_state()
+    y0, yd0 = KPS3.init(my_state, params)
+    residual!(res, yd0, y0, 0.0, 0.0)
+    return norm(res) # z component of force on all particles but the first
+end
+
 function test_nlsolve(;plot=false, prn=false)
-    lower = [-10, -20, -20, -20, -30, -30.0, -10, -10, -10, -10, -10, -10]
-    upper = [ 10,  20,  20,  20,  30,  30.0,  10,  10,  10,  10,  10,  10]
     initial_x =  zeros(12)
     init_392()
     my_state = KPS3.get_state()
     println("\nStarted function test_nlsolve...")
-    results = nlsolve(test_initial_condition, initial_x)
+    @time results = nlsolve(test_initial_condition, initial_x)
 
     println("\nresult: $results")
-    # res4=test_initial_condition(params)
-    # show(@test res4 < 6.0)
+    params=results.zero
+    res4=test_final_condition(params)
+    println("res: $res4")
+    show(@test res4 < 0.001)
 
-    res = KPS3.calc_pre_tension(my_state)
-    println("\nres: $res")
+    pre_tension = KPS3.calc_pre_tension(my_state)
+    println("\npre_tension: $pre_tension")
     if prn
         println("\nres2: "); display(my_state.res2)
     end

@@ -13,7 +13,7 @@ y0, yd0 = KPS3.init(my_state)
 forces = KPS3.get_spring_forces(my_state, my_state.pos)
 println(forces)
 
-tspan = (0.0, 1)         # time span; fails when changed to (0.0, 0.082); works with 0.081s
+tspan = (0.0, 40)         # time span
 
 differential_vars =  ones(Bool, 36)
 prob = DAEProblem(residual!, yd0, y0, tspan, differential_vars=differential_vars)

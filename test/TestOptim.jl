@@ -1,6 +1,6 @@
 module TestOptim
 
-using Test, BenchmarkTools, StaticArrays, Revise, LinearAlgebra, SciMLBase, Optim, LineSearches, GLMakie, Reexport
+using Test, BenchmarkTools, StaticArrays, Revise, LinearAlgebra, SciMLBase, Optim, LineSearches, GLMakie, Reexport, FileIO
 
 export test_optim
 
@@ -67,9 +67,12 @@ function test_optim(;plot=false, prn=false)
     println(forces)
 
     if plot 
-        return lines(x, z)
+        lines(x,z)
+        scatter!(x, z, marker='+', markersize=15.0)
+        fig = current_figure()
+        # save("plot.png, fig")
+        return fig
     end
-    return nothing
 end
 
 end
