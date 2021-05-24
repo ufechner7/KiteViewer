@@ -1,4 +1,4 @@
-using DifferentialEquations, Sundials, GLMakie, StaticArrays
+using Sundials, GLMakie, StaticArrays
 using Revise
 
 if ! @isdefined KPS3
