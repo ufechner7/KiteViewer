@@ -438,15 +438,12 @@ end
 function init(s, X=X0; output=false)
     global pos, vel, acc, state_y0, yd0
 
-    pre_tension =    1.0025
-    p2          = -0.14953723916589248*0.6
-
-    DELTA = 1e-6
+    DELTA = 0.0 # 1e-6
     set_cl_cd(s, 10.0/180.0 * π)
 
     for i in 0:set.segments
-        radius =  -i * set.l_tether / set.segments*pre_tension
-        elevation = set.elevation - p2 * (i+1/(set.segments+1) - 0.5)^2
+        radius =  -i * set.l_tether / set.segments
+        elevation = set.elevation
         sin_el, cos_el = sin(elevation / 180.0 * π), cos(elevation / 180.0 * π)
         radius1 = radius
         if i==0
