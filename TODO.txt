@@ -4,7 +4,6 @@ On Simulator
 2. add winch model
 3. add 4 point kite model
 4. determine pre_tension and p2 automatically
-5. add C2_CORR and STEERING_COEFFICIENT to settings.yaml
 
 On KiteViewer
 1. add button x, y, z and energy
@@ -19,6 +18,7 @@ DONE (sim branch)
 2. Add module TestWindProfile for plotting EXP, LOG and EXPLOG profiles
 3. Fixed KPS3.jl, now working stable and correctly
 4. add z0, profile_law and kcu_mass to settings struct
+5. add c2_cor and c_s to settings.yaml
 
 DONE (main branch)
 1. add toggle "Repeat" for endless replay

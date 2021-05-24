@@ -12,7 +12,7 @@ initial:
     v_reel_out: 0.0        # initial reel out speed    [m/s]
 
 steering:
-    c0:      -0.0032       # steering offset             [-]
+    c0:       0.0          # steering offset   -0.0032           [-]
     c_s:      2.59         # steering coefficient one point model; 2.59 was 0.6; TODO: check if it must be divided by kite_area
     c2_cor:   0.93         # correction factor one point model
     k_ds:     1.5          # influence of the depower angle on the steering sensitivity
@@ -23,7 +23,7 @@ depower:
 kite:
     model: "data/kite.obj" # 3D model of the kite
     mass:  6.2             # kite mass incl. sensor unit [kg]
-    area: 10.18            # projected kite area        [m^2]
+    area: 10.18            # projected kite area         [m²]
     rel_side_area: 30.6    # relative side area           [%]
     alpha_cl:  [-180.0, -160.0, -90.0, -20.0, -10.0,  -5.0,  0.0, 20.0, 40.0, 90.0, 160.0, 180.0]
     cl_list:   [   0.0,    0.5,   0.0,  0.08, 0.125,  0.15,  0.2,  1.0,  1.0,  0.0,  -0.5,   0.0]
@@ -31,9 +31,9 @@ kite:
     cd_list:   [   0.5,    0.5,    0.5,   1.0,   0.2, 0.1,  0.2,  1.0,   0.5,   0.5,   0.5]
     
 bridle:
-    d_line:    2.5         # bridle line diameter            [mm]
+    d_line:    2.5         # bridle line diameter                  [mm]
     l_bridle: 33.4         # sum of the lengths of the bridle lines [m]
-    height:    4.9         # height of bridle                 [m]
+    height:    4.9         # height of bridle                       [m]
 
 kcu:
     mass: 8.4              # mass of the kite control unit   [kg]
