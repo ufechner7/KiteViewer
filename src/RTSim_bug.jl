@@ -24,7 +24,7 @@ prob = DAEProblem(residual!, yd0, y0, tspan, differential_vars=differential_vars
 integrator = init(prob, solver, abstol=0.000001, reltol=0.001)
 
 for i in 1:5
-    step!(integrator, dt, stop_at_tdt=true)
+    step!(integrator, dt, true)
     for (u,t) in tuples(integrator)
         @show u[18], t
     end
