@@ -43,6 +43,7 @@ tether:
     cd_tether: 0.958       # drag coefficient of the tether
     damping: 473.0         # unit damping coefficient        [Ns]
     c_spring: 614600.0     # unit spring constant coefficient [N]
+    rho_tether: 0.0        # density of Dyneema
 
 environment:
     v_wind: 9.51     # wind speed at reference height       [m/s]
