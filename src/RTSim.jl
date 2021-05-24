@@ -8,7 +8,7 @@ end
 
 my_state = KPS3.get_state()
 clear(my_state)
-y0, yd0 = KPS3.init(my_state)
+y0, yd0 = KPS3.find_steady_state(my_state)
 
 forces = KPS3.get_spring_forces(my_state, my_state.pos)
 println(forces)

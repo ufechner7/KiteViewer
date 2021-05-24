@@ -31,7 +31,7 @@ Scientific background: http://arxiv.org/abs/1406.6218 =#
 
 module KPS3
 
-using Dierckx, StaticArrays, LinearAlgebra, Parameters
+using Dierckx, StaticArrays, LinearAlgebra, Parameters, NLsolve
 
 if ! @isdefined Utils
     include("Utils.jl")
@@ -483,6 +483,30 @@ function init(s, X=X0; output=false)
         display(yd0)
     end
     return reduce(vcat, state_y0), reduce(vcat, yd0)
+end
+
+const res = zeros(MVector{2*(SEGMENTS)*3, Float64})
+
+# helper function for the steady state finder
+function test_initial_condition(F, x::Vector)
+    global res
+    my_state = KPS3.get_state()
+    y0, yd0 = KPS3.init(my_state, x)
+    residual!(res, yd0, y0, 0.0, 0.0)
+    for i in 1:SEGMENTS
+        F[i] = res[1+3*(i-1)+18]
+        F[i+SEGMENTS] = res[3+3*(i-1)+18]
+    end
+    return nothing 
+end
+
+function find_steady_state(s)
+    initial_x =  zeros(12)
+    println("\nStarted function test_nlsolve...")
+    @time results = nlsolve(test_initial_condition, initial_x)
+    println("\nresult: $results")
+    params=results.zero
+    KPS3.init(s, params)
 end
 
 end
