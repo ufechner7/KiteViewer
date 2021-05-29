@@ -2,9 +2,7 @@ using Sundials, GLMakie, StaticArrays, Rotations
 using Revise
 
 # TODO:
-# 1. implement function SysState()
-#    a. for the particle positions - DONE -
-#    b. for the orientation
+# 1. implement function SysState() - DONE -
 # 2. integrate RTSim in KiteViewer by calling init_sim and next_step
 # 3. bind steering and depowering to cursor keys 
 
@@ -35,9 +33,14 @@ function SysState()
         Y[i] = pos[i][2]
         Z[i] = pos[i][3]
     end
-    r_xyz = RotXYZ(pi/2, -pi/2, 0)
-    q = UnitQuaternion(r_xyz)
+    
+    pos_kite   = pos[end]
+    pos_before = pos[end-1]
+    v_app = my_state.v_apparent
+    rotation = rot(pos_kite, pos_before, v_app)
+    q = UnitQuaternion(rotation)
     orient = MVector{4, Float32}(q.w, q.x, q.y, q.z)
+
     elevation = calc_elevation([X[end], 0.0, Z[end]])
     return Utils.SysState(my_state.t_0, orient, elevation,0.,0.,0.,0.,0.,0.,X, Y, Z)
 end
