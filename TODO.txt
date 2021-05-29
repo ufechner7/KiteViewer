@@ -1,9 +1,10 @@
 TODO
 On Simulator
-1. write log file for KiteViewer
-2. add winch model
-3. add 4 point kite model
-4. use rho_tether from settings.yaml
+1. create a SysState struct form the state vector
+2. integrate RTSim in KiteViewer
+3. add winch model
+4. add 4 point kite model
+5. use rho_tether from settings.yaml
 
 On KiteViewer
 1. add button x, y, z and energy
