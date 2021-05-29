@@ -53,8 +53,7 @@ export set_v_reel_out, set_depower_steering                                     
     SEGMENTS = set.segments
     G_EARTH = 9.81                # gravitational acceleration
     BRIDLE_DRAG = 1.1             # should probably be removed
-    # X0 = [5.3506365772036615, 9.200200773784072, 12.106325985815378, 14.638292099163197, 17.379867429065342, 21.56465630857364, -2.232627620821657, -3.77671345226395, -4.891355444812783, -5.822234551550322, -6.7917091935113945, -8.16300817107152]
-    X0 = zeros(12)
+    X0 = zeros(2 * SEGMENTS)
     calc_cl = Spline1D(set.alpha_cl, set.cl_list)
     calc_cd = Spline1D(set.alpha_cd, set.cd_list)
 end
@@ -467,21 +466,20 @@ end
 const res = zeros(MVector{6*SEGMENTS, Float64})
 
 # helper function for the steady state finder
-function test_initial_condition(F, x::Vector)
-    global res
-    my_state = KPS3.get_state()
-    y0, yd0 = KPS3.init(my_state, x)
+function test_initial_condition!(F, x::Vector)
+    global res, state
+    y0, yd0 = init(state, x)
     residual!(res, yd0, y0, 0.0, 0.0)
     for i in 1:SEGMENTS
-        F[i] = res[1+3*(i-1)+18]
-        F[i+SEGMENTS] = res[3+3*(i-1)+18]
+        F[i] = res[1 + 3*(i-1) + 3*SEGMENTS]
+        F[i+SEGMENTS] = res[3 + 3*(i-1) + 3*SEGMENTS]
     end
     return nothing 
 end
 
 function find_steady_state(s, prn=false)
     if prn println("\nStarted function test_nlsolve...") end
-    results = nlsolve(test_initial_condition, zeros(2*SEGMENTS))
+    results = nlsolve(test_initial_condition!, zeros(2*SEGMENTS))
     if prn println("\nresult: $results") end
     init(s, results.zero)
 end
