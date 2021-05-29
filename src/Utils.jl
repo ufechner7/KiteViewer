@@ -30,7 +30,7 @@ module Utils
 using Rotations, StaticArrays, StructArrays, RecursiveArrayTools, Arrow, YAML
 export SysState, ExtSysState, SysLog, MyFloat
 
-export demo_state, demo_syslog, demo_log, load_log, syslog2extlog, save_log, rot3d, se
+export demo_state, demo_syslog, demo_log, load_log, syslog2extlog, save_log, rot3d, ground_dist, calc_elevation, se
 
 const MyFloat = Float32               # type to use for postions
 const DATA_PATH = "./data"            # path for log files and other data
@@ -176,6 +176,16 @@ function rot3d(ax, ay, az, bx, by, bz)
     return R_bi * R_ai'
 end
 
+# Calculate the ground distance from the kite position (x,y,z, z up).
+function ground_dist(vec)
+    sqrt(vec[1]^2 + vec[2]^2)
+end 
+
+# Calculate the elevation angle in radian from the kite position 
+function calc_elevation(vec)
+    atan(vec[3]/ground_dist(vec))
+end
+
 # create a demo state with a given height and time
 function demo_state(height=6.0, time=0.0)
     a = 10
@@ -185,7 +195,7 @@ function demo_state(height=6.0, time=0.0)
     r_xyz = RotXYZ(pi/2, -pi/2, 0)
     q = UnitQuaternion(r_xyz)
     orient = MVector{4, Float32}(q.w, q.x, q.y, q.z)
-    elevation = asin(Z[end]/X[end])
+    elevation = calc_elevation([X[end], 0.0, Z[end]])
     return SysState(time, orient, elevation,0.,0.,0.,0.,0.,0.,X, Y, Z)
 end
 
@@ -231,7 +241,8 @@ function demo_log(name="Test_flight"; duration=10)
 end
 
 function save_log(flight_log::SysLog)
-    Arrow.ArrowTypes.registertype!(SysState, SysState)
+    Arrow.ArrowTypes.registertype!(SysState, SysState
+    )
     filename=joinpath(DATA_PATH, flight_log.name) * ".arrow"
     Arrow.write(filename, flight_log.syslog, compress=:lz4)
 end
