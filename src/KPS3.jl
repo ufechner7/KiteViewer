@@ -118,9 +118,7 @@ end
 const state = State{SimFloat, Vec3}()
 
 # Functions
-function get_state()
-    state
-end
+function get_state() state end
 
 # Calculate the air densisity as function of height
 calc_rho(height) = set.rho_0 * exp(-height / 8550.0)
@@ -324,8 +322,6 @@ function residual!(res, yd, y, p, time)
             @inbounds s.pos[i] .= pos[i]
         end
     end
-
-  
     nothing
 end
 
@@ -355,19 +351,13 @@ function set_beta_psi(s, beta, psi)
 end
 
 # Setter for the tether reel-out lenght (at zero force).
-function set_l_tether(s, l_tether)
-    s.l_tether = l_tether
-end
+function set_l_tether(s, l_tether) s.l_tether = l_tether end
 
 # Getter for the tether reel-out lenght (at zero force).
-function get_l_tether(s)
-    s.l_tether
-end
+function get_l_tether(s) s.l_tether end
 
 # Return the absolute value of the force at the winch as calculated during the last simulation. 
-function get_force(s)
-    norm(s.last_force) 
-end
+function get_force(s) norm(s.last_force) end
 
 # Return an array of the scalar spring forces of all tether segements.
 # Input: The vector pos of the positions of the point masses that belong to the tether.
@@ -379,14 +369,10 @@ function get_spring_forces(s, pos)
     forces
 end
 
-function get_lift_drag(s)
-    norm(s.lift_force), norm(s.drag_force)
-end
+function get_lift_drag(s) return (norm(s.lift_force), norm(s.drag_force)) end
 
 # Return the vector of the wind velocity at the height of the kite.
-function get_v_wind(s)
-    s.v_wind
-end
+function get_v_wind(s) s.v_wind end
 
 # Set the vector of the wind-velocity at the height of the kite. As parameter the height,
 # the ground wind speed and the wind direction are needed.
@@ -431,7 +417,7 @@ function calc_pre_tension(s)
     res=av_force/set.c_spring
     if res < 0.0 res = 0.0 end
     if isnan(res) res = 0.0 end
-    return res+1.0
+    return res + 1.0
 end
 
 # Calculate the initial conditions y0, yd0 and sw0. Tether with the given elevation angle,
