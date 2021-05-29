@@ -268,13 +268,6 @@ function clear(s)
     s.damping  = set.damping / s.length
 end
 
-function unpack(y)
-    part = reshape(SVector{6*(set.segments+1)}(y),  Size(3, set.segments+1, 2))
-    pos1 = part[:,:,1]
-    pos = SVector{set.segments+1}(SVector(pos1[:,i]) for i in 1:set.segments+1)
-    return pos
-end
-
 # N-point tether model:
 # Inputs:
 # State vector state_y   = pos1, pos2, ..., posn, vel1, vel2, ..., veln
