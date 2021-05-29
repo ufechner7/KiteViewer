@@ -1,5 +1,12 @@
-using Sundials, GLMakie, StaticArrays
+using Sundials, GLMakie, StaticArrays, Rotations
 using Revise
+
+# TODO:
+# 1. implement function SysState()
+#    a. for the particle positions - DONE -
+#    b. for the orientation
+# 2. integrate RTSim in KiteViewer by calling init_sim and next_step
+# 3. bind steering and depowering to cursor keys 
 
 if ! @isdefined KPS3
     includet("../src/KPS3.jl")
@@ -14,8 +21,25 @@ end
 heights=Float64[]
 times=Float64[]
 
-# create a SysState struct form the state vector u
-function SysState(u)
+const SEGMENTS = KPS3.SEGMENTS
+
+# create a SysState struct from KPS3.state
+function SysState()
+    my_state = KPS3.get_state()
+    pos = my_state.pos
+    X = zeros(MVector{SEGMENTS+1, MyFloat})
+    Y = zeros(MVector{SEGMENTS+1, MyFloat})
+    Z = zeros(MVector{SEGMENTS+1, MyFloat})
+    for i in 1:SEGMENTS+1
+        X[i] = pos[i][1]
+        Y[i] = pos[i][2]
+        Z[i] = pos[i][3]
+    end
+    r_xyz = RotXYZ(pi/2, -pi/2, 0)
+    q = UnitQuaternion(r_xyz)
+    orient = MVector{4, Float32}(q.w, q.x, q.y, q.z)
+    elevation = calc_elevation([X[end], 0.0, Z[end]])
+    return Utils.SysState(my_state.t_0, orient, elevation,0.,0.,0.,0.,0.,0.,X, Y, Z)
 end
 
 function init_sim(t_end)
@@ -36,6 +60,10 @@ function init_sim(t_end)
     return integrator, dt
 end
 
+function get_sysstate()
+    SysState()
+end
+
 function next_step(integrator, dt)
     step!(integrator, dt, true)
     u = integrator.u
@@ -50,7 +78,7 @@ function next_step(integrator, dt)
     end
     my_state = KPS3.get_state()
     KPS3.set_v_reel_out(my_state, v_ro, t)
-    # TODO: return a SysState object
+    SysState()
 end
 
 function rt_sim()
@@ -62,16 +90,9 @@ function rt_sim()
     end
 end
 
-
-
-# pos_x = sol[3*5+1, :]
-# pos_z = sol[3*5+3, :]
-# forces = KPS3.get_spring_forces(my_state, my_state.pos)
-# println(forces)
-# x=[my_state.pos[i][1] for i in 1:7]
-# z=[my_state.pos[i][3] for i in 1:7]
-rt_sim()
-
-lines(times,heights)
+function plot_height()
+    rt_sim()
+    lines(times,heights)
+end
 
 # current_figure()
