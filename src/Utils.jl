@@ -27,10 +27,10 @@ module Utils
 # function se() for reading the settings
 # in addition helper functions for working with rotations
 
-using Rotations, StaticArrays, StructArrays, RecursiveArrayTools, Arrow, YAML
+using Rotations, StaticArrays, StructArrays, RecursiveArrayTools, Arrow, YAML, LinearAlgebra
 export SysState, ExtSysState, SysLog, MyFloat
 
-export demo_state, demo_syslog, demo_log, load_log, syslog2extlog, save_log, rot3d, ground_dist, calc_elevation, se
+export demo_state, demo_syslog, demo_log, load_log, syslog2extlog, save_log, rot, rot3d, ground_dist, calc_elevation, se
 
 const MyFloat = Float32               # type to use for postions
 const DATA_PATH = "./data"            # path for log files and other data
@@ -176,6 +176,17 @@ function rot3d(ax, ay, az, bx, by, bz)
     return R_bi * R_ai'
 end
 
+# calculate the rotation matrix of the kite based on the position of the
+# last two tether particles and the apparent wind speed vector
+function rot(pos_kite, pos_before, v_app)
+    delta = pos_kite - pos_before
+    c = -delta
+    z = normalize(c)
+    y = normalize(cross(-v_app, c))
+    x = normalize(cross(y, c))
+    rot = rot3d([0,-1.0,0], [1.0,0,0], [0,0,-1.0], z, y, x)
+end
+
 # Calculate the ground distance from the kite position (x,y,z, z up).
 function ground_dist(vec)
     sqrt(vec[1]^2 + vec[2]^2)
@@ -183,7 +194,7 @@ end
 
 # Calculate the elevation angle in radian from the kite position 
 function calc_elevation(vec)
-    atan(vec[3]/ground_dist(vec))
+    atan(vec[3] / ground_dist(vec))
 end
 
 # create a demo state with a given height and time

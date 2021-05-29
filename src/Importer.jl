@@ -41,17 +41,6 @@ function getX(pos); return parse_array(pos)[1,:]; end
 function getY(pos); return parse_array(pos)[2,:]; end
 function getZ(pos); return parse_array(pos)[3,:]; end
 
-# calculate the rotation matrix of the kite based on the position of the
-# last two tether particles and the apparent wind speed vector
-function rot(pos_kite, pos_before, v_app)
-    delta = pos_kite - pos_before
-    c = -delta
-    z = normalize(c)
-    y = normalize(cross(-v_app, c))
-    x = normalize(cross(y, c))
-    rot = rot3d([0,-1.0,0], [1.0,0,0], [0,0,-1.0], z, y, x)
-end
-
 function df2syslog(df)
     orient = MVector(1.0f0, 0, 0, 0)
     steps = size(df)[1]
