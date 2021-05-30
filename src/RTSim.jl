@@ -73,5 +73,5 @@ function next_step(integrator, dt)
 end
 
 precompile(init_sim, (Float64,))  
-
+precompile(next_step, (Sundials.IDAIntegrator,))
 end
