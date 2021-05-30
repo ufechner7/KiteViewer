@@ -37,6 +37,7 @@ using Utils, KCU_Sim
 export State, Vec3, SimFloat, ProfileLaw, EXP, LOG, EXPLOG                              # types
 export calc_cl, calc_rho, calc_wind_factor, calc_drag, calc_set_cl_cd, clear, residual! # functions
 export set_v_reel_out, set_depower_steering                                             # setters  
+export get_force
 
 # Constants
 @consts begin

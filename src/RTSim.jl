@@ -29,7 +29,9 @@ function SysState()
 
     elevation = calc_elevation(pos_kite)
     azimuth = azimuth_east(pos_kite)
-    return Utils.SysState(my_state.t_0, orient, elevation, azimuth,0.,0.,0.,0.,0.,X, Y, Z)
+    v_reelout = my_state.v_reel_out
+    force = get_force(my_state)
+    return Utils.SysState(my_state.t_0, orient, elevation, azimuth, 0., v_reelout, force, 0., 0., X, Y, Z)
 end
 
 function get_height()

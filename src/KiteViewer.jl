@@ -143,16 +143,16 @@ function update_system(scene, state, step=0)
     kite_pos[] = points[end]
 
     # print state values
-    # power = state.force * state.v_reelout
-    # energy[1] += (power / se().sample_freq * 2)
+    power = state.force * state.v_reelout
+    energy[1] += (power / se().sample_freq * 2)
     if mod(step, 2) == 0
         height = points[end][3]/se().zoom
         msg = "time:      $(@sprintf("%7.2f", state.time)) s\n" *
             "height:    $(@sprintf("%7.2f", height)) m\n" *
             "elevation: $(@sprintf("%7.2f", state.elevation/pi*180.0)) °\n" *
-            "azimuth:   $(@sprintf("%7.2f", state.azimuth/pi*180.0)) °\n"
-            #"v_reelout: $(@sprintf("%7.2f", state.v_reelout)) m/s   " * "p_mech:  $(@sprintf("%8.2f", state.force*state.v_reelout)) W\n" *
-            #"force:     $(@sprintf("%7.2f", state.force    )) N     " * "energy:  $(@sprintf("%8.2f", energy[1]/3600)) Wh\n"
+            "azimuth:   $(@sprintf("%7.2f", state.azimuth/pi*180.0)) °\n" *
+            "v_reelout: $(@sprintf("%7.2f", state.v_reelout)) m/s   " * "p_mech:  $(@sprintf("%8.2f", state.force*state.v_reelout)) W\n" *
+            "force:     $(@sprintf("%7.2f", state.force    )) N     " * "energy:  $(@sprintf("%8.2f", energy[1]/3600)) Wh\n"
         textnode[] = msg   
     end
 end
