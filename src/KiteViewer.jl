@@ -23,7 +23,7 @@ SOFTWARE. =#
 using GeometryBasics, Rotations, GLMakie, FileIO, LinearAlgebra, Printf
 Makie.__init__()
 
-using Utils, Plot2D, RTSim
+using Utils, Plot2D, RTSim, KCU_Sim
 
 const SCALE = 1.2 
 const INITIAL_HEIGHT =  80.0*se().zoom # meter, for demo
@@ -37,6 +37,7 @@ const TEXT_SIZE = 16
 const running = Node(false)
 const starting = [0]
 const zoom = [1.0]
+const steering = [0.0]
 const textnode = Node("")
 const textsize = Node(TEXT_SIZE)
 const textsize2 = Node(AXIS_LABEL_SIZE)
@@ -175,6 +176,22 @@ function reset_and_zoom(camera, scene3D, zoom)
     end
 end
 
+function steer_right()
+    global steering
+    steering[1] += 0.1
+    if steering[1] > 1.0; steering[1] = 1.0; end
+    KCU_Sim.set_depower_steering(0.0, steering[1])
+    println(steering[1])
+end
+
+function steer_left()
+    global steering
+    steering[1] -= 0.1
+    if steering[1] < -1.0; steering[1] = -1.0; end
+    KCU_Sim.set_depower_steering(0.0, steering[1])
+    println(steering[1])
+end
+
 function main(gl_wait=true)
     scene, layout = layoutscene(resolution = (840+800, 900), backgroundcolor = RGBf0(0.7, 0.8, 1))
     scene3D = LScene(scene, scenekw = (show_axis=false, limits = Rect(-7,-10.0,0, 11,10,11), resolution = (800, 800)), raw=false)
@@ -246,11 +263,18 @@ function main(gl_wait=true)
         end
     end
 
+    on(scene.events.keyboardbutton) do event
+        if event.action in (Keyboard.press, Keyboard.repeat)
+             event.key == Keyboard.left   && steer_left()
+             event.key == Keyboard.right  && steer_right()
+        end
+        # Let the event reach other listeners
+        return false
+    end
+
     status[] = "Initializing..."
-    println("Initializing...")
     integrator = init_sim(se().sim_time)
     status[] = "Stopped"
-    println("Stopped")
 
     @async begin
         while true

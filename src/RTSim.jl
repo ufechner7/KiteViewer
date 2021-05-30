@@ -1,7 +1,7 @@
 module RTSim
 
 using Sundials, StaticArrays, Rotations
-using Utils, KPS3
+using Utils, KPS3, KCU_Sim
 
 export init_sim, get_height, get_sysstate, next_step
 
@@ -40,6 +40,7 @@ function get_height()
 end
 
 function init_sim(t_end)
+    init_kcu()
     my_state = KPS3.get_state()
     clear(my_state)
     y0, yd0 = KPS3.find_steady_state(my_state)
@@ -62,6 +63,9 @@ function get_sysstate()
 end
 
 function next_step(integrator, dt)
+    KCU_Sim.on_timer()
+    # KPS3.set_depower_steering(KPS3.state, KPS3.state.depower, get_steering())
+    # KPS3.set_depower_steering(KPS3.state, 0.0, 0.0)
     step!(integrator, dt, true)
     u = integrator.u
     t = integrator.t
