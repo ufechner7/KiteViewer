@@ -291,4 +291,6 @@ function test(save=false)
     return(load_log("Test_flight.arrow"))
 end
 
+precompile(load_log, (String,))     
+
 end

@@ -1,19 +1,8 @@
 using Sundials, StaticArrays, Rotations
 
 # TODO:
-# 1. implement function SysState() - DONE -
-# 2. integrate RTSim in KiteViewer by calling init_sim and next_step
-# 3. bind steering and depowering to cursor keys 
-
-#if ! @isdefined KPS3
-#    include("../src/KPS3.jl")
-    using KPS3
-#end
-
-#if ! @isdefined Utils
-#    include("Utils.jl")
-    using Utils
-#end
+# 1. bind steering and depowering to cursor keys 
+using Utils, KPS3
 
 const SEGMENTS = KPS3.SEGMENTS
 

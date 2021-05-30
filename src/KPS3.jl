@@ -33,15 +33,7 @@ module KPS3
 
 using Dierckx, StaticArrays, LinearAlgebra, Parameters, NLsolve
 
-#if ! @isdefined Utils
-#    include("Utils.jl")
-    using Utils
-#end
-
-#if ! @isdefined KCU_Sim
-#    include("KCU_Sim.jl")
-    using KCU_Sim
-#end
+using Utils, KCU_Sim
 
 export State, Vec3, SimFloat, ProfileLaw, EXP, LOG, EXPLOG                              # types
 export calc_cl, calc_rho, calc_wind_factor, calc_drag, calc_set_cl_cd, clear, residual! # functions
