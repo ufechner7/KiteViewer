@@ -32,7 +32,6 @@ Scientific background: http://arxiv.org/abs/1406.6218 =#
 module KPS3
 
 using Dierckx, StaticArrays, LinearAlgebra, Parameters, NLsolve
-
 using Utils, KCU_Sim
 
 export State, Vec3, SimFloat, ProfileLaw, EXP, LOG, EXPLOG                              # types

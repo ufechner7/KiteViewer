@@ -1,8 +1,9 @@
-using Sundials, StaticArrays, Rotations
+module RTSim
 
-# TODO:
-# 1. bind steering and depowering to cursor keys 
+using Sundials, StaticArrays, Rotations
 using Utils, KPS3
+
+export init_sim, get_height, get_sysstate, next_step
 
 const SEGMENTS = KPS3.SEGMENTS
 
@@ -71,18 +72,6 @@ function next_step(integrator, dt)
     SysState()
 end
 
-# @async begin
-#     println("Start...")
-#     init_sim(10.0)
-#     println("Stop...")
-# end
+precompile(init_sim, (Float64,))  
 
-# function rt_sim()
-#     t_end = se().sim_time
-#     integrator = init_sim(t_end)
-#     dt = 1.0 / se().sample_freq
-
-#     @time for i in 1:round(t_end/dt)
-#         next_step(integrator, dt)
-#     end
-# end
+end

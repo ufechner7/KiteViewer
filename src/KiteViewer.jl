@@ -23,9 +23,7 @@ SOFTWARE. =#
 using GeometryBasics, Rotations, GLMakie, FileIO, LinearAlgebra, Printf
 Makie.__init__()
 
-using Utils, Plot2D
-
-include("./RTSim.jl")
+using Utils, Plot2D, RTSim
 
 const SCALE = 1.2 
 const INITIAL_HEIGHT =  80.0*se().zoom # meter, for demo
