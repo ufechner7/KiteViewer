@@ -23,14 +23,14 @@ SOFTWARE. =#
 using GeometryBasics, Rotations, GLMakie, FileIO, LinearAlgebra, Printf
 Makie.__init__()
 
-using Revise
-includet("./Utils.jl")
+# using Revise
+include("./Utils.jl")
 using .Utils
 
-includet("./Plot2D.jl")
+include("./Plot2D.jl")
 using .Plot2D
 
-includet("./RTSim.jl")
+include("./RTSim.jl")
 
 const SCALE = 1.2 
 const INITIAL_HEIGHT =  80.0*se().zoom # meter, for demo
@@ -396,7 +396,7 @@ function main(gl_wait=true)
                     i += 1
                 end
                 sleep(delta_t / se().time_lapse)
-                if i >= steps || get_height() < 0.0
+                if i >= steps || (! PLAYING[1] && get_height() < 0.0)
                     if ! sw.active[]
                         FLYING[1] = false
                         PLAYING[1] = false
