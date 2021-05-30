@@ -1,6 +1,7 @@
 system:
-    log_file: "data/log_8700W_8ms" # filename without extension
+    log_file: "data/log_8700W_8ms" # filename without extension  [replay only]
     time_lapse:   3.0              # relative replay speed
+    sim_time:   100.0              # simulation time             [sim only]
     segments:       6              # number of tether segments
     sample_freq:   20              # sample frequency in Hz
     zoom:        0.03              # zoom factor for the system view
