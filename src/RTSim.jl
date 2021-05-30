@@ -19,6 +19,8 @@ end
 heights=Float64[]
 times=Float64[]
 
+INITIALIZED = false
+
 const SEGMENTS = KPS3.SEGMENTS
 
 # create a SysState struct from KPS3.state
@@ -29,9 +31,9 @@ function SysState()
     Y = zeros(MVector{SEGMENTS+1, MyFloat})
     Z = zeros(MVector{SEGMENTS+1, MyFloat})
     for i in 1:SEGMENTS+1
-        X[i] = pos[i][1]
-        Y[i] = pos[i][2]
-        Z[i] = pos[i][3]
+        X[i] = pos[i][1] * se().zoom
+        Y[i] = pos[i][2] * se().zoom
+        Z[i] = pos[i][3] * se().zoom
     end
     
     pos_kite   = pos[end]
@@ -41,8 +43,15 @@ function SysState()
     q = UnitQuaternion(rotation)
     orient = MVector{4, Float32}(q.w, q.x, q.y, q.z)
 
-    elevation = calc_elevation([X[end], 0.0, Z[end]])
-    return Utils.SysState(my_state.t_0, orient, elevation,0.,0.,0.,0.,0.,0.,X, Y, Z)
+    elevation = calc_elevation(pos_kite)
+    # azimuth=0.0
+    azimuth = azimuth_east(pos_kite)
+    return Utils.SysState(my_state.t_0, orient, elevation, azimuth,0.,0.,0.,0.,0.,X, Y, Z)
+end
+
+function get_height()
+    my_state = KPS3.get_state()
+    my_state.pos[end][3]
 end
 
 function init_sim(t_end)
@@ -55,12 +64,13 @@ function init_sim(t_end)
 
     differential_vars =  ones(Bool, 36)
     solver = IDA(linear_solver=:Dense)
-    dt = 0.05
+    dt = 1.0 / se().sample_freq
     tspan = (0.0, t_end) 
 
     prob = DAEProblem(residual!, yd0, y0, tspan, differential_vars=differential_vars)
     integrator = init(prob, solver, abstol=0.000001, reltol=0.001)
-    return integrator, dt
+    INITIALIZED = true
+    return integrator
 end
 
 function get_sysstate()
@@ -85,8 +95,9 @@ function next_step(integrator, dt)
 end
 
 function rt_sim()
-    t_end = 100.0
-    integrator, dt = init_sim(t_end)
+    t_end = se().sim_time
+    integrator = init_sim(t_end)
+    dt = 1.0 / se().sample_freq
 
     @time for i in 1:round(t_end/dt)
         next_step(integrator, dt)

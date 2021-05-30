@@ -30,6 +30,8 @@ using .Utils
 includet("./Plot2D.jl")
 using .Plot2D
 
+includet("./RTSim.jl")
+
 const SCALE = 1.2 
 const INITIAL_HEIGHT =  80.0*se().zoom # meter, for demo
 const MAX_HEIGHT     = 200.0*se().zoom # meter, for demo
@@ -148,16 +150,16 @@ function update_system(scene, state, step=0)
     kite_pos[] = points[end]
 
     # print state values
-    power = state.force * state.v_reelout
-    energy[1] += (power / se().sample_freq * 2)
+    # power = state.force * state.v_reelout
+    # energy[1] += (power / se().sample_freq * 2)
     if mod(step, 2) == 0
         height = points[end][3]/se().zoom
         msg = "time:      $(@sprintf("%7.2f", state.time)) s\n" *
             "height:    $(@sprintf("%7.2f", height)) m\n" *
             "elevation: $(@sprintf("%7.2f", state.elevation/pi*180.0)) °\n" *
-            "azimuth:   $(@sprintf("%7.2f", state.azimuth/pi*180.0)) °\n" *
-            "v_reelout: $(@sprintf("%7.2f", state.v_reelout)) m/s   " * "p_mech:  $(@sprintf("%8.2f", state.force*state.v_reelout)) W\n" *
-            "force:     $(@sprintf("%7.2f", state.force    )) N     " * "energy:  $(@sprintf("%8.2f", energy[1]/3600)) Wh\n"
+            "azimuth:   $(@sprintf("%7.2f", state.azimuth/pi*180.0)) °\n"
+            #"v_reelout: $(@sprintf("%7.2f", state.v_reelout)) m/s   " * "p_mech:  $(@sprintf("%8.2f", state.force*state.v_reelout)) W\n" *
+            #"force:     $(@sprintf("%7.2f", state.force    )) N     " * "energy:  $(@sprintf("%8.2f", energy[1]/3600)) Wh\n"
         textnode[] = msg   
     end
 end
@@ -222,7 +224,7 @@ function main(gl_wait=true)
     btn_RESET       = Button(scene, label = "RESET")
     btn_ZOOM_in     = Button(scene, label = "Zoom +")
     btn_ZOOM_out    = Button(scene, label = "Zoom -")
-    btn_LAUNCH      = Button(scene, label = "LAUNCH")
+    btn_LAUNCH      = Button(scene, label = "START")
     btn_PLAY_PAUSE  = Button(scene, label = @lift($running ? "PAUSE" : " PLAY  "))
     btn_STOP        = Button(scene, label = "STOP")
     sw = Toggle(scene, active = false)
@@ -246,10 +248,16 @@ function main(gl_wait=true)
         if ! PLAYING[1]
             FLYING[1] = true
             PLAYING[1] = false
-            status[] = "Launching..."
+            status[] = "Simulating..."
             reset_and_zoom(camera, scene3D, zoom[1])   
         end
     end
+
+    status[] = "Initializing..."
+    println("Initializing...")
+    integrator = init_sim(se().sim_time)
+    status[] = "Stopped"
+    println("Stopped")
 
     @async begin
         while true
@@ -284,7 +292,7 @@ function main(gl_wait=true)
     end
 
     on(btn_PLAY_PAUSE.clicks) do c     
-        if status[] != "Launching..."
+        if status[] != "Simulating..."
             if ! running[]
                 logfile=se().log_file * ".arrow"                
                 if isfile(logfile)
@@ -359,10 +367,12 @@ function main(gl_wait=true)
                         log = load_log(logfile)
                         status[] = old  
                     end
+                    steps = length(log.syslog)  
                 else
                     log = demo_log("Launch test!")
-                end
-                steps = length(log.syslog)        
+                    steps = Int64(round(1/delta_t * se().sim_time))  
+                    integrator = init_sim(se().sim_time)
+                end  
                 starting[1] = 1
                 active = true
             end
@@ -370,14 +380,23 @@ function main(gl_wait=true)
             energy[1] = 0.0
             # fly...
             while FLYING[1]
-                state = log.syslog[i+1]
+                if PLAYING[1]
+                    state = log.syslog[i+1]
+                else
+                    if isa(integrator, Sundials.IDAIntegrator)
+                        # println("Next step...")
+                        state = next_step(integrator, delta_t)
+                    else
+                        state = log.syslog[1]
+                    end
+                end
                 if running[] || ! PLAYING[1]
                     @sync update_system(scene3D, state, i)
                     pos_x[] = i*delta_t
                     i += 1
                 end
                 sleep(delta_t / se().time_lapse)
-                if i >= steps
+                if i >= steps || get_height() < 0.0
                     if ! sw.active[]
                         FLYING[1] = false
                         PLAYING[1] = false
