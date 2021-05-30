@@ -144,7 +144,7 @@ function update_system(scene, state, step=0)
 
     # print state values
     power = state.force * state.v_reelout
-    energy[1] += (power / se().sample_freq * 2)
+    energy[1] += (power / se().sample_freq)
     if mod(step, 2) == 0
         height = points[end][3]/se().zoom
         msg = "time:      $(@sprintf("%7.2f", state.time)) s\n" *
@@ -369,19 +369,12 @@ function main(gl_wait=true)
                 starting[1] = 1
                 active = true
             end
-            i=0
-            energy[1] = 0.0
-            # fly...
+            i = 0; energy[1] = 0.0
             while FLYING[1]
                 if PLAYING[1]
                     state = log.syslog[i+1]
                 else
-                    if isa(integrator, Sundials.IDAIntegrator)
-                        # println("Next step...")
-                        state = next_step(integrator, delta_t)
-                    else
-                        state = log.syslog[1]
-                    end
+                    state = next_step(integrator, delta_t)
                 end
                 if running[] || ! PLAYING[1]
                     @sync update_system(scene3D, state, i)
