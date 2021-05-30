@@ -30,7 +30,7 @@ module Utils
 using Rotations, StaticArrays, StructArrays, RecursiveArrayTools, Arrow, YAML, LinearAlgebra
 export SysState, ExtSysState, SysLog, MyFloat
 
-export demo_state, demo_syslog, demo_log, load_log, syslog2extlog, save_log, rot, rot3d, ground_dist, calc_elevation, se
+export demo_state, demo_syslog, demo_log, load_log, syslog2extlog, save_log, rot, rot3d, ground_dist, calc_elevation, azimuth_east, se
 
 const MyFloat = Float32               # type to use for postions
 const DATA_PATH = "./data"            # path for log files and other data
@@ -71,8 +71,9 @@ mutable struct Settings
     damping::Float64
     c_spring::Float64
     elevation::Float64
+    sim_time::Float64
 end
-const SETTINGS = [Settings("","",0,0,0,0,"",0,0,0,0,0,0,0,[],[],[],[],0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)]
+const SETTINGS = [Settings("","",0,0,0,0,"",0,0,0,0,0,0,0,[],[],[],[],0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)]
 
 # getter function for the Settings struct
 function se(project="settings.yaml")
@@ -83,6 +84,7 @@ function se(project="settings.yaml")
         SETTINGS[1].segments    = dict["system"]["segments"]
         SETTINGS[1].sample_freq = dict["system"]["sample_freq"]
         SETTINGS[1].time_lapse  = dict["system"]["time_lapse"]
+        SETTINGS[1].sim_time    = dict["system"]["sim_time"]
         SETTINGS[1].zoom        = dict["system"]["zoom"]
         SETTINGS[1].fixed_font  = dict["system"]["fixed_font"]
 
@@ -196,6 +198,14 @@ end
 function calc_elevation(vec)
     atan(vec[3] / ground_dist(vec))
 end
+
+# Calculate the azimuth angle in radian from the kite position in ENU reference frame.
+# Zero east. Positive direction clockwise seen from above.
+# Valid range: -pi .. pi.
+function azimuth_east(vec)
+    return -atan(vec[2], vec[1])
+end
+
 
 # create a demo state with a given height and time
 function demo_state(height=6.0, time=0.0)
