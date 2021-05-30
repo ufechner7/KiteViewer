@@ -24,11 +24,11 @@ using GeometryBasics, Rotations, GLMakie, FileIO, LinearAlgebra, Printf
 Makie.__init__()
 
 # using Revise
-include("./Utils.jl")
-using .Utils
+# include("./Utils.jl")
+using Utils
 
-include("./Plot2D.jl")
-using .Plot2D
+# include("./Plot2D.jl")
+using Plot2D
 
 include("./RTSim.jl")
 

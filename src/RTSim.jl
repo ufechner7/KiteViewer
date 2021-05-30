@@ -5,15 +5,15 @@ using Sundials, StaticArrays, Rotations
 # 2. integrate RTSim in KiteViewer by calling init_sim and next_step
 # 3. bind steering and depowering to cursor keys 
 
-if ! @isdefined KPS3
-    include("../src/KPS3.jl")
-    using .KPS3
-end
+#if ! @isdefined KPS3
+#    include("../src/KPS3.jl")
+    using KPS3
+#end
 
-if ! @isdefined Utils
-    include("Utils.jl")
-    using .Utils
-end
+#if ! @isdefined Utils
+#    include("Utils.jl")
+    using Utils
+#end
 
 const SEGMENTS = KPS3.SEGMENTS
 
