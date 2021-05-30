@@ -476,4 +476,6 @@ function find_steady_state(s, prn=false)
     init(s, results.zero)
 end
 
+precompile(find_steady_state, (State{SimFloat, Vec3},))   
+
 end
