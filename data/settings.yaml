@@ -1,6 +1,6 @@
 system:
     log_file: "data/log_8700W_8ms" # filename without extension  [replay only]
-    time_lapse:   3.0              # relative replay speed
+    time_lapse:   1.0              # relative replay speed
     sim_time:   100.0              # simulation time             [sim only]
     segments:       6              # number of tether segments
     sample_freq:   20              # sample frequency in Hz
@@ -17,6 +17,7 @@ steering:
     c_s:      2.59         # steering coefficient one point model; 2.59 was 0.6; TODO: check if it must be divided by kite_area
     c2_cor:   0.93         # correction factor one point model
     k_ds:     1.5          # influence of the depower angle on the steering sensitivity
+    delta_st: 0.02         # steering increment (when pressing RIGHT)
 
 depower:
     alpha_d_max: 31.00     # max depower angle          [deg]
