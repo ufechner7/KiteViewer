@@ -166,6 +166,10 @@ struct SysLog
 end
 
 # functions
+function __init__()
+    SETTINGS[1].segments=0 # force loading of settings.yaml
+end
+
 """
 Calculate the rotation of reference frame (ax, ay, az) so that it matches the reference frame (bx, by, bz).
 All parameters must be 3-element vectors. Both refrence frames must be orthogonal,
