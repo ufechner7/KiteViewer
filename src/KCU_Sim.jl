@@ -54,6 +54,7 @@ function calc_alpha_depower(rel_depower)
     c = sqrt(a * a + b_0 * b_0)
     # print 'a, b, c:', a, b, c, rel_depower
     if c >= a + b
+         println("ERROR in calc_alpha_depower!")
          return nothing
     else
         tmp = 1/(2*a*b)*(a*a+b*b-c*c)
