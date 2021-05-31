@@ -178,7 +178,7 @@ end
 
 function steer_right()
     global steering
-    steering[1] += 0.1
+    steering[1] += 0.02
     if steering[1] > 1.0; steering[1] = 1.0; end
     KCU_Sim.set_depower_steering(0.0, steering[1])
     println(steering[1])
@@ -186,7 +186,7 @@ end
 
 function steer_left()
     global steering
-    steering[1] -= 0.1
+    steering[1] -= 0.02
     if steering[1] < -1.0; steering[1] = -1.0; end
     KCU_Sim.set_depower_steering(0.0, steering[1])
     println(steering[1])
