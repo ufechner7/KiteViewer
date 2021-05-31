@@ -34,10 +34,12 @@ module KPS3
 using Dierckx, StaticArrays, LinearAlgebra, Parameters, NLsolve
 using Utils, KCU_Sim
 
-export State, Vec3, SimFloat, ProfileLaw, EXP, LOG, EXPLOG                              # types
+export State, Vec3, SimFloat, ProfileLaw, EXP, LOG, EXPLOG                              # constants and types
 export calc_cl, calc_rho, calc_wind_factor, calc_drag, calc_set_cl_cd, clear, residual! # functions
 export set_v_reel_out, set_depower_steering                                             # setters  
-export get_force
+export get_force, get_lod                                                               # getters
+
+set_zero_subnormals(true)         # required to avoid drastic slow down on Intel CPUs when numbers become very small
 
 # Constants
 @consts begin
@@ -325,7 +327,7 @@ function set_depower_steering(s, depower, steering)
     s.steering = steering
     s.depower  = depower
     s.alpha_depower = calc_alpha_depower(depower) * (set.alpha_d_max / 31.0)
-    s.steering = (steering - set.c0) / (1.0 + set.k_ds * (s.alpha_depower / deg2rad(set.alpha_d_max)))
+    # s.steering = (steering - set.c0) / (1.0 + set.k_ds * (s.alpha_depower / deg2rad(set.alpha_d_max)))
     nothing
 end
 
@@ -373,7 +375,7 @@ function set_v_wind_ground(s, height, v_wind_gnd=set.v_wind, wind_dir=0.0)
 end
 
 function get_lod(s)
-    lift, drag = s.get_lod
+    lift, drag = get_lift_drag(s)
     return lift / drag
 end
 
