@@ -64,16 +64,16 @@ end
 
 function next_step(integrator, dt)
     KCU_Sim.on_timer()
-    # KPS3.set_depower_steering(KPS3.state, KPS3.state.depower, get_steering())
-    # KPS3.set_depower_steering(KPS3.state, 0.0, 0.0)
+    KPS3.set_depower_steering(KPS3.state, 0.236, get_steering())
     step!(integrator, dt, true)
     u = integrator.u
     t = integrator.t
-    if iseven(Int64(round(t)))
-        v_ro = -1.0
-    else
-        v_ro = 1.0
-    end
+    # if iseven(Int64(round(t)))
+    #     v_ro = -1.0
+    # else
+    #     v_ro = 1.0
+    # end
+    v_ro = 0.0
     set_v_reel_out(KPS3.state, v_ro, t)
     SysState()
 end
