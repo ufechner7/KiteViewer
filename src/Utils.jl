@@ -219,7 +219,7 @@ end
 # create a demo state with a given height and time
 function demo_state(P, height=6.0, time=0.0)
     a = 10
-    X = range(0, stop=10, length=(se().segments)+1)
+    X = range(0, stop=10, length=(P+1)
     Y = zeros(length(X))
     Z = (a .* cosh.(X./a) .- a) * height/ 5.430806 
     r_xyz = RotXYZ(pi/2, -pi/2, 0)
