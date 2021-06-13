@@ -8,13 +8,13 @@ export init_sim, get_height, get_sysstate, next_step
 const SEGMENTS = KPS3.SEGMENTS
 
 # create a SysState struct from KPS3.state
-function SysState()
+function SysState(P)
     my_state = KPS3.get_state()
     pos = my_state.pos
-    X = zeros(MVector{SEGMENTS+1, MyFloat})
-    Y = zeros(MVector{SEGMENTS+1, MyFloat})
-    Z = zeros(MVector{SEGMENTS+1, MyFloat})
-    for i in 1:SEGMENTS+1
+    X = zeros(MVector{P, MyFloat})
+    Y = zeros(MVector{P, MyFloat})
+    Z = zeros(MVector{P, MyFloat})
+    for i in 1:P
         X[i] = pos[i][1] * se().zoom
         Y[i] = pos[i][2] * se().zoom
         Z[i] = pos[i][3] * se().zoom
@@ -31,7 +31,7 @@ function SysState()
     azimuth = azimuth_east(pos_kite)
     v_reelout = my_state.v_reel_out
     force = get_force(my_state)
-    return Utils.SysState{SEGMENTS+1}(my_state.t_0, orient, elevation, azimuth, 0., v_reelout, force, 0., 0., X, Y, Z)
+    return Utils.SysState{P}(my_state.t_0, orient, elevation, azimuth, 0., v_reelout, force, 0., 0., X, Y, Z)
 end
 
 function get_height()
@@ -58,11 +58,11 @@ function init_sim(t_end)
     return integrator
 end
 
-function get_sysstate()
-    SysState()
+function get_sysstate(P)
+    SysState(P)
 end
 
-function next_step(integrator, dt)
+function next_step(P, integrator, dt)
     KCU_Sim.on_timer()
     KPS3.set_depower_steering(KPS3.state, 0.236, get_steering())
     step!(integrator, dt, true)
@@ -75,7 +75,7 @@ function next_step(integrator, dt)
     # end
     v_ro = 0.0
     set_v_reel_out(KPS3.state, v_ro, t)
-    SysState()
+    SysState(P)
 end
 
 precompile(init_sim, (Float64,))  

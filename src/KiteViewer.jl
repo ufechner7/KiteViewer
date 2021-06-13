@@ -400,7 +400,7 @@ function main(gl_wait=true)
                 if PLAYING[1]
                     state = log.syslog[i+1]
                 else
-                    state = next_step(integrator, delta_t)
+                    state = next_step(se().segments+1, integrator, delta_t)
                 end
                 if running[] || ! PLAYING[1]
                     @sync update_system(scene3D, state, i)
