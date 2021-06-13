@@ -71,7 +71,6 @@ for your data format.
 Run the following commands:
 ```Bash
 cd repos/KiteViewer
-rm Manifest.toml
 rm data/log_8700W_8ms.arrow # not needed when updating from 0.3
 git pull
 ./create_sys_image.sh
