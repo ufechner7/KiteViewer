@@ -73,59 +73,59 @@ mutable struct Settings
     elevation::Float64
     sim_time::Float64
 end
-const SETTINGS = [Settings("","",0,0,0,0,"",0,0,0,0,0,0,0,[],[],[],[],0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)]
+const SETTINGS = Settings("","",0,0,0,0,"",0,0,0,0,0,0,0,[],[],[],[],0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
 
 # getter function for the Settings struct
 function se(project="settings.yaml")
-    if SETTINGS[1].segments == 0
+    if SETTINGS.segments == 0
         # load settings from YAML
         dict = YAML.load_file(joinpath(DATA_PATH, project))
-        SETTINGS[1].log_file    = dict["system"]["log_file"]
-        SETTINGS[1].segments    = dict["system"]["segments"]
-        SETTINGS[1].sample_freq = dict["system"]["sample_freq"]
-        SETTINGS[1].time_lapse  = dict["system"]["time_lapse"]
-        SETTINGS[1].sim_time    = dict["system"]["sim_time"]
-        SETTINGS[1].zoom        = dict["system"]["zoom"]
-        SETTINGS[1].fixed_font  = dict["system"]["fixed_font"]
+        SETTINGS.log_file    = dict["system"]["log_file"]
+        SETTINGS.segments    = dict["system"]["segments"]
+        SETTINGS.sample_freq = dict["system"]["sample_freq"]
+        SETTINGS.time_lapse  = dict["system"]["time_lapse"]
+        SETTINGS.sim_time    = dict["system"]["sim_time"]
+        SETTINGS.zoom        = dict["system"]["zoom"]
+        SETTINGS.fixed_font  = dict["system"]["fixed_font"]
 
-        SETTINGS[1].l_tether    = dict["initial"]["l_tether"]
-        SETTINGS[1].v_reel_out   = dict["initial"]["v_reel_out"]
-        SETTINGS[1].elevation   = dict["initial"]["elevation"]
+        SETTINGS.l_tether    = dict["initial"]["l_tether"]
+        SETTINGS.v_reel_out   = dict["initial"]["v_reel_out"]
+        SETTINGS.elevation   = dict["initial"]["elevation"]
 
-        SETTINGS[1].c0          = dict["steering"]["c0"]
-        SETTINGS[1].c_s         = dict["steering"]["c_s"]
-        SETTINGS[1].c2_cor      = dict["steering"]["c2_cor"]
-        SETTINGS[1].k_ds        = dict["steering"]["k_ds"]
+        SETTINGS.c0          = dict["steering"]["c0"]
+        SETTINGS.c_s         = dict["steering"]["c_s"]
+        SETTINGS.c2_cor      = dict["steering"]["c2_cor"]
+        SETTINGS.k_ds        = dict["steering"]["k_ds"]
 
-        SETTINGS[1].alpha_d_max = dict["depower"]["alpha_d_max"]
+        SETTINGS.alpha_d_max = dict["depower"]["alpha_d_max"]
 
-        SETTINGS[1].model       = dict["kite"]["model"]
-        SETTINGS[1].area        = dict["kite"]["area"]
-        SETTINGS[1].rel_side_area = dict["kite"]["rel_side_area"]
-        SETTINGS[1].mass        = dict["kite"]["mass"]
-        SETTINGS[1].alpha_cl    = dict["kite"]["alpha_cl"]
-        SETTINGS[1].cl_list     = dict["kite"]["cl_list"]
-        SETTINGS[1].alpha_cd    = dict["kite"]["alpha_cd"]
-        SETTINGS[1].cd_list     = dict["kite"]["cd_list"]
+        SETTINGS.model       = dict["kite"]["model"]
+        SETTINGS.area        = dict["kite"]["area"]
+        SETTINGS.rel_side_area = dict["kite"]["rel_side_area"]
+        SETTINGS.mass        = dict["kite"]["mass"]
+        SETTINGS.alpha_cl    = dict["kite"]["alpha_cl"]
+        SETTINGS.cl_list     = dict["kite"]["cl_list"]
+        SETTINGS.alpha_cd    = dict["kite"]["alpha_cd"]
+        SETTINGS.cd_list     = dict["kite"]["cd_list"]
 
-        SETTINGS[1].l_bridle    = dict["bridle"]["l_bridle"]
-        SETTINGS[1].d_line      = dict["bridle"]["d_line"]
+        SETTINGS.l_bridle    = dict["bridle"]["l_bridle"]
+        SETTINGS.d_line      = dict["bridle"]["d_line"]
 
-        SETTINGS[1].kcu_mass    = dict["kcu"]["mass"]
+        SETTINGS.kcu_mass    = dict["kcu"]["mass"]
 
-        SETTINGS[1].cd_tether   = dict["tether"]["cd_tether"]
-        SETTINGS[1].d_tether    = dict["tether"]["d_tether"]
-        SETTINGS[1].damping     = dict["tether"]["damping"]
-        SETTINGS[1].c_spring    = dict["tether"]["c_spring"]
+        SETTINGS.cd_tether   = dict["tether"]["cd_tether"]
+        SETTINGS.d_tether    = dict["tether"]["d_tether"]
+        SETTINGS.damping     = dict["tether"]["damping"]
+        SETTINGS.c_spring    = dict["tether"]["c_spring"]
 
-        SETTINGS[1].v_wind      = dict["environment"]["v_wind"]
-        SETTINGS[1].h_ref       = dict["environment"]["h_ref"]
-        SETTINGS[1].rho_0       = dict["environment"]["rho_0"]
-        SETTINGS[1].z0          = dict["environment"]["z0"]
-        SETTINGS[1].alpha       = dict["environment"]["alpha"]
-        SETTINGS[1].profile_law = dict["environment"]["profile_law"]
+        SETTINGS.v_wind      = dict["environment"]["v_wind"]
+        SETTINGS.h_ref       = dict["environment"]["h_ref"]
+        SETTINGS.rho_0       = dict["environment"]["rho_0"]
+        SETTINGS.z0          = dict["environment"]["z0"]
+        SETTINGS.alpha       = dict["environment"]["alpha"]
+        SETTINGS.profile_law = dict["environment"]["profile_law"]
     end
-    return SETTINGS[1]
+    return SETTINGS
 end
 
 # basic system state; one of these will be saved per time step
@@ -167,7 +167,7 @@ end
 
 # functions
 function __init__()
-    SETTINGS[1].segments=0 # force loading of settings.yaml
+    SETTINGS.segments=0 # force loading of settings.yaml
 end
 
 """
