@@ -20,43 +20,45 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE. =#
 
-using GeometryBasics, Rotations, GLMakie, FileIO, LinearAlgebra, Printf
+using GeometryBasics, Rotations, GLMakie, FileIO, LinearAlgebra, Printf, Parameters
 Makie.__init__()
 
 using Utils, Plot2D, RTSim, KCU_Sim
 
-const SCALE = 1.2 
-const INITIAL_HEIGHT =  80.0*se().zoom # meter, for demo
-const MAX_HEIGHT     = 200.0*se().zoom # meter, for demo
-const KITE = FileIO.load(se().model)
-const FLYING    = [false]
-const PLAYING    = [false]
-const GUI_ACTIVE = [false]
-const AXIS_LABEL_SIZE = 30
-const TEXT_SIZE = 16
-const running = Node(false)
-const starting = [0]
-const zoom = [1.0]
-const steering = [0.0]
-const textnode = Node("")
-const textsize = Node(TEXT_SIZE)
-const textsize2 = Node(AXIS_LABEL_SIZE)
-const status = Node("")
-const p1 = Node(Vector{Point2f0}(undef, 6000)) # 5 min
-const p2 = Node(Vector{Point2f0}(undef, 6000)) # 5 min
-const pos_x = Node(0.0f0)
-const y_label1 = Node("")
-const y_label2 = Node("")
+@consts begin
+    SCALE = 1.2 
+    INITIAL_HEIGHT =  80.0*se().zoom # meter, for demo
+    MAX_HEIGHT     = 200.0*se().zoom # meter, for demo
+    KITE = FileIO.load(se().model)
+    FLYING    = [false]
+    PLAYING    = [false]
+    GUI_ACTIVE = [false]
+    AXIS_LABEL_SIZE = 30
+    TEXT_SIZE = 16
+    running = Node(false)
+    starting = [0]
+    zoom = [1.0]
+    steering = [0.0]
+    textnode = Node("")
+    textsize = Node(TEXT_SIZE)
+    textsize2 = Node(AXIS_LABEL_SIZE)
+    status = Node("")
+    p1 = Node(Vector{Point2f0}(undef, 6000)) # 5 min
+    p2 = Node(Vector{Point2f0}(undef, 6000)) # 5 min
+    pos_x = Node(0.0f0)
+    y_label1 = Node("")
+    y_label2 = Node("")
 
-const points          = Vector{Point3f0}(undef, se().segments+1)
-const quat            = Node(Quaternionf0(0,0,0,1))                        # orientation of the kite
-const kite_pos        = Node(Point3f0(1,0,0))                              # position of the kite
-const positions       = Node([Point3f0(x,0,0) for x in 1:se().segments])   # positions of the tether segments
-const part_positions  = Node([Point3f0(x,0,0) for x in 1:se().segments+1]) # positions of the tether particles
-const markersizes     = Node([Point3f0(1,1,1) for x in 1:se().segments])   # includes the segment length
-const rotations       = Node([Point3f0(1,0,0) for x in 1:se().segments])   # unit vectors corresponding with
+    points          = Vector{Point3f0}(undef, se().segments+1)
+    quat            = Node(Quaternionf0(0,0,0,1))                        # orientation of the kite
+    kite_pos        = Node(Point3f0(1,0,0))                              # position of the kite
+    positions       = Node([Point3f0(x,0,0) for x in 1:se().segments])   # positions of the tether segments
+    part_positions  = Node([Point3f0(x,0,0) for x in 1:se().segments+1]) # positions of the tether particles
+    markersizes     = Node([Point3f0(1,1,1) for x in 1:se().segments])   # includes the segment length
+    rotations       = Node([Point3f0(1,0,0) for x in 1:se().segments])   # unit vectors corresponding with
                                                                            #   the orientation of the segments 
-const energy = [0.0]                                                                           
+    energy = [0.0]
+end                                                                           
 
 function create_coordinate_system(scene, points = 10, max_x = 15.0)
     # create origin

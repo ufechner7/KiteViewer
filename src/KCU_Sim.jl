@@ -6,17 +6,19 @@ using Utils, Parameters
 
 export calc_alpha_depower, init_kcu, set_depower_steering, get_depower, get_steering, on_timer
 
-const HEIGHT_K = 2.23                        # height of the kite
-const HEIGHT_B = 4.9                         # height of the bridle
-const POWER2STEER_DIST = 1.3                 
-const DEPOWER_DRUM_DIAMETER = 69.0e-3 * 0.97 # outer diameter of the depower drum at depower = DEPOWER_OFFSET [m]
-const DEPOWER_OFFSET = 23.6
-const STEERING_LINE_SAG = 0.0                # sag of the steering lines in percent
-const TAPE_THICKNESS = 6e-4           # thickness of the depower tape [m]
-const V_DEPOWER  = 0.075            # max velocity of depowering in units per second (full range: 1 unit)
-const V_STEERING = 0.2              # max velocity of steering in units per second   (full range: 2 units)
-const DEPOWER_GAIN  = 3.0           # 3.0 means: more than 33% error -> full speed
-const STEERING_GAIN = 3.0
+@consts begin
+    HEIGHT_K = 2.23                        # height of the kite
+    HEIGHT_B = 4.9                         # height of the bridle
+    POWER2STEER_DIST = 1.3                 
+    DEPOWER_DRUM_DIAMETER = 69.0e-3 * 0.97 # outer diameter of the depower drum at depower = DEPOWER_OFFSET [m]
+    DEPOWER_OFFSET = 23.6
+    STEERING_LINE_SAG = 0.0                # sag of the steering lines in percent
+    TAPE_THICKNESS = 6e-4           # thickness of the depower tape [m]
+    V_DEPOWER  = 0.075            # max velocity of depowering in units per second (full range: 1 unit)
+    V_STEERING = 0.2              # max velocity of steering in units per second   (full range: 2 units)
+    DEPOWER_GAIN  = 3.0           # 3.0 means: more than 33% error -> full speed
+    STEERING_GAIN = 3.0
+end
 
 @with_kw mutable struct KCUState{S}
     set_depower::S =         DEPOWER_OFFSET * 0.01
