@@ -133,7 +133,7 @@ function se()
 end
 
 # basic system state; one of these will be saved per time step
-struct SysState
+struct SysState{P}
     time::Float64                          # time since start of simulation in seconds
     orient::MVector{4, Float32}            # orientation of the kite (quaternion)
     elevation::MyFloat                     # elevation angle in radians
@@ -143,18 +143,19 @@ struct SysState
     force::MyFloat                         # tether force [N]
     depower::MyFloat                       # depower settings 
     v_app::MyFloat                         # apparent wind speed [m/s]
-    X::MVector{se().segments+1, MyFloat}   # vector of particle positions in x
-    Y::MVector{se().segments+1, MyFloat}   # vector of particle positions in y
-    Z::MVector{se().segments+1, MyFloat}   # vector of particle positions in z
+    X::MVector{P, MyFloat}   # vector of particle positions in x
+    Y::MVector{P, MyFloat}   # vector of particle positions in y
+    Z::MVector{P, MyFloat}   # vector of particle positions in z
 end 
 
+
 # extended SysState containing derived values for plotting
-struct ExtSysState
+struct ExtSysState{P}
     time::Float64                          # time since launch in seconds
     orient::UnitQuaternion{Float32}        # orientation of the kite
-    X::MVector{se().segments+1, MyFloat}   # vector of particle positions in x
-    Y::MVector{se().segments+1, MyFloat}   # vector of particle positions in y
-    Z::MVector{se().segments+1, MyFloat}   # vector of particle positions in z
+    X::MVector{P, MyFloat}   # vector of particle positions in x
+    Y::MVector{P, MyFloat}   # vector of particle positions in y
+    Z::MVector{P, MyFloat}   # vector of particle positions in z
     x::MyFloat                             # kite position in x
     y::MyFloat                             # kite position in y
     z::MyFloat                             # kite position in z
@@ -163,10 +164,10 @@ end
 # flight log, containing the basic data as struct of arrays 
 # and in addition an extended view on the data that includes derived/ calculated values for plotting
 # finally meta data like the file name of the log file is included
-struct SysLog
+struct SysLog{P}
     name::String
-    syslog::StructArray{SysState}    # struct of vectors
-    extlog::StructArray{ExtSysState} # struct of vectors, containing derived values
+    syslog::StructArray{SysState{P}}    # struct of vectors
+    extlog::StructArray{ExtSysState{P}} # struct of vectors, containing derived values
 end
 
 # functions
@@ -216,7 +217,7 @@ end
 
 
 # create a demo state with a given height and time
-function demo_state(height=6.0, time=0.0)
+function demo_state(P, height=6.0, time=0.0)
     a = 10
     X = range(0, stop=10, length=(se().segments)+1)
     Y = zeros(length(X))
@@ -225,22 +226,22 @@ function demo_state(height=6.0, time=0.0)
     q = UnitQuaternion(r_xyz)
     orient = MVector{4, Float32}(q.w, q.x, q.y, q.z)
     elevation = calc_elevation([X[end], 0.0, Z[end]])
-    return SysState(time, orient, elevation,0.,0.,0.,0.,0.,0.,X, Y, Z)
+    return SysState{P}(time, orient, elevation,0.,0.,0.,0.,0.,0.,X, Y, Z)
 end
 
 # create a demo flight log with given name [String] and duration [s]
-function demo_syslog(name="Test flight"; duration=10)
+function demo_syslog(P, name="Test flight"; duration=10)
     max_height = 6.03
     steps   = Int(duration * se().sample_freq) + 1
     time_vec = Vector{Float64}(undef, steps)
     myzeros = zeros(MyFloat, steps)
     elevation = Vector{Float64}(undef, steps)
     orient_vec = Vector{MVector{4, Float32}}(undef, steps)
-    X_vec = Vector{MVector{se().segments+1, MyFloat}}(undef, steps)
-    Y_vec = Vector{MVector{se().segments+1, MyFloat}}(undef, steps)
-    Z_vec = Vector{MVector{se().segments+1, MyFloat}}(undef, steps)
+    X_vec = Vector{MVector{P, MyFloat}}(undef, steps)
+    Y_vec = Vector{MVector{P, MyFloat}}(undef, steps)
+    Z_vec = Vector{MVector{P, MyFloat}}(undef, steps)
     for i in range(0, length=steps)
-        state = demo_state(max_height * i/steps, i/se().sample_freq)
+        state = demo_state(P, max_height * i/steps, i/se().sample_freq)
         time_vec[i+1] = state.time
         orient_vec[i+1] = state.orient
         elevation[i+1] = asin(state.Z[end]/state.X[end])
@@ -248,11 +249,11 @@ function demo_syslog(name="Test flight"; duration=10)
         Y_vec[i+1] = state.Y
         Z_vec[i+1] = state.Z
     end
-    return StructArray{SysState}((time_vec, orient_vec, elevation, myzeros,myzeros,myzeros,myzeros,myzeros,myzeros, X_vec, Y_vec, Z_vec))
+    return StructArray{SysState{P}}((time_vec, orient_vec, elevation, myzeros,myzeros,myzeros,myzeros,myzeros,myzeros, X_vec, Y_vec, Z_vec))
 end
 
 # extend a flight systom log with the fieds x, y, and z (kite positions) and convert the orientation to the type UnitQuaternion
-function syslog2extlog(syslog)
+function syslog2extlog(P, syslog)
     x_vec = @view VectorOfArray(syslog.X)[end,:]
     y_vec = @view VectorOfArray(syslog.Y)[end,:]
     z_vec = @view VectorOfArray(syslog.Z)[end,:]
@@ -260,25 +261,25 @@ function syslog2extlog(syslog)
     for i in range(1, length=length(syslog.time))
         orient_vec[i] = UnitQuaternion(syslog.orient[i])
     end
-    return StructArray{ExtSysState}((syslog.time, orient_vec, syslog.X, syslog.Y, syslog.Z, x_vec, y_vec, z_vec))    
+    return StructArray{ExtSysState{P}}((syslog.time, orient_vec, syslog.X, syslog.Y, syslog.Z, x_vec, y_vec, z_vec))    
 end
 
 # create an artifical log file for demonstration purposes
-function demo_log(name="Test_flight"; duration=10)
-    syslog = demo_syslog(name, duration=duration)
-    return SysLog(name, syslog, syslog2extlog(syslog))
+function demo_log(P, name="Test_flight"; duration=10)
+    syslog = demo_syslog(P, name, duration=duration)
+    return SysLog{P}(name, syslog, syslog2extlog(syslog))
 end
 
-function save_log(flight_log::SysLog)
-    Arrow.ArrowTypes.registertype!(SysState, SysState
+function save_log(P, flight_log::SysLog)
+    Arrow.ArrowTypes.registertype!(SysState{P}, SysState
     )
     filename=joinpath(DATA_PATH, flight_log.name) * ".arrow"
     Arrow.write(filename, flight_log.syslog, compress=:lz4)
 end
 
-function load_log(filename::String)
+function load_log(P, filename::String)
     
-    Arrow.ArrowTypes.registertype!(SysState, SysState)
+    Arrow.ArrowTypes.registertype!(SysState{P}, SysState)
     Arrow.ArrowTypes.registertype!(MVector{4, Float32}, MVector{4, Float32})
     if isnothing(findlast(isequal('.'), filename))
         fullname = joinpath(DATA_PATH, filename) * ".arrow"
@@ -287,9 +288,10 @@ function load_log(filename::String)
     end
     table = Arrow.Table(fullname)
     myzeros = zeros(MyFloat, length(table.time))
-    syslog = StructArray{SysState}((table.time, table.orient, table.elevation, table.azimuth, table.l_tether, table.v_reelout, table.force, table.depower, table.v_app, table.X, table.Y, table.Z))
-    return SysLog(basename(fullname[1:end-6]), syslog, syslog2extlog(syslog))
+    syslog = StructArray{SysState{P}}((table.time, table.orient, table.elevation, table.azimuth, table.l_tether, table.v_reelout, table.force, table.depower, table.v_app, table.X, table.Y, table.Z))
+    return SysLog{P}(basename(fullname[1:end-6]), syslog, syslog2extlog(syslog))
 end
+#=
 
 function test(save=false)
     if save
@@ -300,5 +302,5 @@ function test(save=false)
 end
 
 precompile(load_log, (String,))     
-
+ =#
 end
