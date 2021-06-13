@@ -267,24 +267,24 @@ end
 # Derivative   der_yd    = vel1, vel2, ..., veln, acc1, acc2, ..., accn
 # Output:
 # Residual     res = res1, res2 = pos1,  ..., vel1, ...
-function residual!(res, yd, y, p, time)
+function residual!(res, yd, y::MVector{S, SimFloat}, p, time) where S
     # unpack the vectors y and yd
-    part = reshape(SVector{6*(SEGMENTS)}(y),  Size(3, SEGMENTS, 2))
-    partd = reshape(SVector{6*(SEGMENTS)}(yd),  Size(3, SEGMENTS, 2))
+    part = reshape(SVector{S}(y),  Size(3, div(S,6), 2))
+    partd = reshape(SVector{S}(yd),  Size(3, div(S,6), 2))
     pos1, vel1 = part[:,:,1], part[:,:,2]
-    pos = SVector{SEGMENTS+1}(if i==1 SVector(0.0,0,0) else SVector(pos1[:,i-1]) end for i in 1:SEGMENTS+1)
-    vel = SVector{SEGMENTS+1}(if i==1 SVector(0.0,0,0) else SVector(vel1[:,i-1]) end for i in 1:SEGMENTS+1)
+    pos = SVector{div(S,6)+1}(if i==1 SVector(0.0,0,0) else SVector(pos1[:,i-1]) end for i in 1:div(S,6)+1)
+    vel = SVector{div(S,6)+1}(if i==1 SVector(0.0,0,0) else SVector(vel1[:,i-1]) end for i in 1:div(S,6)+1)
     posd1, veld1 = partd[:,:,1], partd[:,:,2]
-    posd = SVector{SEGMENTS+1}(if i==1 SVector(0.0,0,0) else SVector(posd1[:,i-1]) end for i in 1:SEGMENTS+1)
-    veld = SVector{SEGMENTS+1}(if i==1 SVector(0.0,0,0) else SVector(veld1[:,i-1]) end for i in 1:SEGMENTS+1)
+    posd = SVector{div(S,6)+1}(if i==1 SVector(0.0,0,0) else SVector(posd1[:,i-1]) end for i in 1:div(S,6)+1)
+    veld = SVector{div(S,6)+1}(if i==1 SVector(0.0,0,0) else SVector(veld1[:,i-1]) end for i in 1:div(S,6)+1)
 
     # update parameters
     s = state
-    s.pos_kite .= pos[set.segments+1]
-    s.v_kite   .= vel[set.segments+1]
+    s.pos_kite .= pos[div(S,6)+1]
+    s.v_kite   .= vel[div(S,6)+1]
     delta_t = time - s.t_0
     delta_v = s.v_reel_out - s.last_v_reel_out
-    s.length = (s.l_tether + s.last_v_reel_out * delta_t + 0.5 * delta_v * delta_t^2) / set.segments
+    s.length = (s.l_tether + s.last_v_reel_out * delta_t + 0.5 * delta_v * delta_t^2) / div(S,6)
     s.c_spring = set.c_spring / s.length
     s.damping  = set.damping / s.length
 
@@ -296,10 +296,10 @@ function residual!(res, yd, y, p, time)
     loop(s, pos, vel, posd, veld, s.res1, s.res2)
   
     # copy and flatten result
-    for i in 2:set.segments+1
+    for i in 2:div(S,6)+1
         for j in 1:3
            @inbounds res[3*(i-2)+j] = s.res1[i][j]
-           @inbounds res[3*(set.segments)+3*(i-2)+j] = s.res2[i][j]
+           @inbounds res[3*(div(S,6))+3*(i-2)+j] = s.res2[i][j]
         end
     end
     if norm(res) < 10.0
@@ -463,7 +463,7 @@ const res = zeros(MVector{6*SEGMENTS, Float64})
 function test_initial_condition!(F, x::Vector)
     global res, state
     y0, yd0 = init(state, x)
-    residual!(res, yd0, y0, 0.0, 0.0)
+    residual!(res, yd0, y0, [0.0], 0.0)
     for i in 1:SEGMENTS
         F[i] = res[1 + 3*(i-1) + 3*SEGMENTS]
         F[i+SEGMENTS] = res[3 + 3*(i-1) + 3*SEGMENTS]
