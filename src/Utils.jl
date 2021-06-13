@@ -25,6 +25,7 @@ module Utils
 # data structures for the flight state and the flight log
 # functions for creating a demo flight state, demo flight log, loading and saving flight logs
 # function se() for reading the settings
+# the parameter P is the number of points of the tether, equal to segments+1
 # in addition helper functions for working with rotations
 
 using Rotations, StaticArrays, StructArrays, RecursiveArrayTools, Arrow, YAML, LinearAlgebra
