@@ -267,12 +267,11 @@ end
 # create an artifical log file for demonstration purposes
 function demo_log(P, name="Test_flight"; duration=10)
     syslog = demo_syslog(P, name, duration=duration)
-    return SysLog{P}(name, syslog, syslog2extlog(syslog))
+    return SysLog{P}(name, syslog, syslog2extlog(P, syslog))
 end
 
-function save_log(P, flight_log::SysLog)
-    Arrow.ArrowTypes.registertype!(SysState{P}, SysState
-    )
+function save_log(P, flight_log)
+    Arrow.ArrowTypes.registertype!(SysState{P}, SysState)
     filename=joinpath(DATA_PATH, flight_log.name) * ".arrow"
     Arrow.write(filename, flight_log.syslog, compress=:lz4)
 end
@@ -289,18 +288,17 @@ function load_log(P, filename::String)
     table = Arrow.Table(fullname)
     myzeros = zeros(MyFloat, length(table.time))
     syslog = StructArray{SysState{P}}((table.time, table.orient, table.elevation, table.azimuth, table.l_tether, table.v_reelout, table.force, table.depower, table.v_app, table.X, table.Y, table.Z))
-    return SysLog{P}(basename(fullname[1:end-6]), syslog, syslog2extlog(syslog))
+    return SysLog{P}(basename(fullname[1:end-6]), syslog, syslog2extlog(P, syslog))
 end
-#=
 
 function test(save=false)
     if save
-        log_to_save=demo_log()
-        save_log(log_to_save)
+        log_to_save=demo_log(7)
+        save_log(7, log_to_save)
     end
-    return(load_log("Test_flight.arrow"))
+    return(load_log(7, "Test_flight.arrow"))
 end
 
-precompile(load_log, (String,))     
- =#
+precompile(load_log, (Int64, String,))     
+
 end

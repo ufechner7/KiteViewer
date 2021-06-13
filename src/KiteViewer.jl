@@ -224,7 +224,7 @@ function main(gl_wait=true)
     layout[1:3, 1] = l_sublayout
     l_sublayout[:v] = [scene3D, buttongrid]
 
-    log = demo_log("Launch test!")
+    log = demo_log(7, "Launch test!")
     plot2d(se, ax1, y_label1, log, p1, :height)
     lines!(ax1, p1)
     vlines!(ax1, pos_x, color = :red)
@@ -247,7 +247,7 @@ function main(gl_wait=true)
     gl_screen = display(scene)
     
     init_system(scene3D)
-    update_system(scene3D, demo_state(INITIAL_HEIGHT, 0))
+    update_system(scene3D, demo_state(7, INITIAL_HEIGHT, 0))
 
     camera = cameracontrols(scene3D.scene)
     reset_view(camera, scene3D)
@@ -365,7 +365,7 @@ function main(gl_wait=true)
     # launch the kite on button click
     delta_t = 1.0 / se().sample_freq
     active = false
-    log = demo_log("Launch test!")
+    log = demo_log(7, "Launch test!")
     reset_view(camera, scene3D)
     
     simulation = @async begin
@@ -383,12 +383,12 @@ function main(gl_wait=true)
                         old =  status[]
                         status[] = "Loading log file..."
                         reset_and_zoom(camera, scene3D, zoom[1])   
-                        log = load_log(logfile)
+                        log = load_log(se().segments+1, logfile)
                         status[] = old  
                     end
                     steps = length(log.syslog)  
                 else
-                    log = demo_log("Launch test!")
+                    log = demo_log(7, "Launch test!")
                     steps = Int64(round(1/delta_t * se().sim_time))  
                     integrator = init_sim(se().sim_time)
                 end  
