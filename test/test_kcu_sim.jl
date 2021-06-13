@@ -1,9 +1,6 @@
 using Test, BenchmarkTools, StaticArrays, Revise, LinearAlgebra, SciMLBase
 
-if ! @isdefined KCU_Sim
-    includet("../src/KCU_Sim.jl")
-    using .KCU_Sim
-end
+using KCU_Sim
 
 @testset "test_calc_alpha_depower" begin
     rel_depower = 0.25
