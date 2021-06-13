@@ -36,6 +36,7 @@ const MyFloat = Float32               # type to use for postions
 const DATA_PATH = "./data"            # path for log files and other data
 
 mutable struct Settings
+    project::String
     log_file::String
     model::String
     segments::Int64          # number of tether segments
@@ -73,13 +74,16 @@ mutable struct Settings
     elevation::Float64
     sim_time::Float64
 end
-const SETTINGS = Settings("","",0,0,0,0,"",0,0,0,0,0,0,0,[],[],[],[],0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
+const SETTINGS = Settings("","","",0,0,0,0,"",0,0,0,0,0,0,0,[],[],[],[],0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
 
 # getter function for the Settings struct
-function se(project="settings.yaml")
+function se()
     if SETTINGS.segments == 0
-        # load settings from YAML
-        dict = YAML.load_file(joinpath(DATA_PATH, project))
+        # determine which project to load
+        dict = YAML.load_file(joinpath(DATA_PATH, "system.yaml"))
+        SETTINGS.project = dict["system"]["project"]
+        # load project from YAML
+        dict = YAML.load_file(joinpath(DATA_PATH, SETTINGS.project))
         SETTINGS.log_file    = dict["system"]["log_file"]
         SETTINGS.segments    = dict["system"]["segments"]
         SETTINGS.sample_freq = dict["system"]["sample_freq"]
