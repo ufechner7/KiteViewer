@@ -215,7 +215,6 @@ function azimuth_east(vec)
     return -atan(vec[2], vec[1])
 end
 
-
 # create a demo state with a given height and time
 function demo_state(P, height=6.0, time=0.0)
     a = 10
@@ -277,7 +276,6 @@ function save_log(P, flight_log)
 end
 
 function load_log(P, filename::String)
-    
     Arrow.ArrowTypes.registertype!(SysState{P}, SysState)
     Arrow.ArrowTypes.registertype!(MVector{4, Float32}, MVector{4, Float32})
     if isnothing(findlast(isequal('.'), filename))
