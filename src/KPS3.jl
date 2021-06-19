@@ -43,6 +43,7 @@ set_zero_subnormals(true)         # required to avoid drastic slow down on Intel
 
 # Constants
 @consts begin
+    # TODO: remove set 
     set    = se()                 # settings from settings.yaml
     SEGMENTS = set.segments
     G_EARTH = 9.81                # gravitational acceleration
@@ -57,6 +58,7 @@ const SimFloat = Float64
 const Vec3     = MVector{3, SimFloat}
 const SVec3    = MVector{3, SimFloat}                   
 
+# TODO: add type S to the zeros 
 @with_kw mutable struct State{S, T}
     v_wind::T =           [set.v_wind, 0, 0]    # wind vector at the height of the kite
     v_wind_gnd::T =       [set.v_wind, 0, 0]    # wind vector at reference height
@@ -81,7 +83,8 @@ const SVec3    = MVector{3, SimFloat}
     v_kite::T =           zeros(3)        
     res1::SVector{set.segments+1, Vec3} = zeros(SVector{set.segments+1, Vec3})
     res2::SVector{set.segments+1, Vec3} = zeros(SVector{set.segments+1, Vec3})
-    pos::SVector{set.segments+1, Vec3} = zeros(SVector{set.segments+1, Vec3})
+    # pos::SVector{set.segments+1, Vec3} = zeros(SVector{set.segments+1, Vec3})
+    pos::Vector{Vec3} = zeros(Vec3, set.segments+1)
     seg_area::S =         zero(S)   # area of one tether segment
     bridle_area::S =      zero(S)
     c_spring::S =         zero(S)   # depends on lenght of tether segement
@@ -112,6 +115,25 @@ const state = State{SimFloat, Vec3}()
 
 # Functions
 function get_state() state end
+
+# TODO: completely initialize, even if the project has changed
+function clear(s)
+    s.t_0 = 0.0                              # relative start time of the current time interval
+    s.v_reel_out = 0.0
+    s.last_v_reel_out = 0.0
+    s.area = set.area
+    # self.sync_speed = 0.0
+    s.v_wind        .= [set.v_wind, 0, 0]    # wind vector at the height of the kite
+    s.v_wind_gnd    .= [set.v_wind, 0, 0]    # wind vector at reference height
+    s.v_wind_tether .= [set.v_wind, 0, 0]
+    s.l_tether = set.l_tether
+    s.pos_kite, s.v_kite = zeros(3), zeros(3)
+    # TODO: Check 
+    s.initial_masses .= ones(set.segments+1) * 0.011 * set.l_tether / set.segments
+    s.rho = set.rho_0
+    s.c_spring = set.c_spring / s.length
+    s.damping  = set.damping / s.length
+end
 
 # Calculate the air densisity as function of height
 calc_rho(height) = set.rho_0 * exp(-height / 8550.0)
@@ -241,24 +263,6 @@ function calc_set_cl_cd(s, vec_c, v_app)
     s.vec_z .= normalize(vec_c)
     alpha = calc_alpha(v_app, s.vec_z) - s.alpha_depower
     set_cl_cd(s, alpha)
-end
-
-function clear(s)
-    s.t_0 = 0.0                     # relative start time of the current time interval
-    s.v_reel_out = 0.0
-    s.last_v_reel_out = 0.0
-    s.area = set.area
-    # self.sync_speed = 0.0
-    s.v_wind        .= [set.v_wind, 0, 0]    # wind vector at the height of the kite
-    s.v_wind_gnd    .= [set.v_wind, 0, 0]    # wind vector at reference height
-    s.v_wind_tether .= [set.v_wind, 0, 0]
-    s.l_tether = set.l_tether
-    s.pos_kite, s.v_kite = zeros(3), zeros(3)
-    # TODO: Check 
-    s.initial_masses .= ones(set.segments+1) * 0.011 * set.l_tether / set.segments
-    s.rho = set.rho_0
-    s.c_spring = set.c_spring / s.length
-    s.damping  = set.damping / s.length
 end
 
 # N-point tether model:
