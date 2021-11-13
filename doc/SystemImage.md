@@ -22,6 +22,10 @@ GLMakie, Arrow, MeshIO, RecursiveArrayTools, Revise, Rotations, StaticArrays, St
 If you are using other packages a lot you can add them to the system image by editing the
 file "test/create_sys_image.jl" and then executing ```./create_sys_image.sh```.
 
+By default a tested set of package versions is used as defined in **Manifest.toml.default**. 
+If you want to use the latest and greatest package versions (on your own risk) you can run
+```./create_sys_image --update``` instead.
+
 ## Troubleshooting
 
 ### Error "Cannot find crti.o" on Linux
