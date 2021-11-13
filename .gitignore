@@ -6,3 +6,5 @@ data/kite.obj.mtl
 src/KiteViewer.py
 /MakieSys.so.bak
 /MakieSyssim.so
+/create_sys_image.sh~
+/Manifest.toml.bak
