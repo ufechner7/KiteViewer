@@ -21,7 +21,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE. =#
 
 using GeometryBasics, Rotations, GLMakie, FileIO, LinearAlgebra, Printf
-AbstractPlotting.__init__()
 
 using Revise
 includet("./Utils.jl")
