@@ -24,7 +24,7 @@ file "test/create_sys_image.jl" and then executing ```./create_sys_image.sh```.
 
 By default a tested set of package versions is used as defined in **Manifest.toml.default**. 
 If you want to use the latest and greatest package versions (on your own risk) you can run
-```./create_sys_image --update``` instead.
+```./create_sys_image.sh --update``` instead.
 
 ## Troubleshooting
 
