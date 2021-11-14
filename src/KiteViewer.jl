@@ -21,7 +21,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE. =#
 
 using GeometryBasics, Rotations, GLMakie, FileIO, LinearAlgebra, Printf, Parameters
-Makie.__init__()
 
 using Utils, Plot2D, RTSim, KCU_Sim
 
@@ -30,17 +29,17 @@ using Utils, Plot2D, RTSim, KCU_Sim
     INITIAL_HEIGHT =  80.0*se().zoom # meter, for demo
     MAX_HEIGHT     = 200.0*se().zoom # meter, for demo
     KITE = FileIO.load(se().model)
-    FLYING    = [false]
+    FLYING     = [false]
     PLAYING    = [false]
     GUI_ACTIVE = [false]
     AXIS_LABEL_SIZE = 30
     TEXT_SIZE = 16
-    running = Node(false)
-    starting = [0]
-    zoom = [1.0]
-    steering = [0.0]
-    textnode = Node("")
-    textsize = Node(TEXT_SIZE)
+    running   = Node(false)
+    starting  = [0]
+    zoom      = [1.0]
+    steering  = [0.0]
+    textnode  = Node("")
+    textsize  = Node(TEXT_SIZE)
     textsize2 = Node(AXIS_LABEL_SIZE)
     status = Node("")
     p1 = Node(Vector{Point2f0}(undef, 6000)) # 5 min
@@ -165,7 +164,7 @@ function reset_view(cam, scene3D)
 end
 
 function zoom_scene(camera, scene, zoom=1.0f0)
-    @extractvalue camera (fov, near, projectiontype, lookat, eyeposition, upvector)
+    @extractvalue camera (fov, near, lookat, eyeposition, upvector)
     dir_vector = eyeposition - lookat
     new_eyeposition = lookat + dir_vector * (2.0f0 - zoom)
     update_cam!(scene, new_eyeposition, lookat)

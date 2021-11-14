@@ -24,5 +24,4 @@ Sundials = "c3572dad-4567-51f8-b174-8c6c989267f4"
 YAML = "ddb6d928-2868-570f-bddf-ab3f9cf99eb6"
 
 [compat]
-Makie = "~0.13"
 julia = "~1.6"
