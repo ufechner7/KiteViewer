@@ -55,8 +55,8 @@ end
 
 # Type definitions
 const SimFloat = Float64
-const KVec3     = SizedVector{3, SimFloat}
-const SVec3    = SizedVector{3, SimFloat}                   
+const KVec3     = MVector{3, SimFloat}
+const SVec3    = SVector{3, SimFloat}                   
 
 # TODO: add type S to the zeros 
 @with_kw mutable struct State{S, T}
@@ -270,7 +270,7 @@ end
 # Derivative   der_yd    = vel1, vel2, ..., veln, acc1, acc2, ..., accn
 # Output:
 # Residual     res = res1, res2 = pos1,  ..., vel1, ...
-function residual!(res, yd, y::SizedVector{S, SimFloat}, p, time) where S
+function residual!(res, yd, y::MVector{S, SimFloat}, p, time) where S
     # unpack the vectors y and yd
     part = reshape(SVector{S}(y),  Size(3, div(S,6), 2))
     partd = reshape(SVector{S}(yd),  Size(3, div(S,6), 2))
