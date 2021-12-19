@@ -34,7 +34,7 @@ module KPS3
 using Dierckx, StaticArrays, LinearAlgebra, Parameters, NLsolve
 using Utils, KCU_Sim
 
-export State, Vec3, SimFloat, ProfileLaw, EXP, LOG, EXPLOG                              # constants and types
+export State, KVec3, SimFloat, ProfileLaw, EXP, LOG, EXPLOG                              # constants and types
 export calc_cl, calc_rho, calc_wind_factor, calc_drag, calc_set_cl_cd, clear, residual! # functions
 export set_v_reel_out, set_depower_steering                                             # setters  
 export get_force, get_lod                                                               # getters
@@ -55,7 +55,7 @@ end
 
 # Type definitions
 const SimFloat = Float64
-const Vec3     = SizedVector{3, SimFloat}
+const KVec3     = SizedVector{3, SimFloat}
 const SVec3    = SizedVector{3, SimFloat}                   
 
 # TODO: add type S to the zeros 
@@ -81,10 +81,9 @@ const SVec3    = SizedVector{3, SimFloat}
     vec_z::T =            zeros(3)
     pos_kite::T =         zeros(3)
     v_kite::T =           zeros(3)        
-    res1::SVector{set.segments+1, Vec3} = zeros(SVector{set.segments+1, Vec3})
-    res2::SVector{set.segments+1, Vec3} = zeros(SVector{set.segments+1, Vec3})
-    # pos::SVector{set.segments+1, Vec3} = zeros(SVector{set.segments+1, Vec3})
-    pos::Vector{Vec3} = zeros(Vec3, set.segments+1)
+    res1::SVector{set.segments+1, KVec3} = zeros(SVector{set.segments+1, KVec3})
+    res2::SVector{set.segments+1, KVec3} = zeros(SVector{set.segments+1, KVec3})
+    pos::SVector{set.segments+1, KVec3} = zeros(SVector{set.segments+1, KVec3})
     seg_area::S =         zero(S)   # area of one tether segment
     bridle_area::S =      zero(S)
     c_spring::S =         zero(S)   # depends on lenght of tether segement
@@ -111,7 +110,7 @@ const SVec3    = SizedVector{3, SimFloat}
     masses::MVector{set.segments+1, SimFloat}         = ones(set.segments+1)
 end
 
-const state = State{SimFloat, Vec3}()
+const state = State{SimFloat, KVec3}()
 
 # Functions
 function get_state() state end
@@ -391,11 +390,11 @@ function tether_length(pos)
     return length
 end
 
-const pos = zeros(SVector{SEGMENTS+1, Vec3})
-const vel = zeros(SVector{SEGMENTS+1, Vec3})
-const acc = zeros(SVector{SEGMENTS+1, Vec3})
-const state_y0 = zeros(SVector{2*SEGMENTS, Vec3})
-const yd0 = zeros(SVector{2*SEGMENTS, Vec3})
+const pos = zeros(SVector{SEGMENTS+1, KVec3})
+const vel = zeros(SVector{SEGMENTS+1, KVec3})
+const acc = zeros(SVector{SEGMENTS+1, KVec3})
+const state_y0 = zeros(SVector{2*SEGMENTS, KVec3})
+const yd0 = zeros(SVector{2*SEGMENTS, KVec3})
 
 function calc_pre_tension(s)
     forces = get_spring_forces(s, s.pos)
@@ -479,9 +478,10 @@ function find_steady_state(s, prn=false)
     if prn println("\nStarted function test_nlsolve...") end
     results = nlsolve(test_initial_condition!, zeros(2*SEGMENTS))
     if prn println("\nresult: $results") end
-    init(s, results.zero)
+    res = init(s, results.zero; output=false)
+    res
 end
 
-precompile(find_steady_state, (State{SimFloat, Vec3},))   
+precompile(find_steady_state, (State{SimFloat, KVec3},))   
 
 end
