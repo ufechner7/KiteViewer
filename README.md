@@ -1,5 +1,5 @@
 # KiteViewer
-3D viewer for to visualize the flight path and power production of tethered wind drones and kites for airborne wind energy applications
+3D viewer and simulator for to visualize the flight path and power production of tethered wind drones and kites for airborne wind energy applications
 
 <p align="center"><img src="./doc/KiteViewer.png" /></p>
 
@@ -66,6 +66,13 @@ include("src/Importer.jl")
 ```
 If you have your own .csv log files you need to extend the importer
 for your data format.
+
+## Run the one point kite model
+To start the simulation, click the button "START". To steer the kite, use the right and left cursor keys.
+For a first test, after pressing the START button press the right cursor twice and wait. If you started the main function
+from a Julia console you can see the setting of the steering as numbers in the console.
+
+Not yet implemented: 1. changing the depower settings manually and 2. autopilot.
 
 ## Update from version 0.2
 Run the following commands:
