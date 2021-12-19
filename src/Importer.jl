@@ -8,8 +8,7 @@
 module Importer
 
 using CodecXz, CSV, DataFrames, StaticArrays, StructArrays, Rotations, LinearAlgebra
-include("./Utils.jl")
-using .Utils
+using Utils
 
 # Constants
 const CSV_FILE = se().log_file * ".csv"
@@ -41,7 +40,7 @@ function getX(pos); return parse_array(pos)[1,:]; end
 function getY(pos); return parse_array(pos)[2,:]; end
 function getZ(pos); return parse_array(pos)[3,:]; end
 
-function df2syslog(df)
+function df2syslog(P, df)
     orient = MVector(1.0f0, 0, 0, 0)
     steps = size(df)[1]
     orient_vec = Vector{MVector{4, Float32}}(undef, steps)
@@ -54,7 +53,7 @@ function df2syslog(df)
         q = UnitQuaternion(rotation)
         orient_vec[i] = MVector{4, Float32}(q.w, q.x, q.y, q.z)
     end
-    return StructArray{SysState}((df.time_rel, orient_vec, df.elevation, df.azimuth, df.l_tether, df.v_reelout, df.force, df.depower, 
+    return StructArray{SysState{P}}((df.time_rel, orient_vec, df.elevation, df.azimuth, df.l_tether, df.v_reelout, df.force, df.depower, 
                                   df.v_app_norm, df.X*se().zoom, df.Y*se().zoom, df.Z*se().zoom))
 end
 
@@ -74,9 +73,10 @@ function import_log()
     select!(df, Not(:v_app_str))
 
     # convert to arrow format and save
-    syslog = df2syslog(df)
+    P =  length(df.X[1])
+    syslog = df2syslog(P, df)
     name = basename(CSV_FILE)[1:end-4]
-    save_log(SysLog(name, syslog, syslog2extlog(syslog)))
+    save_log(P, SysLog{P}(name, syslog, syslog2extlog(P, syslog)))
     println("Saved file:    \"data/$name.arrow\" .")
     return data
 end
