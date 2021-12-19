@@ -39,7 +39,7 @@ Create a pre-compiled system image (needed for good performance):
 ```
 ./create_sys_image.sh
 ```
-This needs to be done at least once, but also after important package updates because it freezes the package versions.
+This takes about 10 to 15 minutes and needs to be done at least once, but also after important package updates because it freezes the package versions.
 
 
 Run the program and show the GUI:
@@ -116,7 +116,7 @@ Revise is watching the file KiteViewer.jl, and each time a changed version is sa
 ## Reducing the startup time
 On Linux it can help to activate the "performance" governor. This can be done with the command: ``` sudo ./performance.sh```
 
-If you use the script ./runjulia.sh the new system image with the precompiled packages will be used.
+If you use the script ./runjulia.sh the system image with the precompiled packages will be used.
 If you do not want to make changes to the code you can also run the app by typing ```./kiteviewer.sh```.
 
 More detailed explaination here: [SystemImage.md](./doc/SystemImage.md)
