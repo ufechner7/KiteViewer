@@ -1,7 +1,9 @@
 #!/bin/bash
 cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
 
-jill switch 1.6
+if which jill ; then
+    jill switch 1.6
+fi
 
 if test -f "~/.bashrc"; then
     source ~/.bashrc
