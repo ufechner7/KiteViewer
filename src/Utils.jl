@@ -192,6 +192,7 @@ end
 # last two tether particles and the apparent wind speed vector
 function rot(pos_kite, pos_before, v_app)
     delta = pos_kite - pos_before
+    @assert norm(delta) > 0.0 "Error in function rot() ! pos_kite must be not equal to pos_before. "
     c = -delta
     z = normalize(c)
     y = normalize(cross(-v_app, c))
