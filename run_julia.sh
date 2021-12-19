@@ -3,6 +3,7 @@
 if which jill ; then # if jill is installed
     jill switch 1.6
 fi
+cp -u Manifest.toml.default Manifest.toml
 branch=$(git rev-parse --abbrev-ref HEAD)
 if [[ $branch == "main" ]]; then
     branch=""
