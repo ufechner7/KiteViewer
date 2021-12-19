@@ -38,7 +38,7 @@ cd KiteViewer
 Launch Julia and install the dependencies:
 
 ```Julia
-julia --project
+./run_julia.sh
 using Pkg
 Pkg.instantiate()
 Pkg.precompile()
