@@ -14,7 +14,7 @@ const Vec3     = MVector{3, SimFloat}
 # State vector y   = mass.pos, mass.vel
 # Derivative   yd  = mass.vel, mass.acc
 # Residual     res = (y.vel - yd.vel), (yd.acc - G_EARTH)     
-function res1(res, yd, y, p, t)
+function res1(res, yd, y::MVector{S, SimFloat}, p, t) where S
     res[1:3] .= y[4:6] - yd[1:3]
     res[4:6] .= yd[4:6] - G_EARTH
 end
