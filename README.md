@@ -61,7 +61,7 @@ and converted to the .arrow format.
 
 With the following commands you can import csv flight data manually:
 ```Julia
-./runjulia.sh
+./run_julia.sh
 include("src/Importer.jl")
 ```
 If you have your own .csv log files you need to extend the importer
@@ -105,8 +105,7 @@ Removing the version of libstdc++.so.6 supplied with Julia is only needed for Ju
 ## Hacking the code
 Use the package [Revise](https://timholy.github.io/Revise.jl/stable/) to speed up testing of code changes:
 ```Julia
-julia --project
-using Revise
+./run_julia.sh
 includet("src/KiteViewer.jl")
 ```
 Please don't forget the t at end of the includet command.
