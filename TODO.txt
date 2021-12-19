@@ -12,21 +12,16 @@ On KiteViewer
 3. add FPS display
 4. add importer for the TU Delft kite power flight data set
 5. add receiver for UDP messages to KiteViewer
-6. add simulator from FreeKiteSim (work in progress in branch sim)
 
-DONE (sim branch)
-1. Add modules TestOpt and TestNLopt for finding the initial solution
+DONE (head of main branch)
+1. Add modules TestNLsolve for finding the initial solution
 2. Add module TestWindProfile for plotting EXP, LOG and EXPLOG profiles
 3. Fixed KPS3.jl, now working stable and correctly
 4. add z0, profile_law and kcu_mass to settings struct
 5. add c2_cor and c_s to settings.yaml
-6. determine initial steady state using NLsolve
-7. create a SysState struct form the state vector
-8. integrate RTSim in KiteViewer
-
-DONE (main branch)
-1. add toggle "Repeat" for endless replay
-2. limit version of GLMakie
+6. create a SysState struct form the state vector
+7. integrate RTSim in KiteViewer
+8. add toggle "Repeat" for endless replay
 
 DONE (Version 0.4)
 1. Implemented single window mode, one 3D and two 2D plots
