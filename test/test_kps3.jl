@@ -321,3 +321,15 @@ function run_benchmarks()
     show(@benchmark res=test_initial_condition(initial_x) setup = (initial_x = (zeros(12))))
     println()
 end
+
+# @benchmark residual!(res, yd, y, p, t) setup = (res1 = zeros(SVector{SEGMENTS, KPS3.KVec3}); res2 = deepcopy(res1); 
+#                                                             res = reduce(vcat, vcat(res1, res2)); pos = deepcopy(res1);
+#                                                             pos[1] .= [1.0,2,3]; vel = deepcopy(res1); y = reduce(vcat, vcat(pos, vel));
+#                                                             der_pos = deepcopy(res1); der_vel = deepcopy(res1); yd = reduce(vcat, vcat(der_pos, der_vel));
+#                                                             p = SciMLBase.NullParameters(); t = 0.0)
+
+# With  KVec3     = SizedVector{3, SimFloat}
+# Time  (mean ± σ):   52.215 μs ± 37.302 μs  Memory estimate: 16.92 KiB, allocs estimate: 614.
+#
+# KVec3     = MVector{3, SimFloat}
+#  Time  (mean ± σ):   509.464 ns ±  52.723 ns  Memory estimate: 0 bytes, allocs estimate: 0.
