@@ -35,20 +35,17 @@ git clone https://github.com/ufechner7/KiteViewer.git
 cd KiteViewer
 ```
 
-Launch Julia and install the dependencies:
-
-```Julia
-./run_julia.sh
-using Pkg
-Pkg.instantiate()
-Pkg.precompile()
+Create a pre-compiled system image (needed for good performance):
 ```
-The last two commands will need 3 min or more each to install and precompile all
-required packages when using Julia 1.6 on Windows, longer with Julia 1.5 and shorter on Linux.
+./create_sys_image.sh
+```
+This needs to be done at least once, but also after important package updates because it freezes the package versions.
+
 
 Run the program and show the GUI:
 
 ```Julia
+./run_julia.sh
 include("src/KiteViewer.jl")
 main()
 ```
@@ -119,9 +116,7 @@ Revise is watching the file KiteViewer.jl, and each time a changed version is sa
 ## Reducing the startup time
 On Linux it can help to activate the "performance" governor. This can be done with the command: ``` sudo ./performance.sh```
 
-Using a Julia system image that contains a precompiled version of the GUI library GLMakie.jl can drastically reduce the startup time. To create a system image just run the script: ```./create_sys_image.sh``` This needs to be done at least once, but also after important package updates because it freezes the package versions.
-
-If you now use the script ./runjulia.sh the new system image with the precompiled packages will be used.
+If you use the script ./runjulia.sh the new system image with the precompiled packages will be used.
 If you do not want to make changes to the code you can also run the app by typing ```./kiteviewer.sh```.
 
 More detailed explaination here: [SystemImage.md](./doc/SystemImage.md)
