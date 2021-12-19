@@ -399,7 +399,15 @@ function main(gl_wait=true)
                 if PLAYING[1]
                     state = log.syslog[i+1]
                 else
-                    state = next_step(se().segments+1, integrator, delta_t)
+                    try
+                        state = next_step(se().segments+1, integrator, delta_t)
+                        @assert ! isnan(state.orient[1])
+                    catch e
+                        bt = catch_backtrace()
+                        msg = sprint(showerror, e, bt)
+                        println(msg)
+                        raise(e)
+                    end                   
                 end
                 if running[] || ! PLAYING[1]
                     @sync update_system(scene3D, state, i)
