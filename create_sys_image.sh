@@ -19,6 +19,8 @@ fi
 if test -f "MakieSys${branch}.so"; then
     mv MakieSys${branch}.so MakieSys${branch}.so.bak
 fi
+julia_version=$(julia --version | awk '{print($3)}')
+julia_major=${julia_version:0:3} 
 if [[ $update == true ]]; then
     echo "Updating packages..."
     if test -f "Manifest.toml"; then
@@ -26,20 +28,20 @@ if [[ $update == true ]]; then
     fi
     julia --project -e "include(\"./test/update_packages.jl\");"
 else
-    echo "Using default Manifest.toml ..."
-    julia_version=$(julia --version | awk '{print($3)}')
-    julia_major=${julia_version:0:3} 
+    
     if [[ julia_major == "1.6" ]]; then
-        cp Manifest.toml.default Manifest.toml
+        cp Manifest-1.6.toml.default Manifest.toml
+        echo "Using Manifest-1.6.toml.default ..."
     else
         cp Manifest-1.7.toml.default Manifest.toml
+        echo "Using Manifest-1.7.toml.default ..."
     fi
 fi
 julia --project -e "using Pkg; Pkg.precompile()"
 julia --project -e "include(\"./test/create_sys_image.jl\");"
-mv MakieSys_tmp.so MakieSys${branch}.so
+mv MakieSys_tmp.so MakieSys-${julia_major}-${branch}.so
 julia --project -e "using Pkg; Pkg.precompile()"
 cd src
 touch *.jl # make sure all modules get recompiled in the next step
 cd ..
-julia --project -J MakieSys${branch}.so -e "push!(LOAD_PATH,joinpath(pwd(),\"src\"));using Utils, KCU_Sim, KPS3, Plot2D, RTSim"
+julia --project -J MakieSys-${julia_major}-${branch}.so -e "push!(LOAD_PATH,joinpath(pwd(),\"src\"));using Utils, KCU_Sim, KPS3, Plot2D, RTSim"
