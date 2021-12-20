@@ -253,7 +253,7 @@ function demo_syslog(P, name="Test flight"; duration=10)
     return StructArray{SysState{P}}((time_vec, orient_vec, elevation, myzeros,myzeros,myzeros,myzeros,myzeros,myzeros, X_vec, Y_vec, Z_vec))
 end
 
-# extend a flight systom log with the fieds x, y, and z (kite positions) and convert the orientation to the type UnitQuaternion
+# extend a flight systom log with the fields x, y, and z (kite positions) and convert the orientation to the type UnitQuaternion
 function syslog2extlog(P, syslog)
     x_vec = @view VectorOfArray(syslog.X)[end,:]
     y_vec = @view VectorOfArray(syslog.Y)[end,:]
