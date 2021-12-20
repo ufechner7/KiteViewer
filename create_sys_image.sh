@@ -13,9 +13,6 @@ if [[ $# -gt 0 ]]; then
 fi
 
 branch=$(git rev-parse --abbrev-ref HEAD)
-if [[ $branch == "main" ]]; then
-    branch=""
-fi
 if test -f "MakieSys${branch}.so"; then
     mv MakieSys${branch}.so MakieSys${branch}.so.bak
 fi
@@ -28,8 +25,7 @@ if [[ $update == true ]]; then
     fi
     julia --project -e "include(\"./test/update_packages.jl\");"
 else
-    
-    if [[ julia_major == "1.6" ]]; then
+    if [[ $julia_major == "1.6" ]]; then
         cp Manifest-1.6.toml.default Manifest.toml
         echo "Using Manifest-1.6.toml.default ..."
     else

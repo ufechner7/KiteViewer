@@ -8,9 +8,6 @@ if test -f "~/.bashrc"; then
     source ~/.bashrc
 fi
 branch=$(git rev-parse --abbrev-ref HEAD)
-if [[ $branch == "main" ]]; then
-    branch=""
-fi
 
 echo "Lauching KiteViewer..."
 if test -f "MakieSys-${julia_major}-${branch}.so"; then
