@@ -36,7 +36,7 @@ function init_392()
 end
 
 if ! @isdefined state
-    const state = State{SimFloat, KPS3.KPS3.KVec3}()
+    const state = State{SimFloat, KPS3.KVec3}()
     const SEGMENTS  = se().segments
     set_defaults(state)
 end
@@ -63,11 +63,11 @@ end
 end
 
 @testset "test_calc_drag       " begin
-    v_segment = KPS3.KVec3(1.0, 2, 3)
-    unit_vector = KPS3.KVec3(2.0, 3.0, 4.0)
+    v_segment = KVec3(1.0, 2, 3)
+    unit_vector = KVec3(2.0, 3.0, 4.0)
     rho = SimFloat(calc_rho(10.0))
-    last_tether_drag = KPS3.KVec3(0.0, 0.0, 0.0)
-    v_app_perp = KPS3.KVec3(0, -3.0, -4.0)
+    last_tether_drag = KVec3(0.0, 0.0, 0.0)
+    v_app_perp = KVec3(0, -3.0, -4.0)
     area = 20.0   
     state.v_wind_tether .= [0.1, 0.2, 0.3]
     v_app_norm = calc_drag(state, v_segment, unit_vector, rho, last_tether_drag, v_app_perp, area)
@@ -78,9 +78,9 @@ end
 
 @testset "test_calc_aero_forces" begin
     set_defaults(state)
-    state.v_apparent .= KPS3.KVec3(35.1, 52.2, 69.3)
-    pos_kite = KPS3.KVec3(30.0, 5.0, 100.0)
-    v_kite = KPS3.KVec3(3.0, 5.0, 2.0)
+    state.v_apparent .= KVec3(35.1, 52.2, 69.3)
+    pos_kite = KVec3(30.0, 5.0, 100.0)
+    v_kite = KVec3(3.0, 5.0, 2.0)
     rho = SimFloat(calc_rho(10.0))
     rel_steering = 0.1
     state.beta = 0.1
@@ -99,18 +99,18 @@ end
     set_defaults(state)
     KPS3.clear(state)
     i = 2
-    pos1 = KPS3.KVec3(30.0, 5.0, 100.0)
-    pos2 = KPS3.KVec3(30.0+10, 5.0+11, 100.0+20)
-    vel1 = KPS3.KVec3(3.0, 5.0, 2.0)
-    vel2 = KPS3.KVec3(3.0+0.1, 5.0+0.2, 2.0+0.3)
+    pos1 = KVec3(30.0, 5.0, 100.0)
+    pos2 = KVec3(30.0+10, 5.0+11, 100.0+20)
+    vel1 = KVec3(3.0, 5.0, 2.0)
+    vel2 = KVec3(3.0+0.1, 5.0+0.2, 2.0+0.3)
     mass = 9.0
-    veld = KPS3.KVec3(0.1, 0.3, 0.4)
-    result = KPS3.KVec3(0, 0, 0)
+    veld = KVec3(0.1, 0.3, 0.4)
+    result = KVec3(0, 0, 0)
     state.c_spring = 0.011
     state.damping = 0.01
-    state.last_tether_drag = KPS3.KVec3(5.0,6,7)
-    state.last_force = KPS3.KVec3(-1.0, -2, -3)
-    state.v_app_perp = KPS3.KVec3(0.1,0.22,0.33)
+    state.last_tether_drag = KVec3(5.0,6,7)
+    state.last_force = KVec3(-1.0, -2, -3)
+    state.v_app_perp = KVec3(0.1,0.22,0.33)
     state.v_wind_tether .= [0.1, 0.2, 0.3]
     state.length = 10.0
     KPS3.calc_res(state, pos1, pos2, vel1, vel2, mass, veld, result, i)
@@ -122,22 +122,22 @@ end
 
 @testset "test_calc_loop       " begin
     KPS3.clear(state)
-    state.last_tether_drag = KPS3.KVec3(5.0,6,7)
-    state.last_force = KPS3.KVec3(-1.0, -2, -3)
-    state.v_app_perp = KPS3.KVec3(0.1,0.22,0.33)
+    state.last_tether_drag = KVec3(5.0,6,7)
+    state.last_force = KVec3(-1.0, -2, -3)
+    state.v_app_perp = KVec3(0.1,0.22,0.33)
     state.v_wind_tether .= [0.1, 0.2, 0.3]
     state.length = 10.0
     state.c_spring = KPS3.set.c_spring / state.length
     state.damping  = KPS3.set.damping / state.length
-    pos  = zeros(SVector{SEGMENTS+1, KPS3.KVec3})
+    pos  = zeros(SVector{SEGMENTS+1, KVec3})
     for i in 1:SEGMENTS+1
         pos[i][3] = 5.0 * (i-1)
     end
-    vel  = zeros(SVector{SEGMENTS+1, KPS3.KVec3})
-    posd = zeros(SVector{SEGMENTS+1, KPS3.KVec3})
-    veld = zeros(SVector{SEGMENTS+1, KPS3.KVec3})
-    res1 = zeros(SVector{SEGMENTS+1, KPS3.KVec3})
-    res2 = zeros(SVector{SEGMENTS+1, KPS3.KVec3})
+    vel  = zeros(SVector{SEGMENTS+1, KVec3})
+    posd = zeros(SVector{SEGMENTS+1, KVec3})
+    veld = zeros(SVector{SEGMENTS+1, KVec3})
+    res1 = zeros(SVector{SEGMENTS+1, KVec3})
+    res2 = zeros(SVector{SEGMENTS+1, KVec3})
     @test state.c_spring ≈ 61460.0
     @test state.damping  ≈    94.6
     KPS3.loop(state, pos, vel, posd, veld, res1, res2)
@@ -150,8 +150,8 @@ end
 end
 
 @testset "test_calc_alpha      " begin
-    v_app = KPS3.KVec3(10,2,3)
-    vec_z = normalize(KPS3.KVec3(3,2,0))
+    v_app = KVec3(10,2,3)
+    vec_z = normalize(KVec3(3,2,0))
     alpha = KPS3.calc_alpha(v_app, vec_z)
     @test alpha ≈ -1.091003745821884
 end
@@ -162,8 +162,8 @@ end
 end
 
 @testset "test_calc_set_cl_cd  " begin
-    v_app = KPS3.KVec3(10,2,3)
-    vec_c = KPS3.KVec3(3,2,0)
+    v_app = KVec3(10,2,3)
+    vec_c = KVec3(3,2,0)
     KPS3.calc_set_cl_cd(state, vec_c, v_app)
 end
 
@@ -177,7 +177,7 @@ end
 # Output:
 # Residual     res = res1, res2 = pos1,  ..., vel1, ...
 @testset "test_residual!       " begin
-    res1 = zeros(SVector{SEGMENTS, KPS3.KVec3})
+    res1 = zeros(SVector{SEGMENTS, KVec3})
     res2 = deepcopy(res1)
     res = reduce(vcat, vcat(res1, res2))
     pos = deepcopy(res1)
@@ -219,7 +219,7 @@ end
     @test isapprox(my_state.param_cd, 0.125342896308, atol=1e-4)
 end
 
-res1 = zeros(SVector{SEGMENTS+1, KPS3.KPS3.KVec3})
+res1 = zeros(SVector{SEGMENTS+1, KPS3.KVec3})
 res2 = deepcopy(res1)
 if ! @isdefined res3
     const res3 = reduce(vcat, vcat(res1, res2))
@@ -286,33 +286,33 @@ function run_benchmarks()
     show(@benchmark calc_cl(α) setup=(α=(rand()-0.5) * 360.0))
     println("\ncalc_drag:")
     show(@benchmark calc_drag(state, v_segment, unit_vector, rho, last_tether_drag, v_app_perp, 
-                            area) setup=(v_segment = KPS3.KVec3(1.0, 2, 3);
-                            unit_vector = KPS3.KVec3(2.0, 3.0, 4.0); 
-                            rho = calc_rho(10.0f0); last_tether_drag = KPS3.KVec3(0.0, 0.0, 0.0); 
-                            v_app_perp =  KPS3.KVec3(0, -3.0, -4.0); area=se().area))
+                            area) setup=(v_segment = KVec3(1.0, 2, 3);
+                            unit_vector = KVec3(2.0, 3.0, 4.0); 
+                            rho = calc_rho(10.0f0); last_tether_drag = KVec3(0.0, 0.0, 0.0); 
+                            v_app_perp =  KVec3(0, -3.0, -4.0); area=se().area))
     println("\ncalc_aero_forces:")
-    show(@benchmark KPS3.calc_aero_forces(state, pos_kite, v_kite, rho, rel_steering) setup=(state.v_apparent .= KPS3.KVec3(35.1,
-                                        52.2, 69.3); pos_kite = KPS3.KVec3(30.0, 5.0, 100.0);  
-                                        v_kite = KPS3.KVec3(3.0, 5.0, 2.0);  
+    show(@benchmark KPS3.calc_aero_forces(state, pos_kite, v_kite, rho, rel_steering) setup=(state.v_apparent .= KVec3(35.1,
+                                        52.2, 69.3); pos_kite = KVec3(30.0, 5.0, 100.0);  
+                                        v_kite = KVec3(3.0, 5.0, 2.0);  
                                         rho = SimFloat(calc_rho(10.0));  rel_steering = 0.1))
     println("\ncalc_res:")
     show(@benchmark KPS3.calc_res(state, pos1, pos2, vel1, vel2, mass, veld, result, i) setup=(i = 1; 
-                            pos1 = KPS3.KVec3(30.0, 5.0, 100.0); pos2 = KPS3.KVec3(30.0+10, 5.0+11, 100.0+20); 
-                            vel1 = KPS3.KVec3(3.0, 5.0, 2.0); vel2 = KPS3.KVec3(3.0+0.1, 5.0+0.2, 2.0+0.3); 
-                            mass = 9.0; veld = KPS3.KVec3(0.1, 0.3, 0.4); result = KPS3.KVec3(0, 0, 0)))
+                            pos1 = KVec3(30.0, 5.0, 100.0); pos2 = KVec3(30.0+10, 5.0+11, 100.0+20); 
+                            vel1 = KVec3(3.0, 5.0, 2.0); vel2 = KVec3(3.0+0.1, 5.0+0.2, 2.0+0.3); 
+                            mass = 9.0; veld = KVec3(0.1, 0.3, 0.4); result = KVec3(0, 0, 0)))
     println("\ncalc_loop")
-    show(@benchmark KPS3.loop(state, pos, vel, posd, veld, res1, res2) setup=(pos = zeros(SVector{SEGMENTS+1, KPS3.KVec3}); 
-                            vel  = zeros(SVector{SEGMENTS+1, KPS3.KVec3}); posd  = zeros(SVector{SEGMENTS+1, KPS3.KVec3}); 
-                            veld  = zeros(SVector{SEGMENTS+1, KPS3.KVec3}); res1  = zeros(SVector{SEGMENTS+1, KPS3.KVec3}); 
-                            res2  = zeros(SVector{SEGMENTS+1, KPS3.KVec3}) ))
+    show(@benchmark KPS3.loop(state, pos, vel, posd, veld, res1, res2) setup=(pos = zeros(SVector{SEGMENTS+1, KVec3}); 
+                            vel  = zeros(SVector{SEGMENTS+1, KVec3}); posd  = zeros(SVector{SEGMENTS+1, KVec3}); 
+                            veld  = zeros(SVector{SEGMENTS+1, KVec3}); res1  = zeros(SVector{SEGMENTS+1, KVec3}); 
+                            res2  = zeros(SVector{SEGMENTS+1, KVec3}) ))
     println("\nset_cl_cd")
     show(@benchmark KPS3.set_cl_cd(state, alpha) setup= (alpha = 10.0))
     println("\ncalc_alpha")
-    show(@benchmark KPS3.calc_alpha(v_app, vec_z) setup=(v_app = KPS3.KVec3(10,2,3); vec_z = normalize(KPS3.KVec3(3,2,0))))
+    show(@benchmark KPS3.calc_alpha(v_app, vec_z) setup=(v_app = KVec3(10,2,3); vec_z = normalize(KVec3(3,2,0))))
     println("\ncalc_set_cl_cd")
-    show(@benchmark KPS3.calc_set_cl_cd(state, vec_c, v_app) setup=(v_app = KPS3.KVec3(10,2,3); vec_c = KPS3.KVec3(3,2,0)))
+    show(@benchmark KPS3.calc_set_cl_cd(state, vec_c, v_app) setup=(v_app = KVec3(10,2,3); vec_c = KVec3(3,2,0)))
     println("\nresidual!")
-    show(@benchmark residual!(res, yd, y, p, t) setup = (res1 = zeros(SVector{SEGMENTS, KPS3.KVec3}); res2 = deepcopy(res1); 
+    show(@benchmark residual!(res, yd, y, p, t) setup = (res1 = zeros(SVector{SEGMENTS, KVec3}); res2 = deepcopy(res1); 
                                                             res = reduce(vcat, vcat(res1, res2)); pos = deepcopy(res1);
                                                             pos[1] .= [1.0,2,3]; vel = deepcopy(res1); y = reduce(vcat, vcat(pos, vel));
                                                             der_pos = deepcopy(res1); der_vel = deepcopy(res1); yd = reduce(vcat, vcat(der_pos, der_vel));
@@ -322,7 +322,7 @@ function run_benchmarks()
     println()
 end
 
-# @benchmark residual!(res, yd, y, p, t) setup = (res1 = zeros(SVector{SEGMENTS, KPS3.KVec3}); res2 = deepcopy(res1); 
+# @benchmark residual!(res, yd, y, p, t) setup = (res1 = zeros(SVector{SEGMENTS, KVec3}); res2 = deepcopy(res1); 
 #                                                             res = reduce(vcat, vcat(res1, res2)); pos = deepcopy(res1);
 #                                                             pos[1] .= [1.0,2,3]; vel = deepcopy(res1); y = reduce(vcat, vcat(pos, vel));
 #                                                             der_pos = deepcopy(res1); der_vel = deepcopy(res1); yd = reduce(vcat, vcat(der_pos, der_vel));
