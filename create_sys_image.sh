@@ -27,7 +27,13 @@ if [[ $update == true ]]; then
     julia --project -e "include(\"./test/update_packages.jl\");"
 else
     echo "Using default Manifest.toml ..."
-    cp Manifest.toml.default Manifest.toml
+    julia_version=$(julia --version | awk '{print($3)}')
+    julia_major=${julia_version:0:3} 
+    if [[ julia_major == "1.6" ]]; then
+        cp Manifest.toml.default Manifest.toml
+    else
+        cp Manifest-1.7.toml.default Manifest.toml
+    fi
 fi
 julia --project -e "using Pkg; Pkg.precompile()"
 julia --project -e "include(\"./test/create_sys_image.jl\");"
