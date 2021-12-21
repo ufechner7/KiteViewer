@@ -34,7 +34,7 @@ module KPS3
 using Dierckx, StaticArrays, LinearAlgebra, Parameters, NLsolve
 using Utils, KCU_Sim
 
-export State, KVec3, SimFloat, ProfileLaw, EXP, LOG, EXPLOG                              # constants and types
+export State, KVec3, SimFloat, ProfileLaw, EXP, LOG, EXPLOG                             # constants and types
 export calc_cl, calc_rho, calc_wind_factor, calc_drag, calc_set_cl_cd, clear, residual! # functions
 export set_v_reel_out, set_depower_steering                                             # setters  
 export get_force, get_lod                                                               # getters
@@ -58,7 +58,6 @@ const SimFloat = Float64
 const KVec3    = MVector{3, SimFloat}
 const SVec3    = SVector{3, SimFloat}                   
 
-# TODO: add type S to the zeros 
 @with_kw mutable struct State{S, T}
     v_wind::T =           [set.v_wind, 0, 0]    # wind vector at the height of the kite
     v_wind_gnd::T =       [set.v_wind, 0, 0]    # wind vector at reference height
@@ -351,7 +350,7 @@ function get_force(s) norm(s.last_force) end
 # Return an array of the scalar spring forces of all tether segements.
 # Input: The vector pos of the positions of the point masses that belong to the tether.
 function get_spring_forces(s, pos)
-    forces = zeros(set.segments)
+    forces = zeros(SimFloat, set.segments)
     for i in 1:set.segments
         forces[i] =  s.c_spring * (norm(pos[i+1] - pos[i]) - s.length)
     end
@@ -460,7 +459,7 @@ function init(s, X=X0; output=false)
     return reduce(vcat, state_y0), reduce(vcat, yd0)
 end
 
-const res = zeros(SizedVector{6*SEGMENTS, Float64})
+const res = zeros(MVector{6*SEGMENTS, SimFloat})
 
 # helper function for the steady state finder
 function test_initial_condition!(F, x::Vector)
@@ -476,7 +475,7 @@ end
 
 function find_steady_state(s, prn=false)
     if prn println("\nStarted function test_nlsolve...") end
-    results = nlsolve(test_initial_condition!, zeros(2*SEGMENTS))
+    results = nlsolve(test_initial_condition!, zeros(SimFloat, 2*SEGMENTS))
     if prn println("\nresult: $results") end
     res = init(s, results.zero; output=false)
     res
