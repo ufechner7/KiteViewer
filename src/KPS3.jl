@@ -55,7 +55,7 @@ end
 
 # Type definitions
 const SimFloat = Float64
-const KVec3     = MVector{3, SimFloat}
+const KVec3    = MVector{3, SimFloat}
 const SVec3    = SVector{3, SimFloat}                   
 
 # TODO: add type S to the zeros 
@@ -64,23 +64,23 @@ const SVec3    = SVector{3, SimFloat}
     v_wind_gnd::T =       [set.v_wind, 0, 0]    # wind vector at reference height
     v_wind_tether::T =    [set.v_wind, 0, 0]
     v_apparent::T =       [set.v_wind, 0, 0]
-    v_app_perp::T =       zeros(3)
-    drag_force::T =       zeros(3)
-    lift_force::T =       zeros(3)
-    steering_force::T =   zeros(3)
-    last_force::T =       zeros(3)
-    spring_force::T =     zeros(3)
-    total_forces::T =     zeros(3)
-    force::T =            zeros(3)
-    unit_vector::T =      zeros(3)
-    av_vel::T =           zeros(3)
-    kite_y::T =           zeros(3)
-    segment::T =          zeros(3)
-    last_tether_drag::T = zeros(3)
-    acc::T =              zeros(3)     
-    vec_z::T =            zeros(3)
-    pos_kite::T =         zeros(3)
-    v_kite::T =           zeros(3)        
+    v_app_perp::T =       zeros(S, 3)
+    drag_force::T =       zeros(S, 3)
+    lift_force::T =       zeros(S, 3)
+    steering_force::T =   zeros(S, 3)
+    last_force::T =       zeros(S, 3)
+    spring_force::T =     zeros(S, 3)
+    total_forces::T =     zeros(S, 3)
+    force::T =            zeros(S, 3)
+    unit_vector::T =      zeros(S, 3)
+    av_vel::T =           zeros(S, 3)
+    kite_y::T =           zeros(S, 3)
+    segment::T =          zeros(S, 3)
+    last_tether_drag::T = zeros(S, 3)
+    acc::T =              zeros(S, 3)     
+    vec_z::T =            zeros(S, 3)
+    pos_kite::T =         zeros(S, 3)
+    v_kite::T =           zeros(S, 3)        
     res1::SVector{set.segments+1, KVec3} = zeros(SVector{set.segments+1, KVec3})
     res2::SVector{set.segments+1, KVec3} = zeros(SVector{set.segments+1, KVec3})
     pos::SVector{set.segments+1, KVec3} = zeros(SVector{set.segments+1, KVec3})
@@ -126,7 +126,7 @@ function clear(s)
     s.v_wind_gnd    .= [set.v_wind, 0, 0]    # wind vector at reference height
     s.v_wind_tether .= [set.v_wind, 0, 0]
     s.l_tether = set.l_tether
-    s.pos_kite, s.v_kite = zeros(3), zeros(3)
+    s.pos_kite, s.v_kite = zeros(SimFloat, 3), zeros(SimFloat, 3)
     # TODO: Check 
     s.initial_masses .= ones(set.segments+1) * 0.011 * set.l_tether / set.segments
     s.rho = set.rho_0
