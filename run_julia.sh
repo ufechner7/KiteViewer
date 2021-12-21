@@ -3,7 +3,7 @@
 julia_version=$(julia --version | awk '{print($3)}')
 julia_major=${julia_version:0:3} 
 branch=$(git rev-parse --abbrev-ref HEAD)
-cp -u MakieSys-${julia_major}-${branch}.so.default Manifest.toml
+cp -u Manifest-${julia_major}.toml.default Manifest.toml
 if test -f "MakieSys-${julia_major}-${branch}.so"; then
     julia -J  MakieSys-${julia_major}-${branch}.so --project -e "push!(LOAD_PATH,joinpath(pwd(),\"test\"));push!(LOAD_PATH,joinpath(pwd(),\"src\")); using Revise" -i
 else
