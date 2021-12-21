@@ -12,12 +12,13 @@ if [[ $# -gt 0 ]]; then
     fi
 fi
 
-branch=$(git rev-parse --abbrev-ref HEAD)
-if test -f "MakieSys${branch}.so"; then
-    mv MakieSys${branch}.so MakieSys${branch}.so.bak
-fi
 julia_version=$(julia --version | awk '{print($3)}')
 julia_major=${julia_version:0:3} 
+branch=$(git rev-parse --abbrev-ref HEAD)
+if test -f "MakieSys-${julia_major}-${branch}.so"; then
+    mv MakieSys-${julia_major}-${branch}.so MakieSys-${julia_major}-${branch}.so.bak
+fi
+
 if [[ $update == true ]]; then
     echo "Updating packages..."
     if test -f "Manifest.toml"; then
