@@ -5,7 +5,7 @@
 
 ## Requirements
 
-Julia 1.6 or higher must be installed. You can download it at https://www.julialang.org/
+Julia 1.6.x or 1.7.x must be installed. You can download it at https://www.julialang.org/
 
 On Linux or MAC you can install the latest Julia version with the following command:
 ```
@@ -71,34 +71,6 @@ from a Julia console you can see the setting of the steering as numbers in the c
 
 Not yet implemented: 1. changing the depower settings manually and 2. autopilot.
 
-## Update from version 0.2
-Run the following commands:
-```Bash
-cd repos/KiteViewer
-rm data/log_8700W_8ms.arrow # not needed when updating from 0.3
-git pull
-./create_sys_image.sh
-```
-
-## Fixing OpenGL problems
-On a computer with Ubuntu 20.04 and Intel integrated graphics the following steps were needed to make OpenGL work:
-
-```Bash
-sudo apt install libglfw3
-cd ~/packages/julias/julia-1.5.3/lib/julia/
-rm libstdc++.so.6 
-```
-After implementing this fix rebuild GLMakie with the following command from within Julia:
-
-```Bash
-cd ~/repos/KiteViewer
-julia --project
-] 
-build GLMakie
-```
-
-Removing the version of libstdc++.so.6 supplied with Julia is only needed for Julia versions older than 1.6.0 due to this bug: https://github.com/JuliaGL/GLFW.jl/issues/198
-
 ## Hacking the code
 Use the package [Revise](https://timholy.github.io/Revise.jl/stable/) to speed up testing of code changes:
 ```Julia
@@ -116,7 +88,7 @@ Revise is watching the file KiteViewer.jl, and each time a changed version is sa
 ## Reducing the startup time
 On Linux it can help to activate the "performance" governor. This can be done with the command: ``` sudo ./performance.sh```
 
-If you use the script ./runjulia.sh the system image with the precompiled packages will be used.
+If you use the script ./run_julia.sh the system image with the precompiled packages will be used.
 If you do not want to make changes to the code you can also run the app by typing ```./kiteviewer.sh```.
 
 More detailed explaination here: [SystemImage.md](./doc/SystemImage.md)
