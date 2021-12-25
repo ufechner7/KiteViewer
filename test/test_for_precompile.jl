@@ -2,7 +2,7 @@ push!(LOAD_PATH,joinpath(pwd(),"src"))
 @info LOAD_PATH
 let    
     include("../src/KiteViewer.jl")
-    Utils.test(true)
+    KiteUtils.test(true)
     main(false)
 end
 let 
