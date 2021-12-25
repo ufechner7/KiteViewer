@@ -22,7 +22,7 @@ SOFTWARE. =#
 
 using GeometryBasics, Rotations, GLMakie, FileIO, LinearAlgebra, Printf, Parameters
 
-using Utils, Plot2D, RTSim, KCU_Sim
+using KiteUtils, Plot2D, RTSim, KCU_Sim
 
 @consts begin
     SCALE = 1.2 

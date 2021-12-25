@@ -1,7 +1,7 @@
 module RTSim
 
 using Sundials, StaticArrays, Rotations
-using Utils, KPS3, KCU_Sim
+using KiteUtils, KPS3, KCU_Sim
 
 export init_sim, get_height, get_sysstate, next_step
 
@@ -31,7 +31,7 @@ function SysState(P)
     azimuth = azimuth_east(pos_kite)
     v_reelout = my_state.v_reel_out
     force = get_force(my_state)
-    return Utils.SysState{P}(my_state.t_0, orient, elevation, azimuth, 0., v_reelout, force, 0., 0., X, Y, Z)
+    return KiteUtils.SysState{P}(my_state.t_0, orient, elevation, azimuth, 0., v_reelout, force, 0., 0., X, Y, Z)
 end
 
 function get_height()

@@ -8,7 +8,7 @@
 module Importer
 
 using CodecXz, CSV, DataFrames, StaticArrays, StructArrays, Rotations, LinearAlgebra
-using Utils
+using KiteUtils
 
 # Constants
 const CSV_FILE = se().log_file * ".csv"

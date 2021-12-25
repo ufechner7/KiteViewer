@@ -32,7 +32,7 @@ Scientific background: http://arxiv.org/abs/1406.6218 =#
 module KPS3
 
 using Dierckx, StaticArrays, LinearAlgebra, Parameters, NLsolve
-using Utils, KCU_Sim
+using KiteUtils, KCU_Sim
 
 export State, KVec3, SimFloat, ProfileLaw, EXP, LOG, EXPLOG                             # constants and types
 export calc_cl, calc_rho, calc_wind_factor, calc_drag, calc_set_cl_cd, clear, residual! # functions
