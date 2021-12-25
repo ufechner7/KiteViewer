@@ -1,6 +1,9 @@
 using Sundials, GLMakie, StaticArrays
 # Tutorial example showing how to use an implicit solver 
 # It simulates a falling mass.
+# 
+# To run this example, launch julia with the command ./run_julia.sh and execute 
+# include("src/DAE_Example.jl")
 
 if ! @isdefined G_EARTH
     const G_EARTH  = [0.0, 0.0, -9.81]
