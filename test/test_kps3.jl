@@ -1,13 +1,8 @@
-using Test, BenchmarkTools, StaticArrays, Revise, LinearAlgebra, SciMLBase, GLMakie
+using Test, BenchmarkTools, StaticArrays, Revise, LinearAlgebra, SciMLBase, GLMakie, KiteUtils
 
 if ! @isdefined KPS3
     includet("../src/KPS3.jl")
     using .KPS3
-end
-
-if ! @isdefined Utils
-    include("../src/Utils.jl")
-    using .Utils
 end
 
 function set_defaults(state)
