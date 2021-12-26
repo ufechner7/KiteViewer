@@ -24,8 +24,8 @@ function SysState(P)
     pos_before = pos[end-1]
     v_app = my_state.v_apparent
     rotation = rot(pos_kite, pos_before, v_app)
-    q = UnitQuaternion(rotation)
-    orient = MVector{4, Float32}(q.w, q.x, q.y, q.z)
+    q = QuatRotation(rotation)
+    orient = MVector{4, Float32}(Rotations.params(q))
 
     elevation = calc_elevation(pos_kite)
     azimuth = azimuth_east(pos_kite)

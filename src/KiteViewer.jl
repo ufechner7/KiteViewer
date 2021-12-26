@@ -140,8 +140,8 @@ function update_system(scene, state, step=0)
     rotations[] = [normalize(points[k+1] - points[k]) for k in 1:se().segments]
 
     # move and turn the kite to the new position
-    q0 = UnitQuaternion(state.orient)
-    quat[]     = Quaternionf0(q0.x, q0.y, q0.z, q0.w)
+    q0 = Rotations.params(QuatRotation(state.orient))     # returns an SVector in the order w,x,y,z
+    quat[]     = Quaternionf0(q0[2], q0[3], q0[4], q0[1]) # the constructor expects the order x,y,z,w
     kite_pos[] = points[end]
 
     # print state values

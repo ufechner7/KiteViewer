@@ -27,6 +27,7 @@ kite:
     mass:  6.2             # kite mass incl. sensor unit [kg]
     area: 10.18            # projected kite area         [m²]
     rel_side_area: 30.6    # relative side area           [%]
+    height: 2.23           # height of the kite           [m]
     alpha_cl:  [-180.0, -160.0, -90.0, -20.0, -10.0,  -5.0,  0.0, 20.0, 40.0, 90.0, 160.0, 180.0]
     cl_list:   [   0.0,    0.5,   0.0,  0.08, 0.125,  0.15,  0.2,  1.0,  1.0,  0.0,  -0.5,   0.0]
     alpha_cd:  [-180.0, -170.0, -140.0, -90.0, -20.0, 0.0, 20.0, 90.0, 140.0, 170.0, 180.0]
@@ -38,7 +39,15 @@ bridle:
     height:    4.9         # height of bridle                       [m]
 
 kcu:
-    mass: 8.4              # mass of the kite control unit   [kg]
+    mass: 8.4                    # mass of the kite control unit   [kg]
+    power2steer_dist: 1.3        #                                 [m]
+    depower_drum_diameter: 0.069 #                                 [m]
+    depower_offset: 23.6         #                                 [%]
+    tape_thickness: 0.0006       #                                 [m]
+    v_depower: 0.075             # max velocity of depowering in units per second (full range: 1 unit)
+    v_steering: 0.2              # max velocity of steering in units per second   (full range: 2 units)
+    depower_gain: 3.0            # 3.0 means: more than 33% error -> full speed
+    steering_gain: 3.0
 
 tether:
     d_tether:  4           # tether diameter                 [mm]
