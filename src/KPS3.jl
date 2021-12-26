@@ -43,7 +43,6 @@ set_zero_subnormals(true)         # required to avoid drastic slow down on Intel
 
 # Constants
 @consts begin
-    # TODO: remove set 
     set    = se()                 # settings from settings.yaml
     SEGMENTS = set.segments
     G_EARTH = 9.81                # gravitational acceleration
