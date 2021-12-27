@@ -20,7 +20,8 @@ steering:
     delta_st: 0.02         # steering increment (when pressing RIGHT)
 
 depower:
-    alpha_d_max: 31.00     # max depower angle          [deg]
+    alpha_d_max:    31.0   # max depower angle                            [deg]
+    depower_offset: 23.6   # at rel_depower=0.236 the kite is fully powered [%]
     
 kite:
     model: "data/kite.obj" # 3D model of the kite
@@ -42,7 +43,6 @@ kcu:
     mass: 8.4                    # mass of the kite control unit   [kg]
     power2steer_dist: 1.3        #                                 [m]
     depower_drum_diameter: 0.069 #                                 [m]
-    depower_offset: 23.6         #                                 [%]
     tape_thickness: 0.0006       #                                 [m]
     v_depower: 0.075             # max velocity of depowering in units per second (full range: 1 unit)
     v_steering: 0.2              # max velocity of steering in units per second   (full range: 2 units)
@@ -61,5 +61,5 @@ environment:
     h_ref:  6.0      # reference height for the wind speed    [m]
     rho_0:  1.225    # air density at the ground          [kg/m³]
     alpha:  0.08163  # exponent of the wind profile law
-    z0: 0.0002       # surface roughness                      [m]
+    z0:     0.0002   # surface roughness                      [m]
     profile_law: 3   # 1=EXP, 2=LOG, 3=EXPLOG

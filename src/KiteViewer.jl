@@ -300,7 +300,14 @@ function main(gl_wait=true)
         logfile=se().log_file * ".arrow"  
         if ! isfile(logfile)
             status[] = "The logfile $logfile is missing! Importing..."; sleep(0.1)
-            include("src/Importer.jl"); sleep(0.1)
+            try
+                include("src/Importer.jl"); sleep(0.1)
+            catch e
+                bt = catch_backtrace()
+                msg = sprint(showerror, e, bt)
+                println(msg)
+                raise(e)
+            end 
             if isfile(logfile)
                 status[] = "Success!"
             end
@@ -381,8 +388,15 @@ function main(gl_wait=true)
                     if log.name != logfile
                         old =  status[]
                         status[] = "Loading log file..."
-                        reset_and_zoom(camera, scene3D, zoom[1])   
-                        log = load_log(se().segments+1, logfile)
+                        reset_and_zoom(camera, scene3D, zoom[1])
+                        try   
+                            log = load_log(se().segments+1, logfile)
+                        catch e
+                            bt = catch_backtrace()
+                            msg = sprint(showerror, e, bt)
+                            println(msg)
+                            raise(e)
+                        end 
                         status[] = old  
                     end
                     steps = length(log.syslog)  
