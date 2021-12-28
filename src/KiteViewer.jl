@@ -391,13 +391,15 @@ function main(gl_wait=true)
                         reset_and_zoom(camera, scene3D, zoom[1])
                         try   
                             log = load_log(se().segments+1, logfile)
+                            status[] = old 
                         catch e
                             bt = catch_backtrace()
                             msg = sprint(showerror, e, bt)
                             println(msg)
                             raise(e)
+                            status[] = "Error loading log file: " * logfile
                         end 
-                        status[] = old  
+                         
                     end
                     steps = length(log.syslog)  
                 else
