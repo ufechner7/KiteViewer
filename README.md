@@ -99,5 +99,5 @@ The simulator is tested against the results of the paper [Dynamic Model of a Pum
 
 
 ## References
-- [Research Fechner](https://research.tudelft.nl/en/publications/?search=Uwe+Fechner&pageSize=50&ordering=rating&descending=true) for the scientic background of this code.
-- [KiteUtils](https://github.com/ufechner7/KiteUtils.jl)
+- [Research Fechner](https://research.tudelft.nl/en/publications/?search=Uwe+Fechner&pageSize=50&ordering=rating&descending=true) for the scientic background of this code
+- [KiteUtils](https://github.com/ufechner7/KiteUtils.jl) Julia package, used by this program
