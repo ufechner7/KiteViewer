@@ -3,10 +3,6 @@ cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
 
 julia_version=$(julia --version | awk '{print($3)}')
 julia_major=${julia_version:0:3} 
-
-if test -f "~/.bashrc"; then
-    source ~/.bashrc
-fi
 branch=$(git rev-parse --abbrev-ref HEAD)
 
 echo "Lauching KiteViewer..."
