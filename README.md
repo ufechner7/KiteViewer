@@ -95,7 +95,9 @@ More detailed explaination here: [SystemImage.md](./doc/SystemImage.md)
 (Tested on Windows10 and Linux.)
 
 ## Tests of the Simulator
-The simulator is tested against the results of the paper [Dynamic Model of a Pumping Kite Power System](http://arxiv.org/abs/1406.6218). For details of the tests see:  [Tests.md](./doc/Tests.md) 
+The simulator is tested against the results of the paper [Dynamic Model of a Pumping Kite Power System](http://arxiv.org/abs/1406.6218). For details of the tests see:  [Tests.md](./doc/Tests.md)
 
-## Scientific background
-See: [Research Fechner](https://research.tudelft.nl/en/publications/?search=Uwe+Fechner&pageSize=50&ordering=rating&descending=true) for the scientic background of this code.
+
+## References
+- [Research Fechner](https://research.tudelft.nl/en/publications/?search=Uwe+Fechner&pageSize=50&ordering=rating&descending=true) for the scientic background of this code.
+- [KiteUtils](https://github.com/ufechner7/KiteUtils.jl)
