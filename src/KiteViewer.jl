@@ -390,9 +390,11 @@ function main(gl_wait=true)
                         status[] = "Loading log file..."
                         reset_and_zoom(camera, scene3D, zoom[1])
                         try 
-                            # log = nothing
-                            # sleep(0.1)  
-                            log = load_log(se().segments+1, logfile)
+                            tmp = load_log(7, logfile)
+                            for i in 1:length(tmp.syslog)
+                                dummy=tmp.syslog[i]
+                            end
+                            log = tmp
                             status[] = old 
                         catch e
                             bt = catch_backtrace()
