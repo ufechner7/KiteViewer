@@ -1,6 +1,6 @@
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.7.0"
+julia_version = "1.7.1"
 manifest_format = "2.0"
 
 [[deps.AbstractFFTs]]
@@ -381,9 +381,9 @@ version = "3.3.10+0"
 
 [[deps.FastBroadcast]]
 deps = ["LinearAlgebra", "Polyester", "Static"]
-git-tree-sha1 = "e32a81c505ab234c992ca978f31ed8b0dabbc327"
+git-tree-sha1 = "0f8ef5dcb040dbb9edd98b1763ac10882ee1ff03"
 uuid = "7034ab61-46d4-4ed7-9d0f-46aef9175898"
-version = "0.1.11"
+version = "0.1.12"
 
 [[deps.FileIO]]
 deps = ["Pkg", "Requires", "UUIDs"]
@@ -1185,9 +1185,9 @@ version = "1.2.0"
 
 [[deps.Revise]]
 deps = ["CodeTracking", "Distributed", "FileWatching", "JuliaInterpreter", "LibGit2", "LoweredCodeUtils", "OrderedCollections", "Pkg", "REPL", "Requires", "UUIDs", "Unicode"]
-git-tree-sha1 = "e548ac9d96617541b5aa3be54990937b8c0f2be9"
+git-tree-sha1 = "2f9d4d6679b5f0394c52731db3794166f49d5131"
 uuid = "295af30f-e4ad-537b-8983-00126c2a3abe"
-version = "3.3.0"
+version = "3.3.1"
 
 [[deps.Rmath]]
 deps = ["Random", "Rmath_jll"]
