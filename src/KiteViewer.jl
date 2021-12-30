@@ -390,7 +390,7 @@ function main(gl_wait=true)
                         status[] = "Loading log file..."
                         reset_and_zoom(camera, scene3D, zoom[1])
                         try 
-                            tmp = load_log(7, logfile)
+                            tmp = load_log(se().segments+1, logfile)
                             for i in 1:length(tmp.syslog)
                                 dummy=tmp.syslog[i]
                             end
