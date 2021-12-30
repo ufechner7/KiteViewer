@@ -389,7 +389,9 @@ function main(gl_wait=true)
                         old =  status[]
                         status[] = "Loading log file..."
                         reset_and_zoom(camera, scene3D, zoom[1])
-                        try   
+                        try 
+                            # log = nothing
+                            # sleep(0.1)  
                             log = load_log(se().segments+1, logfile)
                             status[] = old 
                         catch e
@@ -413,7 +415,18 @@ function main(gl_wait=true)
             i = 0; energy[1] = 0.0
             while FLYING[1]
                 if PLAYING[1]
-                    state = log.syslog[i+1]
+                    state = nothing
+                    # println("===> i: ", i)
+                    try
+                        @assert i >= 0
+                        @assert i < length(log.syslog)
+                        state = log.syslog[i+1]
+                    catch e
+                        bt = catch_backtrace()
+                        msg = sprint(showerror, e, bt)
+                        println(msg)
+                        raise(e)
+                    end
                 else
                     try
                         state = next_step(se().segments+1, integrator, delta_t)
