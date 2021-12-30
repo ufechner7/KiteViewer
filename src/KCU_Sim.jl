@@ -7,12 +7,7 @@ using KiteUtils, Parameters
 export calc_alpha_depower, init_kcu, set_depower_steering, get_depower, get_steering, on_timer
 
 @consts begin
-    HEIGHT_K = 2.23                        # height of the kite
-    HEIGHT_B = 4.9                         # height of the bridle
-    POWER2STEER_DIST = 1.3                 
-    DEPOWER_DRUM_DIAMETER = 69.0e-3 * 0.97 # outer diameter of the depower drum at depower = DEPOWER_OFFSET [m]
-    DEPOWER_OFFSET = 23.6
-    STEERING_LINE_SAG = 0.0                # sag of the steering lines in percent
+    set = se()              
     TAPE_THICKNESS = 6e-4           # thickness of the depower tape [m]
     V_DEPOWER  = 0.075            # max velocity of depowering in units per second (full range: 1 unit)
     V_STEERING = 0.2              # max velocity of steering in units per second   (full range: 2 units)
@@ -21,10 +16,10 @@ export calc_alpha_depower, init_kcu, set_depower_steering, get_depower, get_stee
 end
 
 @with_kw mutable struct KCUState{S}
-    set_depower::S =         DEPOWER_OFFSET * 0.01
+    set_depower::S =         set.depower_offset * 0.01
     set_steering::S =        0.0
-    depower::S =             DEPOWER_OFFSET * 0.01   #    0 .. 1.0
-    steering::S =            0.0                     # -1.0 .. 1.0
+    depower::S =             set.depower_offset * 0.01   #    0 .. 1.0
+    steering::S =            0.0                         # -1.0 .. 1.0
 end
 
 const kcu_state = KCUState{Float64}()
@@ -32,9 +27,9 @@ const kcu_state = KCUState{Float64}()
 # Calculate the length increase of the depower line [m] as function of the relative depower
 # setting [0..1].
 function calc_delta_l(rel_depower)
-    u = DEPOWER_DRUM_DIAMETER * (100.0 + STEERING_LINE_SAG) / 100.0
+    u = set.depower_drum_diameter
     l_ro = 0.0
-    rotations = (rel_depower - 0.01 * DEPOWER_OFFSET) * 10.0 * 11.0 / 3.0 * (3918.8 - 230.8) / 4096.
+    rotations = (rel_depower - 0.01 * set.depower_offset) * 10.0 * 11.0 / 3.0 * (3918.8 - 230.8) / 4096.
     while rotations > 0.0
          l_ro += u * π    
          rotations -= 1.0
@@ -49,8 +44,8 @@ end
 # calculate the change of the angle between the kite and the last tether segment [rad] as function of the
 # length increase of the depower line delta_l [m].
 function calc_alpha_depower(rel_depower)
-    a   = POWER2STEER_DIST
-    b_0 = HEIGHT_B + 0.5 * HEIGHT_K
+    a   =  set.power2steer_dist
+    b_0 = set.height_b + 0.5 * set.height_k
     b = b_0 + 0.5 * calc_delta_l(rel_depower) # factor 0.5 due to the pulleys
 
     c = sqrt(a * a + b_0 * b_0)
@@ -72,10 +67,10 @@ function calc_alpha_depower(rel_depower)
 end
 
 function init_kcu()
-    kcu_state.set_depower =         DEPOWER_OFFSET * 0.01
+    kcu_state.set_depower =         set.depower_offset * 0.01
     kcu_state.set_steering =        0.0
-    kcu_state.depower =             DEPOWER_OFFSET * 0.01   #    0 .. 1.0
-    kcu_state.steering =            0.0                     # -1.0 .. 1.0
+    kcu_state.depower =             set.depower_offset * 0.01   #    0 .. 1.0
+    kcu_state.steering =            0.0                         # -1.0 .. 1.0
 end
 
 function set_depower_steering(depower, steering)
