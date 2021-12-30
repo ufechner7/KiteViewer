@@ -439,7 +439,11 @@ function main(gl_wait=true)
                     end                   
                 end
                 if running[] || ! PLAYING[1]
-                    @sync update_system(scene3D, state, i)
+                    if ! isnothing(state)
+                        @sync update_system(scene3D, state, i)
+                    else
+                        println("Warning! isnothing(state)")
+                    end
                     pos_x[] = i*delta_t
                     i += 1
                 end
