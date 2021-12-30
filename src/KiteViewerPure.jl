@@ -24,7 +24,7 @@ SOFTWARE. =#
 
 using GeometryBasics, Rotations, GLMakie, FileIO, LinearAlgebra, Printf, Parameters
 
-using KiteUtils, Plot2D
+using KiteUtils
 
 @consts begin
     SCALE = 1.2 
@@ -47,8 +47,6 @@ using KiteUtils, Plot2D
     p1 = Node(Vector{Point2f0}(undef, 6000)) # 5 min
     p2 = Node(Vector{Point2f0}(undef, 6000)) # 5 min
     pos_x = Node(0.0f0)
-    y_label1 = Node("")
-    y_label2 = Node("")
 
     points          = Vector{Point3f0}(undef, se().segments+1)
     quat            = Node(Quaternionf0(0,0,0,1))                        # orientation of the kite
@@ -180,7 +178,7 @@ function reset_and_zoom(camera, scene3D, zoom)
 end
 
 function main(gl_wait=true)
-    scene, layout = layoutscene(resolution = (840+800, 900), backgroundcolor = RGBf0(0.7, 0.8, 1))
+    scene, layout = layoutscene(resolution = (840, 900), backgroundcolor = RGBf0(0.7, 0.8, 1))
     scene3D = LScene(scene, scenekw = (show_axis=false, limits = Rect(-7,-10.0,0, 11,10,11), resolution = (800, 800)), raw=false)
     create_coordinate_system(scene3D)
     cam = cameracontrols(scene3D.scene)
@@ -201,22 +199,12 @@ function main(gl_wait=true)
 
     layout[1, 1] = scene3D
     layout[2, 1] = buttongrid = GridLayout(tellwidth = false)
-    layout[1, 2] = ax1 = Axis(scene, xlabel = "time [s]", ylabel = y_label1)
-    layout[2, 2] = ax2 = Axis(scene, xlabel = "time [s]", ylabel = y_label2)
-    linkxaxes!(ax1, ax2)
 
     l_sublayout = GridLayout()
     layout[1:3, 1] = l_sublayout
     l_sublayout[:v] = [scene3D, buttongrid]
 
     log = demo_log(7, "Launch test!")
-    plot2d(se, ax1, y_label1, log, p1, :height)
-    lines!(ax1, p1)
-    vlines!(ax1, pos_x, color = :red)
-
-    plot2d(se, ax2, y_label2, log, p2, :elevation, true)
-    lines!(ax2, p2)
-    vlines!(ax2, pos_x, color = :red)
 
     btn_RESET       = Button(scene, label = "RESET")
     btn_ZOOM_in     = Button(scene, label = "Zoom +")
@@ -237,38 +225,7 @@ function main(gl_wait=true)
     reset_view(camera, scene3D)
 
     reset() = reset_and_zoom(camera, scene3D, zoom[1]) 
-    layout[3, 2] = bg = GridLayout(tellwidth = false, default_colgap=10)
-    buttons(scene, bg, se, ax1, ax2, y_label1, y_label2, reset)
-
-    on(scene.events.keyboardbutton) do event
-        if event.action in (Keyboard.press, Keyboard.repeat)
-             event.key == Keyboard.left   && steer_left()
-             event.key == Keyboard.right  && steer_right()
-        end
-        # Let the event reach other listeners
-        return false
-    end
-
     status[] = "Stopped"
-
-    @async begin
-        while true
-            if starting[1] == 1
-                starting[1] = 0
-                plot2d(se, ax1, y_label1, log, p1, :height)
-                if PLAYING[]
-                    plot2d(se, ax2, y_label2, log, p2, :power, true)
-                else
-                    plot2d(se, ax2, y_label2, log, p2, :elevation, true)
-                end
-                x2 = log.extlog.time
-                xlims!(ax2, x2[1], x2[end])
-                reset_and_zoom(camera, scene3D, zoom[1])  
-            else
-                sleep(0.1)
-            end
-        end
-    end
 
     @async begin
         logfile=se().log_file * ".arrow"  
