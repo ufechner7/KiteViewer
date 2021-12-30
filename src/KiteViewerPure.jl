@@ -320,17 +320,24 @@ function main(gl_wait=true)
                         old =  status[]
                         status[] = "Loading log file..."
                         reset_and_zoom(camera, scene3D, zoom[1])
-                        try 
-                            log = load_log(se().segments+1, logfile)
-                            status[] = old 
-                        catch e
-                            bt = catch_backtrace()
-                            msg = sprint(showerror, e, bt)
-                            println(msg)
-                            raise(e)
-                            status[] = "Error loading log file: " * logfile
-                        end 
-                         
+                        log = demo_log(7, "Launch test!")
+                        tmp = load_log(se().segments+1, logfile)
+                        for i in 1:length(tmp.syslog)
+                            dummy=tmp.syslog[i]
+                            j=i+1
+                        end
+                        log=tmp
+                        # try 
+                        #     log = load_log(se().segments+1, logfile)
+                        #     status[] = old 
+                        # catch e
+                        #     bt = catch_backtrace()
+                        #     msg = sprint(showerror, e, bt)
+                        #     println(msg)
+                        #     raise(e)
+                        #     status[] = "Error loading log file: " * logfile
+                        # end 
+                        status[] = old 
                     end
                     steps = length(log.syslog)  
                 end  
