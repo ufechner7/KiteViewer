@@ -1,7 +1,7 @@
 module RTSim
 
 using Sundials, StaticArrays, Rotations
-using KiteUtils, KPS3, KCU_Sim
+using KiteUtils, KPS3, KitePodSimulator
 
 export init_sim, get_height, get_sysstate, next_step
 
@@ -63,7 +63,7 @@ function get_sysstate(P)
 end
 
 function next_step(P, integrator, dt)
-    KCU_Sim.on_timer()
+    KitePodSimulator.on_timer()
     KPS3.set_depower_steering(KPS3.state, 0.236, get_steering())
     step!(integrator, dt, true)
     u = integrator.u
