@@ -41,4 +41,4 @@ julia --project -e "using Pkg; Pkg.precompile()"
 cd src
 touch *.jl # make sure all modules get recompiled in the next step
 cd ..
-julia --project -J MakieSys-${julia_major}-${branch}.so -e "push!(LOAD_PATH,joinpath(pwd(),\"src\"));using KiteUtils, KCU_Sim, KPS3, Plot2D, RTSim"
+julia --project -J MakieSys-${julia_major}-${branch}.so -e "push!(LOAD_PATH,joinpath(pwd(),\"src\"));using KiteUtils, KitePodSimulator, KiteModels, Plot2D, RTSim"
