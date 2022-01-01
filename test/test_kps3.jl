@@ -68,29 +68,27 @@ end
     @test v_app_perp ≈ [ 35.1, 52.2, 69.3]
 end
 
-#=
 @testset "test_calc_aero_forces" begin
-    set_defaults(state)
-    state.v_apparent .= KVec3(35.1, 52.2, 69.3)
+    set_defaults()
+    kps.v_apparent .= KVec3(35.1, 52.2, 69.3)
     pos_kite = KVec3(30.0, 5.0, 100.0)
     v_kite = KVec3(3.0, 5.0, 2.0)
-    rho = SimFloat(calc_rho(10.0))
+    rho = SimFloat(calc_rho(kps, 10.0))
     rel_steering = 0.1
-    state.beta = 0.1
-    state.psi = 0.2
-    state.param_cl = 0.2
-    state.param_cd = 1.0
-    KPS3.calc_aero_forces(state, pos_kite, v_kite, rho, rel_steering)
-    @test state.v_apparent ≈ [5.0,  -5, -2]
-    @test state.kite_y ≈ [ 0.64101597,  0.73258967, -0.22893427]
-    @test state.cor_steering ≈ 0.0250173783309
-    @test state.steering_force ≈ [-15.88482337, -18.15408385, 5.6731512 ]
-    @test state.last_force ≈ [-555.24319976, 544.82004621, 80.49946362]
+    kps.beta = 0.1
+    kps.psi = 0.2
+    kps.param_cl = 0.2
+    kps.param_cd = 1.0
+    KiteModels.calc_aero_forces(kps, pos_kite, v_kite, rho, rel_steering)
+    @test kps.v_apparent ≈ [5.0,  -5, -2]
+    @test kps.kite_y ≈ [ 0.64101597,  0.73258967, -0.22893427]
+    @test kps.cor_steering ≈ 0.0250173783309
+    @test kps.steering_force ≈ [-15.88482337, -18.15408385, 5.6731512 ]
+    @test kps.last_force ≈ [-555.24319976, 544.82004621, 80.49946362]
 end
 
 @testset "test_calc_res        " begin
-    set_defaults(state)
-    KPS3.clear(state)
+    set_defaults()
     i = 2
     pos1 = KVec3(30.0, 5.0, 100.0)
     pos2 = KVec3(30.0+10, 5.0+11, 100.0+20)
@@ -99,20 +97,21 @@ end
     mass = 9.0
     veld = KVec3(0.1, 0.3, 0.4)
     result = KVec3(0, 0, 0)
-    state.c_spring = 0.011
-    state.damping = 0.01
-    state.last_tether_drag = KVec3(5.0,6,7)
-    state.last_force = KVec3(-1.0, -2, -3)
-    state.v_app_perp = KVec3(0.1,0.22,0.33)
-    state.v_wind_tether .= [0.1, 0.2, 0.3]
-    state.length = 10.0
-    KPS3.calc_res(state, pos1, pos2, vel1, vel2, mass, veld, result, i)
+    kps.c_spring = 0.011
+    kps.damping = 0.01
+    kps.last_tether_drag = KVec3(5.0,6,7)
+    kps.last_force = KVec3(-1.0, -2, -3)
+    kps.v_app_perp = KVec3(0.1,0.22,0.33)
+    kps.v_wind_tether .= [0.1, 0.2, 0.3]
+    kps.length = 10.0
+    KiteModels.calc_res(kps, pos1, pos2, vel1, vel2, mass, veld, result, i)
     @test_broken result ≈ [  0.20699179,   0.49870291,  10.58156092]
     i = SEGMENTS+1
-    KPS3.calc_res(state, pos1, pos2, vel1, vel2, mass, veld, result, i)
+    KiteModels.calc_res(kps, pos1, pos2, vel1, vel2, mass, veld, result, i)
     @test_broken result ≈ [0.04174994,  0.14058806, 10.32680159]
 end
 
+#=
 @testset "test_calc_loop       " begin
     KPS3.clear(state)
     state.last_tether_drag = KVec3(5.0,6,7)
