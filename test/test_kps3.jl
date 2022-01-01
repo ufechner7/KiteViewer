@@ -111,16 +111,15 @@ end
     @test_broken result ≈ [0.04174994,  0.14058806, 10.32680159]
 end
 
-#=
 @testset "test_calc_loop       " begin
-    KPS3.clear(state)
-    state.last_tether_drag = KVec3(5.0,6,7)
-    state.last_force = KVec3(-1.0, -2, -3)
-    state.v_app_perp = KVec3(0.1,0.22,0.33)
-    state.v_wind_tether .= [0.1, 0.2, 0.3]
-    state.length = 10.0
-    state.c_spring = KPS3.set.c_spring / state.length
-    state.damping  = KPS3.set.damping / state.length
+    set_defaults()
+    kps.last_tether_drag = KVec3(5.0,6,7)
+    kps.last_force = KVec3(-1.0, -2, -3)
+    kps.v_app_perp = KVec3(0.1,0.22,0.33)
+    kps.v_wind_tether .= [0.1, 0.2, 0.3]
+    kps.length = 10.0
+    kps.c_spring = kps.set.c_spring / kps.length
+    kps.damping  = kps.set.damping / kps.length
     pos  = zeros(SVector{SEGMENTS+1, KVec3})
     for i in 1:SEGMENTS+1
         pos[i][3] = 5.0 * (i-1)
@@ -130,9 +129,9 @@ end
     veld = zeros(SVector{SEGMENTS+1, KVec3})
     res1 = zeros(SVector{SEGMENTS+1, KVec3})
     res2 = zeros(SVector{SEGMENTS+1, KVec3})
-    @test state.c_spring ≈ 61460.0
-    @test state.damping  ≈    94.6
-    KPS3.loop(state, pos, vel, posd, veld, res1, res2)
+    @test kps.c_spring ≈ 61460.0
+    @test kps.damping  ≈    94.6
+    KiteModels.loop(kps, pos, vel, posd, veld, res1, res2)
     @test sum(res1) ≈ [0.0, 0.0, 0.0]
     @test_broken isapprox(res2[7], [5.03576566e-02, 1.00715313e-01, 7.81683430e+02], rtol=1e-4) 
     @test_broken isapprox(res2[6], [9.13190455e-03, 1.82638091e-02, 9.81000000e+00], rtol=1e-4) 
@@ -140,6 +139,7 @@ end
     @test_broken isapprox(res2[2], [2.38418505e-03, 4.76837010e-03, 9.81000000e+00], rtol=1e-4)
     @test isapprox(res2[1], [0.0,0.0,0.0], rtol=1e-4)
 end
+#=
 
 @testset "test_calc_alpha      " begin
     v_app = KVec3(10,2,3)
@@ -325,3 +325,9 @@ end
 #
 # KVec3     = MVector{3, SimFloat}
 #  Time  (mean ± σ):   509.464 ns ±  52.723 ns  Memory estimate: 0 bytes, allocs estimate: 0. =#
+
+@benchmark residual!(res, yd, y, p, t) setup = (res1 = zeros(SVector{SEGMENTS, KVec3}); res2 = deepcopy(res1); 
+                                                               res = reduce(vcat, vcat(res1, res2)); pos = deepcopy(res1);
+                                                               pos[1] .= [1.0,2,3]; vel = deepcopy(res1); y = reduce(vcat, vcat(pos, vel));
+                                                               der_pos = deepcopy(res1); der_vel = deepcopy(res1); yd = reduce(vcat, vcat(der_pos, der_vel));
+                                                               p = kps; t = 0.0)
