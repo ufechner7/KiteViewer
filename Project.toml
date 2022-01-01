@@ -27,6 +27,6 @@ YAML = "ddb6d928-2868-570f-bddf-ab3f9cf99eb6"
 [compat]
 Arrow = "1.4"
 KiteUtils = "0.2.5"
-KitePodSimulator = "0.2.0"
+KitePodSimulator = "0.2.1"
 StaticArrays = "= 1.2.5"
 julia = "~1.6, ~1.7"
