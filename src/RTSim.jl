@@ -1,16 +1,16 @@
 module RTSim
 
 using Sundials, StaticArrays, Rotations
-using KiteUtils, KPS3, KitePodSimulator
+using KiteUtils, KiteModels, KitePodSimulator
 
 export init_sim, get_height, get_sysstate, next_step
 
 const SEGMENTS = se().segments
 const kcu = KCU()
 
-# create a SysState struct from KPS3.state
+# create a SysState struct from KiteModels.state
 function SysState(P)
-    my_state = KPS3.get_state()
+    my_state = KiteModels.get_state()
     pos = my_state.pos
     X = zeros(MVector{P, MyFloat})
     Y = zeros(MVector{P, MyFloat})
@@ -36,17 +36,17 @@ function SysState(P)
 end
 
 function get_height()
-    my_state = KPS3.get_state()
+    my_state = KiteModels.get_state()
     my_state.pos[end][3]
 end
 
 function init_sim(t_end)
     init_kcu(kcu, se())
-    my_state = KPS3.get_state()
+    my_state = KiteModels.get_state()
     clear(my_state)
-    y0, yd0 = KPS3.find_steady_state(my_state)
+    y0, yd0 = KiteModels.find_steady_state(my_state)
 
-    # forces = KPS3.get_spring_forces(my_state, my_state.pos)
+    # forces = KiteModels.get_spring_forces(my_state, my_state.pos)
     # println(forces)
 
     differential_vars =  ones(Bool, 36)
@@ -65,7 +65,7 @@ end
 
 function next_step(P, integrator, dt)
     KitePodSimulator.on_timer(kcu)
-    KPS3.set_depower_steering(KPS3.state, kcu, 0.236, get_steering(kcu))
+    KiteModels.set_depower_steering(KiteModels.state, kcu, 0.236, get_steering(kcu))
     step!(integrator, dt, true)
     u = integrator.u
     t = integrator.t
@@ -75,7 +75,7 @@ function next_step(P, integrator, dt)
     #     v_ro = 1.0
     # end
     v_ro = 0.0
-    set_v_reel_out(KPS3.state, v_ro, t)
+    set_v_reel_out(KiteModels.state, v_ro, t)
     SysState(P)
 end
 
