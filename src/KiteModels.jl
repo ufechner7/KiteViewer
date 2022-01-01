@@ -35,7 +35,7 @@ using Dierckx, StaticArrays, LinearAlgebra, Parameters, NLsolve
 using KiteUtils, KitePodSimulator
 
 export KPS3, KVec3, SimFloat, ProfileLaw, EXP, LOG, EXPLOG                              # constants and types
-export calc_cl, calc_rho, calc_wind_factor, calc_drag, calc_set_cl_cd, clear, residual! # functions
+export calc_rho, calc_wind_factor, calc_drag, calc_set_cl_cd, clear, residual!          # functions
 export set_v_reel_out, set_depower_steering                                             # setters  
 export get_force, get_lod                                                               # getters
 
@@ -90,7 +90,7 @@ State of the kite power system. Parameters:
     seg_area::S =         zero(S)   # area of one tether segment
     bridle_area::S =      zero(S)
     c_spring::S =         zero(S)   # depends on lenght of tether segement
-    length::S =           set.l_tether / P
+    length::S =           0.0
     damping::S =          zero(S)   # depends on lenght of tether segement
     area::S =             zero(S)
     last_v_app_norm_tether::S = zero(S)
@@ -125,8 +125,8 @@ function clear(s)
     s.v_wind_tether .= [s.set.v_wind, 0, 0]
     s.v_apparent    .= [s.set.v_wind, 0, 0]
     s.l_tether = s.set.l_tether
+    s.length = s.l_tether / s.set.segments
     s.pos_kite, s.v_kite = zeros(SimFloat, 3), zeros(SimFloat, 3)
-    # TODO: Check 
     s.initial_masses .= ones(s.set.segments+1) * 0.011 * s.set.l_tether / s.set.segments # Dyneema: 1.1 kg/ 100m
     s.rho = s.set.rho_0
     s.c_spring = s.set.c_spring / s.length
