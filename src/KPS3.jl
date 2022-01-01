@@ -47,7 +47,6 @@ set_zero_subnormals(true)         # required to avoid drastic slow down on Intel
     SEGMENTS = set.segments
     G_EARTH = 9.81                # gravitational acceleration
     BRIDLE_DRAG = 1.1             # should probably be removed
-    X0 = zeros(2 * SEGMENTS)
     calc_cl = Spline1D(set.alpha_cl, set.cl_list)
     calc_cd = Spline1D(set.alpha_cd, set.cd_list)
 end
@@ -388,12 +387,6 @@ function tether_length(pos)
     return length
 end
 
-const pos = zeros(SVector{SEGMENTS+1, KVec3})
-const vel = zeros(SVector{SEGMENTS+1, KVec3})
-const acc = zeros(SVector{SEGMENTS+1, KVec3})
-const state_y0 = zeros(SVector{2*SEGMENTS, KVec3})
-const yd0 = zeros(SVector{2*SEGMENTS, KVec3})
-
 function calc_pre_tension(s)
     forces = get_spring_forces(s, s.pos)
     av_force = 0.0
@@ -409,8 +402,13 @@ end
 
 # Calculate the initial conditions y0, yd0 and sw0. Tether with the given elevation angle,
 # particle zero fixed at origin. """
-function init(s, X=X0; output=false)
-    global pos, vel, acc, state_y0, yd0
+function init(s, X; output=false)
+    # X = zeros(2 * SEGMENTS)
+    pos = zeros(SVector{SEGMENTS+1, KVec3})
+    vel = zeros(SVector{SEGMENTS+1, KVec3})
+    acc = zeros(SVector{SEGMENTS+1, KVec3})
+    state_y0 = zeros(SVector{2*SEGMENTS, KVec3})
+    yd0 = zeros(SVector{2*SEGMENTS, KVec3})
 
     DELTA = 1e-6
     set_cl_cd(s, 10.0/180.0 * π)
@@ -458,21 +456,20 @@ function init(s, X=X0; output=false)
     return reduce(vcat, state_y0), reduce(vcat, yd0)
 end
 
-const res = zeros(MVector{6*SEGMENTS, SimFloat})
-
-# helper function for the steady state finder
-function test_initial_condition!(F, x::Vector)
-    global res, state
-    y0, yd0 = init(state, x)
-    residual!(res, yd0, y0, [0.0], 0.0)
-    for i in 1:SEGMENTS
-        F[i] = res[1 + 3*(i-1) + 3*SEGMENTS]
-        F[i+SEGMENTS] = res[3 + 3*(i-1) + 3*SEGMENTS]
-    end
-    return nothing 
-end
-
 function find_steady_state(s, prn=false)
+    res = zeros(MVector{6*SEGMENTS, SimFloat})
+    state = s
+
+    # helper function for the steady state finder
+    function test_initial_condition!(F, x::Vector)
+        y0, yd0 = init(state, x)
+        residual!(res, yd0, y0, [0.0], 0.0)
+        for i in 1:SEGMENTS
+            F[i] = res[1 + 3*(i-1) + 3*SEGMENTS]
+            F[i+SEGMENTS] = res[3 + 3*(i-1) + 3*SEGMENTS]
+        end
+        return nothing 
+    end
     if prn println("\nStarted function test_nlsolve...") end
     results = nlsolve(test_initial_condition!, zeros(SimFloat, 2*SEGMENTS))
     if prn println("\nresult: $results") end
