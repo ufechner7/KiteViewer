@@ -324,10 +324,10 @@ end
 
 # Setter depower and the steering model inputs. Valid range for steering: -1.0 .. 1.0.
 # Valid range for depower: 0 .. 1.0
-function set_depower_steering(s, depower, steering)
+function set_depower_steering(s, kcu, depower, steering)
     s.steering = steering
     s.depower  = depower
-    s.alpha_depower = calc_alpha_depower(depower) * (set.alpha_d_max / 31.0)
+    s.alpha_depower = calc_alpha_depower(kcu, depower) * (set.alpha_d_max / 31.0)
     # s.steering = (steering - set.c0) / (1.0 + set.k_ds * (s.alpha_depower / deg2rad(set.alpha_d_max)))
     nothing
 end

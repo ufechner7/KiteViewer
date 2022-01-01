@@ -5,7 +5,8 @@ using KiteUtils, KPS3, KitePodSimulator
 
 export init_sim, get_height, get_sysstate, next_step
 
-const SEGMENTS = KPS3.SEGMENTS
+const SEGMENTS = se().segments
+const kcu = KCU()
 
 # create a SysState struct from KPS3.state
 function SysState(P)
@@ -40,7 +41,7 @@ function get_height()
 end
 
 function init_sim(t_end)
-    init_kcu()
+    init_kcu(kcu, se())
     my_state = KPS3.get_state()
     clear(my_state)
     y0, yd0 = KPS3.find_steady_state(my_state)
@@ -63,8 +64,8 @@ function get_sysstate(P)
 end
 
 function next_step(P, integrator, dt)
-    KitePodSimulator.on_timer()
-    KPS3.set_depower_steering(KPS3.state, 0.236, get_steering())
+    KitePodSimulator.on_timer(kcu)
+    KPS3.set_depower_steering(KPS3.state, kcu, 0.236, get_steering(kcu))
     step!(integrator, dt, true)
     u = integrator.u
     t = integrator.t
