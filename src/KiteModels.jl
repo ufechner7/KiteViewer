@@ -34,14 +34,13 @@ module KiteModels
 using Dierckx, StaticArrays, LinearAlgebra, Parameters, NLsolve
 using KiteUtils, KitePodSimulator
 
-export KPS3, KVec3, SimFloat, ProfileLaw, EXP, LOG, EXPLOG                             # constants and types
+export KPS3, KVec3, SimFloat, ProfileLaw, EXP, LOG, EXPLOG                              # constants and types
 export calc_cl, calc_rho, calc_wind_factor, calc_drag, calc_set_cl_cd, clear, residual! # functions
 export set_v_reel_out, set_depower_steering                                             # setters  
 export get_force, get_lod                                                               # getters
 
 set_zero_subnormals(true)         # required to avoid drastic slow down on Intel CPUs when numbers become very small
 
-# Constants
 # Constants
 const G_EARTH = 9.81                # gravitational acceleration
 const BRIDLE_DRAG = 1.1             # should probably be removed
@@ -111,11 +110,6 @@ const SVec3    = SVector{3, SimFloat}
     initial_masses::MVector{set.segments+1, SimFloat} = ones(set.segments+1) * 0.011 * set.l_tether / set.segments # Dyneema: 1.1 kg/ 100m
     masses::MVector{set.segments+1, SimFloat}         = ones(set.segments+1)
 end
-
-const state = KPS3{SimFloat, KVec3}()
-
-# Functions
-function get_state() state end
 
 # TODO: completely initialize, even if the project has changed
 function clear(s)
@@ -284,7 +278,7 @@ function residual!(res, yd, y::MVector{S, SimFloat}, p, time) where S
     veld = SVector{div(S,6)+1}(if i==1 SVector(0.0,0,0) else SVector(veld1[:,i-1]) end for i in 1:div(S,6)+1)
 
     # update parameters
-    s = state
+    s = p
     s.pos_kite .= pos[div(S,6)+1]
     s.v_kite   .= vel[div(S,6)+1]
     delta_t = time - s.t_0
@@ -468,7 +462,8 @@ function find_steady_state(s, prn=false)
     # helper function for the steady state finder
     function test_initial_condition!(F, x::Vector)
         y0, yd0 = init(state, x)
-        residual!(res, yd0, y0, [0.0], 0.0)
+        # residual!((res, yd0, y0, [0.0], 0.0) -> residual!(res, yd0, y0, [0.0], 0.0, state))
+        residual!(res, yd0, y0, state, 0.0)
         for i in 1:SEGMENTS
             F[i] = res[1 + 3*(i-1) + 3*SEGMENTS]
             F[i+SEGMENTS] = res[3 + 3*(i-1) + 3*SEGMENTS]
