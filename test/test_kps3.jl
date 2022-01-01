@@ -1,76 +1,74 @@
 using Test, BenchmarkTools, StaticArrays, Revise, LinearAlgebra, SciMLBase, GLMakie, KiteUtils
 
-if ! @isdefined KPS3
-    includet("../src/KPS3.jl")
-    using .KPS3
+using KiteModels, KitePodSimulator
+
+const SEGMENTS = se().segments
+if ! @isdefined kcu
+    const kcu = KCU()
+    const kps = KPS3(kcu)
 end
 
-function set_defaults(state)
-    KPS3.set.l_tether = 150.0
-    KPS3.set.elevation = 60.0
-    KPS3.set.area = 20.0
-    KPS3.set.rel_side_area = 50.0
-    KPS3.set.v_wind = 8.0
-    KPS3.set.mass = 11.4
-    KPS3.set.damping =  2 * 473.0
-    KPS3.set.alpha = 1.0/7
-    KPS3.set.c_s = 0.6
-    KPS3.clear(state)
+function set_defaults()
+    KiteModels.clear(kps)
+    kps.set.l_tether = 150.0
+    kps.set.elevation = 60.0
+    kps.set.area = 20.0
+    kps.set.rel_side_area = 50.0
+    kps.set.v_wind = 8.0
+    kps.set.mass = 11.4
+    kps.set.damping =  2 * 473.0
+    kps.set.alpha = 1.0/7
+    kps.set.c_s = 0.6
+    
 end
 
 function init_392()
-    my_state = KPS3.get_state()
-    KPS3.set.l_tether = 392.0
-    KPS3.set.elevation = 70.0
-    KPS3.set.area = 10.0
-    KPS3.set.rel_side_area = 50.0
-    KPS3.set.v_wind = 9.1
-    KPS3.set.mass = 6.2
-    KPS3.set.c_s = 0.6
-    KPS3.clear(my_state)
+    KiteModels.clear(kps)
+    kps.set.l_tether = 392.0
+    kps.set.elevation = 70.0
+    kps.set.area = 10.0
+    kps.set.rel_side_area = 50.0
+    kps.set.v_wind = 9.1
+    kps.set.mass = 6.2
+    kps.set.c_s = 0.6
 end
 
-if ! @isdefined state
-    const state = State{SimFloat, KPS3.KVec3}()
-    const SEGMENTS  = se().segments
-    set_defaults(state)
-end
-
+set_defaults()
 
 @testset "calc_rho             " begin
-    @test isapprox(calc_rho(0.0), 1.225, atol=1e-5) 
-    @test isapprox(calc_rho(100.0), 1.210756, atol=1e-5) 
+    @test isapprox(calc_rho(kps, 0.0), 1.225, atol=1e-5) 
+    @test isapprox(calc_rho(kps, 100.0), 1.210756, atol=1e-5) 
 end
 
 @testset "calc_wind_factor     " begin
-    my_state = KPS3.get_state()
-    set_defaults(my_state)
-    @test isapprox(calc_wind_factor(6.0, EXP),   1.0, atol=1e-5) 
-    @test isapprox(calc_wind_factor(10.0, EXP),  1.0757037, atol=1e-5) 
-    @test isapprox(calc_wind_factor(100.0, EXP), 1.494685, atol=1e-5)
+    set_defaults()
+    @test isapprox(calc_wind_factor(kps, 6.0, EXP),   1.0, atol=1e-5) 
+    @test isapprox(calc_wind_factor(kps, 10.0, EXP),  1.0757037, atol=1e-5) 
+    @test isapprox(calc_wind_factor(kps, 100.0, EXP), 1.494685, atol=1e-5)
 end
-
+ 
 @testset "calc_cl              " begin
-    @test isapprox(calc_cl(-5.0), 0.150002588978, atol=1e-4) 
-    @test isapprox(calc_cl( 0.0), 0.200085035326, atol=1e-4) 
-    @test isapprox(calc_cl(10.0), 0.574103590856, atol=1e-4)
-    @test isapprox(calc_cl(20.0), 1.0, atol=1e-4)
+    @test isapprox(kps.calc_cl(-5.0), 0.150002588978, atol=1e-4) 
+    @test isapprox(kps.calc_cl( 0.0), 0.200085035326, atol=1e-4) 
+    @test isapprox(kps.calc_cl(10.0), 0.574103590856, atol=1e-4)
+    @test isapprox(kps.calc_cl(20.0), 1.0, atol=1e-4)
 end
 
 @testset "test_calc_drag       " begin
     v_segment = KVec3(1.0, 2, 3)
     unit_vector = KVec3(2.0, 3.0, 4.0)
-    rho = SimFloat(calc_rho(10.0))
+    rho = SimFloat(calc_rho(kps, 10.0))
     last_tether_drag = KVec3(0.0, 0.0, 0.0)
     v_app_perp = KVec3(0, -3.0, -4.0)
     area = 20.0   
-    state.v_wind_tether .= [0.1, 0.2, 0.3]
-    v_app_norm = calc_drag(state, v_segment, unit_vector, rho, last_tether_drag, v_app_perp, area)
+    kps.v_wind_tether .= [0.1, 0.2, 0.3]
+    v_app_norm = calc_drag(kps, v_segment, unit_vector, rho, last_tether_drag, v_app_perp, area)
     @test v_app_norm ≈ 3.3674916481
     @test last_tether_drag ≈ [-38506.7140169,  -57266.39520463, -76026.07639235]
     @test v_app_perp ≈ [ 35.1, 52.2, 69.3]
 end
 
+#=
 @testset "test_calc_aero_forces" begin
     set_defaults(state)
     state.v_apparent .= KVec3(35.1, 52.2, 69.3)
@@ -327,4 +325,4 @@ end
 # Time  (mean ± σ):   52.215 μs ± 37.302 μs  Memory estimate: 16.92 KiB, allocs estimate: 614.
 #
 # KVec3     = MVector{3, SimFloat}
-#  Time  (mean ± σ):   509.464 ns ±  52.723 ns  Memory estimate: 0 bytes, allocs estimate: 0.
+#  Time  (mean ± σ):   509.464 ns ±  52.723 ns  Memory estimate: 0 bytes, allocs estimate: 0. =#
