@@ -48,7 +48,6 @@ const BRIDLE_DRAG = 1.1             # should probably be removed
 # TODO: remove
 @consts begin
     set    = se()                 # settings from settings.yaml
-    SEGMENTS = set.segments
     calc_cl = Spline1D(set.alpha_cl, set.cl_list)
     calc_cd = Spline1D(set.alpha_cd, set.cd_list)
 end
@@ -61,6 +60,8 @@ const SVec3    = SVector{3, SimFloat}
 @with_kw mutable struct KPS3{S, T}
     set::Settings = se()
     kcu::KCU = KCU()
+    calc_cl = Spline1D(se().alpha_cl, se().cl_list)
+    calc_cd = Spline1D(se().alpha_cd, se().cd_list)    
     v_wind::T =           [set.v_wind, 0, 0]    # wind vector at the height of the kite
     v_wind_gnd::T =       [set.v_wind, 0, 0]    # wind vector at reference height
     v_wind_tether::T =    [set.v_wind, 0, 0]
@@ -118,16 +119,26 @@ function clear(s)
     s.last_v_reel_out = 0.0
     s.area = set.area
     # self.sync_speed = 0.0
-    s.v_wind        .= [set.v_wind, 0, 0]    # wind vector at the height of the kite
-    s.v_wind_gnd    .= [set.v_wind, 0, 0]    # wind vector at reference height
-    s.v_wind_tether .= [set.v_wind, 0, 0]
+    s.v_wind        .= [s.set.v_wind, 0, 0]    # wind vector at the height of the kite
+    s.v_wind_gnd    .= [s.set.v_wind, 0, 0]    # wind vector at reference height
+    s.v_wind_tether .= [s.set.v_wind, 0, 0]
     s.l_tether = set.l_tether
     s.pos_kite, s.v_kite = zeros(SimFloat, 3), zeros(SimFloat, 3)
     # TODO: Check 
-    s.initial_masses .= ones(set.segments+1) * 0.011 * set.l_tether / set.segments
+    s.initial_masses .= ones(s.set.segments+1) * 0.011 * set.l_tether / set.segments
     s.rho = set.rho_0
     s.c_spring = set.c_spring / s.length
     s.damping  = set.damping / s.length
+end
+
+function KPS3(kcu::KCU)
+    s = KPS3{SimFloat, KVec3}()
+    s.set = kcu.set
+    s.kcu = kcu
+    s.calc_cl = Spline1D(s.set.alpha_cl, s.set.cl_list)
+    s.calc_cd = Spline1D(s.set.alpha_cd, s.set.cd_list)       
+    clear(s)
+    return s
 end
 
 # Calculate the air densisity as function of height
@@ -378,9 +389,9 @@ function get_lod(s)
     return lift / drag
 end
 
-function tether_length(pos)
+function tether_length(s, pos)
     length = 0.0
-    for i in 1:SEGMENTS
+    for i in 1:s.set.segments
         length += norm(pos[i+1] - pos[i])
     end
     return length
@@ -389,10 +400,10 @@ end
 function calc_pre_tension(s)
     forces = get_spring_forces(s, s.pos)
     av_force = 0.0
-    for i in 1:SEGMENTS
+    for i in 1:s.set.segments
         av_force += forces[i]
     end
-    av_force /= SEGMENTS
+    av_force /= s.set.segments
     res=av_force/set.c_spring
     if res < 0.0 res = 0.0 end
     if isnan(res) res = 0.0 end
@@ -402,12 +413,11 @@ end
 # Calculate the initial conditions y0, yd0 and sw0. Tether with the given elevation angle,
 # particle zero fixed at origin. """
 function init(s, X; output=false)
-    # X = zeros(2 * SEGMENTS)
-    pos = zeros(SVector{SEGMENTS+1, KVec3})
-    vel = zeros(SVector{SEGMENTS+1, KVec3})
-    acc = zeros(SVector{SEGMENTS+1, KVec3})
-    state_y0 = zeros(SVector{2*SEGMENTS, KVec3})
-    yd0 = zeros(SVector{2*SEGMENTS, KVec3})
+    pos = zeros(SVector{s.set.segments+1, KVec3})
+    vel = zeros(SVector{s.set.segments+1, KVec3})
+    acc = zeros(SVector{s.set.segments+1, KVec3})
+    state_y0 = zeros(SVector{2*s.set.segments, KVec3})
+    yd0 = zeros(SVector{2*s.set.segments, KVec3})
 
     DELTA = 1e-6
     set_cl_cd(s, 10.0/180.0 * π)
@@ -420,7 +430,7 @@ function init(s, X; output=false)
         if i==0
             pos[i+1] .= SVec3(0.0, DELTA, 0.0)
         else
-            pos[i+1] .= SVec3(-cos_el * radius1+X[i], DELTA, -sin_el * radius1+X[SEGMENTS+i])
+            pos[i+1] .= SVec3(-cos_el * radius1+X[i], DELTA, -sin_el * radius1+X[s.set.segments+i])
         end
         vel[i+1] .= SVec3(DELTA, DELTA, DELTA)
         acc[i+1] .= SVec3(DELTA, DELTA, DELTA)
@@ -456,7 +466,7 @@ function init(s, X; output=false)
 end
 
 function find_steady_state(s, prn=false)
-    res = zeros(MVector{6*SEGMENTS, SimFloat})
+    res = zeros(MVector{6*s.set.segments, SimFloat})
     state = s
 
     # helper function for the steady state finder
@@ -464,14 +474,14 @@ function find_steady_state(s, prn=false)
         y0, yd0 = init(state, x)
         # residual!((res, yd0, y0, [0.0], 0.0) -> residual!(res, yd0, y0, [0.0], 0.0, state))
         residual!(res, yd0, y0, state, 0.0)
-        for i in 1:SEGMENTS
-            F[i] = res[1 + 3*(i-1) + 3*SEGMENTS]
-            F[i+SEGMENTS] = res[3 + 3*(i-1) + 3*SEGMENTS]
+        for i in 1:s.set.segments
+            F[i] = res[1 + 3*(i-1) + 3*s.set.segments]
+            F[i+s.set.segments] = res[3 + 3*(i-1) + 3*s.set.segments]
         end
         return nothing 
     end
     if prn println("\nStarted function test_nlsolve...") end
-    results = nlsolve(test_initial_condition!, zeros(SimFloat, 2*SEGMENTS))
+    results = nlsolve(test_initial_condition!, zeros(SimFloat, 2*s.set.segments))
     if prn println("\nresult: $results") end
     res = init(s, results.zero; output=false)
     res

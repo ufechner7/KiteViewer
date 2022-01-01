@@ -7,7 +7,7 @@ export init_sim, get_height, get_sysstate, next_step
 
 const SEGMENTS = se().segments
 const kcu = KCU()
-const kps = KPS3{SimFloat, KVec3}()
+const kps = KPS3(kcu)
 
 # create a SysState struct from KiteModels.state
 function SysState(P)
