@@ -57,7 +57,7 @@ const SimFloat = Float64
 const KVec3    = MVector{3, SimFloat}
 const SVec3    = SVector{3, SimFloat}                   
 
-@with_kw mutable struct KPS3{S, T}
+@with_kw mutable struct KPS3{S, T, P}
     set::Settings = se()
     kcu::KCU = KCU()
     calc_cl = Spline1D(se().alpha_cl, se().cl_list)
@@ -83,13 +83,13 @@ const SVec3    = SVector{3, SimFloat}
     vec_z::T =            zeros(S, 3)
     pos_kite::T =         zeros(S, 3)
     v_kite::T =           zeros(S, 3)        
-    res1::SVector{set.segments+1, KVec3} = zeros(SVector{set.segments+1, KVec3})
-    res2::SVector{set.segments+1, KVec3} = zeros(SVector{set.segments+1, KVec3})
-    pos::SVector{set.segments+1, KVec3} = zeros(SVector{set.segments+1, KVec3})
+    res1::SVector{P, KVec3} = zeros(SVector{P, KVec3})
+    res2::SVector{P, KVec3} = zeros(SVector{P, KVec3})
+    pos::SVector{P, KVec3} = zeros(SVector{P, KVec3})
     seg_area::S =         zero(S)   # area of one tether segment
     bridle_area::S =      zero(S)
     c_spring::S =         zero(S)   # depends on lenght of tether segement
-    length::S =           set.l_tether / set.segments
+    length::S =           set.l_tether / P
     damping::S =          zero(S)   # depends on lenght of tether segement
     area::S =             zero(S)
     last_v_app_norm_tether::S = zero(S)
@@ -108,8 +108,8 @@ const SVec3    = SVector{3, SimFloat}
     rho::S =               set.rho_0
     depower::S =           0.0
     steering::S =          0.0
-    initial_masses::MVector{set.segments+1, SimFloat} = ones(set.segments+1) * 0.011 * set.l_tether / set.segments # Dyneema: 1.1 kg/ 100m
-    masses::MVector{set.segments+1, SimFloat}         = ones(set.segments+1)
+    initial_masses::MVector{P, SimFloat} = ones(P) * 0.011 * set.l_tether / P # Dyneema: 1.1 kg/ 100m
+    masses::MVector{P, SimFloat}         = ones(P)
 end
 
 # TODO: completely initialize, even if the project has changed
@@ -125,14 +125,14 @@ function clear(s)
     s.l_tether = set.l_tether
     s.pos_kite, s.v_kite = zeros(SimFloat, 3), zeros(SimFloat, 3)
     # TODO: Check 
-    s.initial_masses .= ones(s.set.segments+1) * 0.011 * set.l_tether / set.segments
+    s.initial_masses .= ones(s.set.segments+1) * 0.011 * set.l_tether / s.set.segments
     s.rho = set.rho_0
     s.c_spring = set.c_spring / s.length
     s.damping  = set.damping / s.length
 end
 
 function KPS3(kcu::KCU)
-    s = KPS3{SimFloat, KVec3}()
+    s = KPS3{SimFloat, KVec3, kcu.set.segments+1}()
     s.set = kcu.set
     s.kcu = kcu
     s.calc_cl = Spline1D(s.set.alpha_cl, s.set.cl_list)
