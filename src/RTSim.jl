@@ -62,7 +62,7 @@ end
 
 function next_step(P, integrator, dt)
     KitePodSimulator.on_timer(kcu)
-    KiteModels.set_depower_steering(kps, kcu, 0.236, get_steering(kcu))
+    KiteModels.set_depower_steering(kps, 0.236, get_steering(kcu))
     step!(integrator, dt, true)
     u = integrator.u
     t = integrator.t
