@@ -139,28 +139,28 @@ end
     @test_broken isapprox(res2[2], [2.38418505e-03, 4.76837010e-03, 9.81000000e+00], rtol=1e-4)
     @test isapprox(res2[1], [0.0,0.0,0.0], rtol=1e-4)
 end
-#=
+
 
 @testset "test_calc_alpha      " begin
     v_app = KVec3(10,2,3)
     vec_z = normalize(KVec3(3,2,0))
-    alpha = KPS3.calc_alpha(v_app, vec_z)
+    alpha = KiteModels.calc_alpha(v_app, vec_z)
     @test alpha ≈ -1.091003745821884
 end
 
 @testset "test_set_cl_cd       " begin
     alpha = 10.0
-    KPS3.set_cl_cd(state, alpha)
+    KiteModels.set_cl_cd(kps, alpha)
 end
 
 @testset "test_calc_set_cl_cd  " begin
     v_app = KVec3(10,2,3)
     vec_c = KVec3(3,2,0)
-    KPS3.calc_set_cl_cd(state, vec_c, v_app)
+    KiteModels.calc_set_cl_cd(kps, vec_c, v_app)
 end
 
 @testset "test_clear           " begin
-    KPS3.clear(state)
+    KiteModels.clear(kps)
 end
 
 # Inputs:
@@ -179,30 +179,30 @@ end
     der_pos = deepcopy(res1)
     der_vel = deepcopy(res1)
     yd = reduce(vcat, vcat(der_pos, der_vel))
-    p = SciMLBase.NullParameters()
+    p = kps
     t = 0.0
-    clear(state)
+    clear(kps)
     residual!(res, yd, y, p, t)
 end
 
 @testset "test_set_v_reel_out  " begin
     v_reel_out = 1.1
     t_0 = 5.5
-    set_v_reel_out(state, v_reel_out, t_0)
-    @test state.v_reel_out ≈ 1.1
-    @test state.t_0 ≈ 5.5
-    clear(state)
+    set_v_reel_out(kps, v_reel_out, t_0)
+    @test kps.v_reel_out ≈ 1.1
+    @test kps.t_0 ≈ 5.5
+    clear(kps)
 end
 
 @testset "test_set_depower_steering" begin
     depower  = 0.25
     steering = 0.0
-    set_depower_steering(state, depower, steering)
+    KiteModels.set_depower_steering(kps, depower, steering)
 end
 
 @testset "test_init            " begin
-    my_state = deepcopy(state)
-    y0, yd0 = KPS3.init(my_state)
+    my_state = deepcopy(kps)
+    y0, yd0 = KiteModels.init(my_state, zeros(SimFloat, 2*SEGMENTS))
     @test length(y0)  == (SEGMENTS) * 6
     @test length(yd0) == (SEGMENTS) * 6
     @test sum(y0)  ≈ 717.163369868302
@@ -211,16 +211,16 @@ end
     @test isapprox(my_state.param_cd, 0.125342896308, atol=1e-4)
 end
 
-res1 = zeros(SVector{SEGMENTS+1, KPS3.KVec3})
+res1 = zeros(SVector{SEGMENTS+1, KiteModels.KVec3})
 res2 = deepcopy(res1)
 if ! @isdefined res3
     const res3 = reduce(vcat, vcat(res1, res2))
 end
 
 function test_initial_condition(params::Vector)
-    my_state = KPS3.get_state()
-    y0, yd0 = KPS3.init(my_state, params)
-    residual!(res3, yd0, y0, 0.0, 0.0)
+    my_state = kps
+    y0, yd0 = KiteModels.init(my_state, params)
+    residual!(res3, yd0, y0, kps, 0.0)
     return norm(res3) # z component of force on all particles but the first
 end
 
@@ -233,13 +233,13 @@ z= nothing
     initial_x =  [-1.52505,  -3.67761,  -5.51761,  -6.08916,  -4.41371,  0.902124,  0.366393,  0.909132,  1.27537,  1.1538,  0.300657,  -1.51768]
     res=test_initial_condition(initial_x)
 
-    my_state = KPS3.get_state()
-    KPS3.set.l_tether = 392.0
-    KPS3.set.elevation = 70.0
-    KPS3.set.area = 10.0
-    KPS3.set.v_wind = 9.1
-    KPS3.set.mass = 6.2
-    KPS3.clear(my_state)
+    my_state = kps
+    kps.set.l_tether = 392.0
+    kps.set.elevation = 70.0
+    kps.set.area = 10.0
+    kps.set.v_wind = 9.1
+    kps.set.mass = 6.2
+    KiteModels.clear(my_state)
     # println("state.param_cl: $(my_state.param_cl), state.param_cd: $(my_state.param_cd)")
     # println("res2: "); display(my_state.res2)
     # println("pos: "); display(my_state.pos)
@@ -251,15 +251,13 @@ z= nothing
     end  
     # println(norm(res))
 
-    #=
-    @test my_state.length ≈ 65.36666666666667
-    @test my_state.c_spring ≈ 9402.345741968382
-    @test my_state.damping  ≈  14.472208057113717
-    @test isapprox(my_state.param_cl, 1.0, atol=1e-4)
-    @test isapprox(my_state.param_cd, 0.2, atol=1e-4) # [-275.31680793466865, -3.5309114469539753e-5, -873.0000830018812]
- 
-    @test sum(my_state.res1) ≈ [0.0, 1.0e-6, 0.0]
-    @test my_state.res2[1]   ≈ [1.00000000e-06,  1.00000000e-06,  1.00000000e-06] =#
+    @test my_state.length ≈ 65.33333333333333
+    @test my_state.c_spring ≈ 9407.142857142859
+    @test my_state.damping  ≈  14.479591836734695
+    @test isapprox(my_state.param_cl, 1.0641931441572074, atol=1e-4)
+    @test isapprox(my_state.param_cd, 0.22825898470541978, atol=1e-4)
+    @test sum(my_state.res1) ≈ [0.0, 0.0, 0.0]
+    @test my_state.res2[1]   ≈ [0.0, 0.0, 0.0]
 
     # @test isapprox(my_state.res2[2], [8.83559075e+00, -4.72588546e-07, -5.10109289e+00], rtol=3e-2)
     # @test isapprox(my_state.res2[3], [8.81318565e+00, -4.68864292e-07, -5.08829453e+00], rtol=1e-3)
@@ -267,7 +265,6 @@ z= nothing
     # println("res2: "); display(my_state.res2)
     # println("lift force: $(norm(my_state.lift_force)) N")
 end
-# lines(x, z)
 
 function run_benchmarks()
     println("\ncalc_rho:")
