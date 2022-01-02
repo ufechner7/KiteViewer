@@ -1,6 +1,6 @@
 using Test
 
-using KCU_Sim: calc_alpha_depower
+using KitePodSimulator: calc_alpha_depower
 
 using RTSim
 
