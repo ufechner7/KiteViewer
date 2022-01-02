@@ -331,3 +331,12 @@ end
                                                                pos[1] .= [1.0,2,3]; vel = deepcopy(res1); y = reduce(vcat, vcat(pos, vel));
                                                                der_pos = deepcopy(res1); der_vel = deepcopy(res1); yd = reduce(vcat, vcat(der_pos, der_vel));
                                                                p = kps; t = 0.0)
+
+#  Time  (mean ± σ):   913.738 ns ± 395.611 ns  ┊ GC (mean ± σ):  0.43% ±  0.97% with const PART= se().segments+1
+#  Time  (mean ± σ):   943.225 ns ± 488.996 ns  ┊ GC (mean ± σ):  0.51% ±  0.98% without const PART ...
+#  using KiteModels; @time KiteModels.find_steady_state(KPS3{SimFloat, KVec3, 7}())
+#  0.308473 seconds (3.12 M allocations: 108.310 MiB, 4.08% gc time)
+# ((F, x) -> f1!(F, x, params))
+# old: residual!(res, yd0, y0, [0.0], 0.0)
+# new: residual!(res, yd0, y0, [0.0], 0.0, state) 35ms to 155ms
+# ((res, yd, y::MVector{S, SimFloat}, p, t) -> res1(res, yd, y::MVector{S, SimFloat}, p, t, state))
