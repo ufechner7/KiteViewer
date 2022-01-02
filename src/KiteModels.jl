@@ -48,7 +48,12 @@ const BRIDLE_DRAG = 1.1             # should probably be removed
 # Type definitions
 const SimFloat = Float64
 const KVec3    = MVector{3, SimFloat}
-const SVec3    = SVector{3, SimFloat}                   
+const SVec3    = SVector{3, SimFloat}  
+
+# the following two definitions speed up the function residual! from 940ns to 540ns
+# disadvantage: changing the cl and cd curves requires a restart of the program     
+const calc_cl = Spline1D(se().alpha_cl, se().cl_list)
+const calc_cd = Spline1D(se().alpha_cd, se().cd_list)  
 
 """
     mutable struct KPS3{S, T, P}
@@ -131,6 +136,8 @@ function clear(s)
     s.rho = s.set.rho_0
     s.c_spring = s.set.c_spring / s.length
     s.damping  = s.set.damping / s.length
+    s.calc_cl = Spline1D(s.set.alpha_cl, s.set.cl_list)
+    s.calc_cd = Spline1D(s.set.alpha_cd, s.set.cd_list) 
 end
 
 function KPS3(kcu::KCU)
@@ -253,8 +260,8 @@ function set_cl_cd(s, alpha)
     if angle < -180.0
         angle += 360.0
     end
-    s.param_cl = s.calc_cl(angle)
-    s.param_cd = s.calc_cd(angle)
+    s.param_cl = calc_cl(angle)
+    s.param_cd = calc_cd(angle)
     nothing
 end
 
