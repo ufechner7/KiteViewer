@@ -50,8 +50,8 @@ function df2syslog(P, df)
         pos_before = [df.X[i][end-1], df.Y[i][end-1], df.Z[i][end-1]]
         v_app = V_app[i]
         rotation = rot(pos_kite, pos_before, v_app)
-        q = UnitQuaternion(rotation)
-        orient_vec[i] = MVector{4, Float32}(q.w, q.x, q.y, q.z)
+        q = QuatRotation(rotation)
+        orient_vec[i] = MVector{4, Float32}(Rotations.params(q))
     end
     return StructArray{SysState{P}}((df.time_rel, orient_vec, df.elevation, df.azimuth, df.l_tether, df.v_reelout, df.force, df.depower, 
                                   df.v_app_norm, df.X*se().zoom, df.Y*se().zoom, df.Z*se().zoom))
