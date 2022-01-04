@@ -230,9 +230,9 @@ uuid = "d38c429a-6771-53c6-b99e-75d170b6e991"
 version = "0.5.7"
 
 [[deps.Crayons]]
-git-tree-sha1 = "3f71217b538d7aaee0b69ab47d9b7724ca8afa0d"
+git-tree-sha1 = "b618084b49e78985ffa8422f32b9838e397b9fc2"
 uuid = "a8cc5b0e-0ffa-5ad4-8c14-923d3ee1735f"
-version = "4.0.4"
+version = "4.1.0"
 
 [[deps.DEDataArrays]]
 deps = ["ArrayInterface", "DocStringExtensions", "LinearAlgebra", "RecursiveArrayTools", "SciMLBase", "StaticArrays"]
@@ -683,17 +683,15 @@ version = "0.6.3"
 
 [[deps.KitePodSimulator]]
 deps = ["KiteUtils", "Parameters"]
-git-tree-sha1 = "e31c545b2f0d195df3ff0693e85ca9e1022c392b"
-repo-rev = "main"
-repo-url = "https://github.com/ufechner7/KitePodSimulator.jl"
+git-tree-sha1 = "7ab969ab5d7c4322e1123af46104d307076d994a"
 uuid = "558fcde3-b420-4fcf-b6fa-fc874c7e75b7"
 version = "0.2.0"
 
 [[deps.KiteUtils]]
 deps = ["Arrow", "DocStringExtensions", "LinearAlgebra", "Parameters", "RecursiveArrayTools", "Rotations", "StaticArrays", "StructArrays", "YAML"]
-git-tree-sha1 = "1900e88ac36a53455889c44ef1d7d4c18bf6adc4"
+git-tree-sha1 = "da72ee1d5752e5b518fbf2984c86ed9c6682efe1"
 uuid = "90980105-b163-44e5-ba9f-8b1c83bb0533"
-version = "0.2.4"
+version = "0.2.5"
 
 [[deps.LAME_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
@@ -1169,16 +1167,16 @@ uuid = "3cdcf5f2-1ef4-517c-9805-6587b60abb01"
 version = "1.2.1"
 
 [[deps.RecursiveArrayTools]]
-deps = ["ArrayInterface", "ChainRulesCore", "DocStringExtensions", "FillArrays", "LinearAlgebra", "RecipesBase", "Requires", "StaticArrays", "Statistics", "ZygoteRules"]
-git-tree-sha1 = "827ae9e1dc9fc0170319c8e77e7934b123c9bbdf"
+deps = ["Adapt", "ArrayInterface", "ChainRulesCore", "DocStringExtensions", "FillArrays", "LinearAlgebra", "RecipesBase", "Requires", "StaticArrays", "Statistics", "ZygoteRules"]
+git-tree-sha1 = "13d811040b088b234929dcde08a90be421eeede1"
 uuid = "731186ca-8d62-57ce-b412-fbd966d074cd"
-version = "2.21.1"
+version = "2.22.0"
 
 [[deps.RecursiveFactorization]]
 deps = ["LinearAlgebra", "LoopVectorization", "Polyester", "StrideArraysCore", "TriangularSolve"]
-git-tree-sha1 = "b7edd69c796b30985ea6dfeda8504cdb7cf77e9f"
+git-tree-sha1 = "40ca9722e6934f7c4c4bda57db653c05911540e8"
 uuid = "f2c3362d-daeb-58d1-803e-2bc74f2840b4"
-version = "0.2.5"
+version = "0.2.6"
 
 [[deps.Reexport]]
 git-tree-sha1 = "45e428421666073eab6f2da5c9d310d99bb12f9b"
@@ -1387,9 +1385,9 @@ uuid = "bea87d4a-7f5b-5778-9afe-8cc45184846c"
 
 [[deps.Sundials]]
 deps = ["CEnum", "DataStructures", "DiffEqBase", "Libdl", "LinearAlgebra", "Logging", "Reexport", "SparseArrays", "Sundials_jll"]
-git-tree-sha1 = "872d182f61a5d626e21cd970597cfb1856d8ef50"
+git-tree-sha1 = "a8bbdf8e19058d1cf69c29ebb4514e9bcaa2305f"
 uuid = "c3572dad-4567-51f8-b174-8c6c989267f4"
-version = "4.8.0"
+version = "4.9.0"
 
 [[deps.Sundials_jll]]
 deps = ["Artifacts", "CompilerSupportLibraries_jll", "JLLWrappers", "Libdl", "OpenBLAS_jll", "Pkg", "SuiteSparse_jll"]
