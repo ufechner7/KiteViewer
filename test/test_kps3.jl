@@ -268,44 +268,44 @@ end
 
 function run_benchmarks()
     println("\ncalc_rho:")
-    show(@benchmark calc_rho(height) setup=(height=1.0 + rand() * 200.0))
+    show(@benchmark calc_rho(kps, height) setup=(height=1.0 + rand() * 200.0))
     println("\ncalc_wind_factor:")
-    show(@benchmark calc_wind_factor(height) setup=(height=rand() * 200.0))
+    show(@benchmark calc_wind_factor(kps, height) setup=(height=rand() * 200.0))
     println("\ncalc_cl:")
-    show(@benchmark calc_cl(α) setup=(α=(rand()-0.5) * 360.0))
+    show(@benchmark KiteModels.calc_cl(α) setup=(α=(rand()-0.5) * 360.0))
     println("\ncalc_drag:")
-    show(@benchmark calc_drag(state, v_segment, unit_vector, rho, last_tether_drag, v_app_perp, 
+    show(@benchmark calc_drag(kps, v_segment, unit_vector, rho, last_tether_drag, v_app_perp, 
                             area) setup=(v_segment = KVec3(1.0, 2, 3);
                             unit_vector = KVec3(2.0, 3.0, 4.0); 
-                            rho = calc_rho(10.0f0); last_tether_drag = KVec3(0.0, 0.0, 0.0); 
+                            rho = calc_rho(kps, 10.0f0); last_tether_drag = KVec3(0.0, 0.0, 0.0); 
                             v_app_perp =  KVec3(0, -3.0, -4.0); area=se().area))
     println("\ncalc_aero_forces:")
-    show(@benchmark KPS3.calc_aero_forces(state, pos_kite, v_kite, rho, rel_steering) setup=(state.v_apparent .= KVec3(35.1,
+    show(@benchmark KiteModels.calc_aero_forces(kps, pos_kite, v_kite, rho, rel_steering) setup=(kps.v_apparent .= KVec3(35.1,
                                         52.2, 69.3); pos_kite = KVec3(30.0, 5.0, 100.0);  
                                         v_kite = KVec3(3.0, 5.0, 2.0);  
-                                        rho = SimFloat(calc_rho(10.0));  rel_steering = 0.1))
+                                        rho = SimFloat(calc_rho(kps, 10.0));  rel_steering = 0.1))
     println("\ncalc_res:")
-    show(@benchmark KPS3.calc_res(state, pos1, pos2, vel1, vel2, mass, veld, result, i) setup=(i = 1; 
+    show(@benchmark KiteModels.calc_res(kps, pos1, pos2, vel1, vel2, mass, veld, result, i) setup=(i = 1; 
                             pos1 = KVec3(30.0, 5.0, 100.0); pos2 = KVec3(30.0+10, 5.0+11, 100.0+20); 
                             vel1 = KVec3(3.0, 5.0, 2.0); vel2 = KVec3(3.0+0.1, 5.0+0.2, 2.0+0.3); 
                             mass = 9.0; veld = KVec3(0.1, 0.3, 0.4); result = KVec3(0, 0, 0)))
     println("\ncalc_loop")
-    show(@benchmark KPS3.loop(state, pos, vel, posd, veld, res1, res2) setup=(pos = zeros(SVector{SEGMENTS+1, KVec3}); 
+    show(@benchmark KiteModels.loop(kps, pos, vel, posd, veld, res1, res2) setup=(pos = zeros(SVector{SEGMENTS+1, KVec3}); 
                             vel  = zeros(SVector{SEGMENTS+1, KVec3}); posd  = zeros(SVector{SEGMENTS+1, KVec3}); 
                             veld  = zeros(SVector{SEGMENTS+1, KVec3}); res1  = zeros(SVector{SEGMENTS+1, KVec3}); 
                             res2  = zeros(SVector{SEGMENTS+1, KVec3}) ))
     println("\nset_cl_cd")
-    show(@benchmark KPS3.set_cl_cd(state, alpha) setup= (alpha = 10.0))
+    show(@benchmark KiteModels.set_cl_cd(kps, alpha) setup= (alpha = 10.0))
     println("\ncalc_alpha")
-    show(@benchmark KPS3.calc_alpha(v_app, vec_z) setup=(v_app = KVec3(10,2,3); vec_z = normalize(KVec3(3,2,0))))
+    show(@benchmark KiteModels.calc_alpha(v_app, vec_z) setup=(v_app = KVec3(10,2,3); vec_z = normalize(KVec3(3,2,0))))
     println("\ncalc_set_cl_cd")
-    show(@benchmark KPS3.calc_set_cl_cd(state, vec_c, v_app) setup=(v_app = KVec3(10,2,3); vec_c = KVec3(3,2,0)))
+    show(@benchmark KiteModels.calc_set_cl_cd(kps, vec_c, v_app) setup=(v_app = KVec3(10,2,3); vec_c = KVec3(3,2,0)))
     println("\nresidual!")
     show(@benchmark residual!(res, yd, y, p, t) setup = (res1 = zeros(SVector{SEGMENTS, KVec3}); res2 = deepcopy(res1); 
                                                             res = reduce(vcat, vcat(res1, res2)); pos = deepcopy(res1);
                                                             pos[1] .= [1.0,2,3]; vel = deepcopy(res1); y = reduce(vcat, vcat(pos, vel));
                                                             der_pos = deepcopy(res1); der_vel = deepcopy(res1); yd = reduce(vcat, vcat(der_pos, der_vel));
-                                                            p = SciMLBase.NullParameters(); t = 0.0))
+                                                            p = kps; t = 0.0))
     println("\ntest_initial_condition")
     show(@benchmark res=test_initial_condition(initial_x) setup = (initial_x = (zeros(12))))
     println()
