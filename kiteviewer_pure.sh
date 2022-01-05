@@ -5,6 +5,14 @@ julia_version=$(julia --version | awk '{print($3)}')
 julia_major=${julia_version:0:3} 
 branch=$(git rev-parse --abbrev-ref HEAD)
 
+if [[ $julia_major == "1.6" ]]; then
+    cp Manifest-1.6.toml.default Manifest.toml
+    echo "Using Manifest-1.6.toml.default ..."
+else
+    cp Manifest-1.7.toml.default Manifest.toml
+    echo "Using Manifest-1.7.toml.default ..."
+fi
+
 echo "Lauching KiteViewer..."
 if test -f "MakieSys-${julia_major}-${branch}.so"; then
     julia --startup-file=no  -t 1 -J MakieSys-${julia_major}-${branch}.so --optimize=2 --project -e "push!(LOAD_PATH,joinpath(pwd(),\"src\"));include(\"./src/KiteViewerPure.jl\");main(true)"
