@@ -1,0 +1,212 @@
+ufechner@TUD277255:~/tmp/KiteViewer$ ./kiteviewer_pure.sh 
+Using Manifest-1.7.toml.default ...
+Lauching KiteViewer...
+
+signal (11): Segmentation fault
+in expression starting at none:1
+gc_try_setmark at /buildworker/worker/package_linux64/build/src/gc.c:1711 [inlined]
+gc_mark_loop at /buildworker/worker/package_linux64/build/src/gc.c:2303
+_jl_gc_collect at /buildworker/worker/package_linux64/build/src/gc.c:3039
+jl_gc_collect at /buildworker/worker/package_linux64/build/src/gc.c:3248
+maybe_collect at /buildworker/worker/package_linux64/build/src/gc.c:882 [inlined]
+jl_gc_pool_alloc at /buildworker/worker/package_linux64/build/src/gc.c:1209
+LineInfoNode at ./boot.jl:422 [inlined]
+ir_inline_item! at ./compiler/ssair/inlining.jl:326
+batch_inline! at ./compiler/ssair/inlining.jl:594
+ssa_inlining_pass! at ./compiler/ssair/inlining.jl:83
+jfptr_ssa_inlining_passNOT._9213 at /home/ufechner/tmp/KiteViewer/MakieSys-1.7-bug.so (unknown line)
+_jl_invoke at /buildworker/worker/package_linux64/build/src/gf.c:2247 [inlined]
+jl_apply_generic at /buildworker/worker/package_linux64/build/src/gf.c:2429
+run_passes at ./compiler/optimize.jl:307
+optimize at ./compiler/optimize.jl:296 [inlined]
+_typeinf at ./compiler/typeinfer.jl:255
+typeinf at ./compiler/typeinfer.jl:209
+typeinf_edge at ./compiler/typeinfer.jl:823 [inlined]
+abstract_call_method at ./compiler/abstractinterpretation.jl:504
+abstract_call_gf_by_type at ./compiler/abstractinterpretation.jl:105
+abstract_call_known at ./compiler/abstractinterpretation.jl:1342
+abstract_call at ./compiler/abstractinterpretation.jl:1397
+abstract_apply at ./compiler/abstractinterpretation.jl:987
+abstract_call_known at ./compiler/abstractinterpretation.jl:1249
+jfptr_abstract_call_known_13200 at /home/ufechner/tmp/KiteViewer/MakieSys-1.7-bug.so (unknown line)
+tojlinvoke15955 at /home/ufechner/tmp/KiteViewer/MakieSys-1.7-bug.so (unknown line)
+j_abstract_call_known_10437 at /home/ufechner/tmp/KiteViewer/MakieSys-1.7-bug.so (unknown line)
+abstract_call at ./compiler/abstractinterpretation.jl:1397
+abstract_call at ./compiler/abstractinterpretation.jl:1382
+abstract_eval_statement at ./compiler/abstractinterpretation.jl:1534
+typeinf_local at ./compiler/abstractinterpretation.jl:1918
+typeinf_nocycle at ./compiler/abstractinterpretation.jl:2014
+_typeinf at ./compiler/typeinfer.jl:226
+typeinf at ./compiler/typeinfer.jl:209
+typeinf_edge at ./compiler/typeinfer.jl:823 [inlined]
+abstract_call_method at ./compiler/abstractinterpretation.jl:504
+abstract_call_gf_by_type at ./compiler/abstractinterpretation.jl:105
+abstract_call_known at ./compiler/abstractinterpretation.jl:1342
+abstract_call at ./compiler/abstractinterpretation.jl:1397
+abstract_apply at ./compiler/abstractinterpretation.jl:987
+abstract_call_known at ./compiler/abstractinterpretation.jl:1249
+jfptr_abstract_call_known_13200 at /home/ufechner/tmp/KiteViewer/MakieSys-1.7-bug.so (unknown line)
+tojlinvoke15955 at /home/ufechner/tmp/KiteViewer/MakieSys-1.7-bug.so (unknown line)
+j_abstract_call_known_10437 at /home/ufechner/tmp/KiteViewer/MakieSys-1.7-bug.so (unknown line)
+abstract_call at ./compiler/abstractinterpretation.jl:1397
+abstract_call at ./compiler/abstractinterpretation.jl:1382
+abstract_eval_statement at ./compiler/abstractinterpretation.jl:1534
+typeinf_local at ./compiler/abstractinterpretation.jl:1918
+typeinf_nocycle at ./compiler/abstractinterpretation.jl:2014
+_typeinf at ./compiler/typeinfer.jl:226
+typeinf at ./compiler/typeinfer.jl:209
+typeinf_edge at ./compiler/typeinfer.jl:823 [inlined]
+abstract_call_method at ./compiler/abstractinterpretation.jl:504
+abstract_call_gf_by_type at ./compiler/abstractinterpretation.jl:105
+abstract_call_known at ./compiler/abstractinterpretation.jl:1342
+abstract_call at ./compiler/abstractinterpretation.jl:1397
+abstract_apply at ./compiler/abstractinterpretation.jl:987
+abstract_call_known at ./compiler/abstractinterpretation.jl:1249
+jfptr_abstract_call_known_13200 at /home/ufechner/tmp/KiteViewer/MakieSys-1.7-bug.so (unknown line)
+tojlinvoke15955 at /home/ufechner/tmp/KiteViewer/MakieSys-1.7-bug.so (unknown line)
+j_abstract_call_known_10437 at /home/ufechner/tmp/KiteViewer/MakieSys-1.7-bug.so (unknown line)
+abstract_call at ./compiler/abstractinterpretation.jl:1397
+abstract_call at ./compiler/abstractinterpretation.jl:1382
+abstract_eval_statement at ./compiler/abstractinterpretation.jl:1534
+typeinf_local at ./compiler/abstractinterpretation.jl:1918
+typeinf_nocycle at ./compiler/abstractinterpretation.jl:2014
+_typeinf at ./compiler/typeinfer.jl:226
+typeinf at ./compiler/typeinfer.jl:209
+typeinf_edge at ./compiler/typeinfer.jl:823 [inlined]
+abstract_call_method at ./compiler/abstractinterpretation.jl:504
+abstract_call_gf_by_type at ./compiler/abstractinterpretation.jl:105
+abstract_call_known at ./compiler/abstractinterpretation.jl:1342
+abstract_call at ./compiler/abstractinterpretation.jl:1397
+abstract_apply at ./compiler/abstractinterpretation.jl:987
+abstract_call_known at ./compiler/abstractinterpretation.jl:1249
+jfptr_abstract_call_known_13200 at /home/ufechner/tmp/KiteViewer/MakieSys-1.7-bug.so (unknown line)
+tojlinvoke15955 at /home/ufechner/tmp/KiteViewer/MakieSys-1.7-bug.so (unknown line)
+j_abstract_call_known_10437 at /home/ufechner/tmp/KiteViewer/MakieSys-1.7-bug.so (unknown line)
+abstract_call at ./compiler/abstractinterpretation.jl:1397
+abstract_call at ./compiler/abstractinterpretation.jl:1382
+abstract_eval_statement at ./compiler/abstractinterpretation.jl:1534
+typeinf_local at ./compiler/abstractinterpretation.jl:1918
+typeinf_nocycle at ./compiler/abstractinterpretation.jl:2014
+_typeinf at ./compiler/typeinfer.jl:226
+typeinf at ./compiler/typeinfer.jl:209
+typeinf_edge at ./compiler/typeinfer.jl:823 [inlined]
+abstract_call_method at ./compiler/abstractinterpretation.jl:504
+abstract_call_gf_by_type at ./compiler/abstractinterpretation.jl:105
+abstract_call_known at ./compiler/abstractinterpretation.jl:1342
+abstract_call at ./compiler/abstractinterpretation.jl:1397
+abstract_apply at ./compiler/abstractinterpretation.jl:987
+abstract_call_known at ./compiler/abstractinterpretation.jl:1249
+jfptr_abstract_call_known_13200 at /home/ufechner/tmp/KiteViewer/MakieSys-1.7-bug.so (unknown line)
+tojlinvoke15955 at /home/ufechner/tmp/KiteViewer/MakieSys-1.7-bug.so (unknown line)
+j_abstract_call_known_10437 at /home/ufechner/tmp/KiteViewer/MakieSys-1.7-bug.so (unknown line)
+abstract_call at ./compiler/abstractinterpretation.jl:1397
+abstract_call at ./compiler/abstractinterpretation.jl:1382
+abstract_eval_statement at ./compiler/abstractinterpretation.jl:1534
+typeinf_local at ./compiler/abstractinterpretation.jl:1918
+typeinf_nocycle at ./compiler/abstractinterpretation.jl:2014
+_typeinf at ./compiler/typeinfer.jl:226
+typeinf at ./compiler/typeinfer.jl:209
+typeinf_edge at ./compiler/typeinfer.jl:823 [inlined]
+abstract_call_method at ./compiler/abstractinterpretation.jl:504
+abstract_call_gf_by_type at ./compiler/abstractinterpretation.jl:105
+abstract_call_known at ./compiler/abstractinterpretation.jl:1342
+abstract_call at ./compiler/abstractinterpretation.jl:1397
+abstract_apply at ./compiler/abstractinterpretation.jl:987
+abstract_call_known at ./compiler/abstractinterpretation.jl:1249
+jfptr_abstract_call_known_13200 at /home/ufechner/tmp/KiteViewer/MakieSys-1.7-bug.so (unknown line)
+tojlinvoke15955 at /home/ufechner/tmp/KiteViewer/MakieSys-1.7-bug.so (unknown line)
+j_abstract_call_known_10437 at /home/ufechner/tmp/KiteViewer/MakieSys-1.7-bug.so (unknown line)
+abstract_call at ./compiler/abstractinterpretation.jl:1397
+abstract_call at ./compiler/abstractinterpretation.jl:1382
+abstract_eval_statement at ./compiler/abstractinterpretation.jl:1534
+typeinf_local at ./compiler/abstractinterpretation.jl:1918
+typeinf_nocycle at ./compiler/abstractinterpretation.jl:2014
+_typeinf at ./compiler/typeinfer.jl:226
+typeinf at ./compiler/typeinfer.jl:209
+typeinf_edge at ./compiler/typeinfer.jl:823 [inlined]
+abstract_call_method at ./compiler/abstractinterpretation.jl:504
+abstract_call_gf_by_type at ./compiler/abstractinterpretation.jl:105
+abstract_call_known at ./compiler/abstractinterpretation.jl:1342
+abstract_call at ./compiler/abstractinterpretation.jl:1397
+abstract_apply at ./compiler/abstractinterpretation.jl:987
+abstract_call_known at ./compiler/abstractinterpretation.jl:1249
+jfptr_abstract_call_known_13200 at /home/ufechner/tmp/KiteViewer/MakieSys-1.7-bug.so (unknown line)
+tojlinvoke15955 at /home/ufechner/tmp/KiteViewer/MakieSys-1.7-bug.so (unknown line)
+j_abstract_call_known_10437 at /home/ufechner/tmp/KiteViewer/MakieSys-1.7-bug.so (unknown line)
+abstract_call at ./compiler/abstractinterpretation.jl:1397
+abstract_call at ./compiler/abstractinterpretation.jl:1382
+abstract_eval_statement at ./compiler/abstractinterpretation.jl:1534
+typeinf_local at ./compiler/abstractinterpretation.jl:1918
+typeinf_nocycle at ./compiler/abstractinterpretation.jl:2014
+_typeinf at ./compiler/typeinfer.jl:226
+typeinf at ./compiler/typeinfer.jl:209
+typeinf_edge at ./compiler/typeinfer.jl:823 [inlined]
+abstract_call_method at ./compiler/abstractinterpretation.jl:504
+abstract_call_gf_by_type at ./compiler/abstractinterpretation.jl:105
+abstract_call_known at ./compiler/abstractinterpretation.jl:1342
+abstract_call at ./compiler/abstractinterpretation.jl:1397
+abstract_apply at ./compiler/abstractinterpretation.jl:987
+abstract_call_known at ./compiler/abstractinterpretation.jl:1249
+jfptr_abstract_call_known_13200 at /home/ufechner/tmp/KiteViewer/MakieSys-1.7-bug.so (unknown line)
+tojlinvoke15955 at /home/ufechner/tmp/KiteViewer/MakieSys-1.7-bug.so (unknown line)
+j_abstract_call_known_10437 at /home/ufechner/tmp/KiteViewer/MakieSys-1.7-bug.so (unknown line)
+abstract_call at ./compiler/abstractinterpretation.jl:1397
+abstract_call at ./compiler/abstractinterpretation.jl:1382
+abstract_eval_statement at ./compiler/abstractinterpretation.jl:1534
+typeinf_local at ./compiler/abstractinterpretation.jl:1918
+typeinf_nocycle at ./compiler/abstractinterpretation.jl:2014
+_typeinf at ./compiler/typeinfer.jl:226
+typeinf at ./compiler/typeinfer.jl:209
+typeinf_edge at ./compiler/typeinfer.jl:823 [inlined]
+abstract_call_method at ./compiler/abstractinterpretation.jl:504
+abstract_call_gf_by_type at ./compiler/abstractinterpretation.jl:105
+abstract_call_known at ./compiler/abstractinterpretation.jl:1342
+abstract_call at ./compiler/abstractinterpretation.jl:1397
+abstract_apply at ./compiler/abstractinterpretation.jl:987
+abstract_call_known at ./compiler/abstractinterpretation.jl:1249
+jfptr_abstract_call_known_13200 at /home/ufechner/tmp/KiteViewer/MakieSys-1.7-bug.so (unknown line)
+tojlinvoke15955 at /home/ufechner/tmp/KiteViewer/MakieSys-1.7-bug.so (unknown line)
+j_abstract_call_known_10437 at /home/ufechner/tmp/KiteViewer/MakieSys-1.7-bug.so (unknown line)
+abstract_call at ./compiler/abstractinterpretation.jl:1397
+abstract_call at ./compiler/abstractinterpretation.jl:1382
+abstract_eval_statement at ./compiler/abstractinterpretation.jl:1534
+typeinf_local at ./compiler/abstractinterpretation.jl:1918
+typeinf_nocycle at ./compiler/abstractinterpretation.jl:2014
+_typeinf at ./compiler/typeinfer.jl:226
+typeinf at ./compiler/typeinfer.jl:209
+typeinf_edge at ./compiler/typeinfer.jl:823 [inlined]
+abstract_call_method at ./compiler/abstractinterpretation.jl:504
+abstract_call_gf_by_type at ./compiler/abstractinterpretation.jl:105
+abstract_call_known at ./compiler/abstractinterpretation.jl:1342
+jfptr_abstract_call_known_13200 at /home/ufechner/tmp/KiteViewer/MakieSys-1.7-bug.so (unknown line)
+tojlinvoke15955 at /home/ufechner/tmp/KiteViewer/MakieSys-1.7-bug.so (unknown line)
+j_abstract_call_known_10437 at /home/ufechner/tmp/KiteViewer/MakieSys-1.7-bug.so (unknown line)
+abstract_call at ./compiler/abstractinterpretation.jl:1397
+abstract_call at ./compiler/abstractinterpretation.jl:1382
+abstract_eval_statement at ./compiler/abstractinterpretation.jl:1534
+typeinf_local at ./compiler/abstractinterpretation.jl:1918
+typeinf_nocycle at ./compiler/abstractinterpretation.jl:2014
+_typeinf at ./compiler/typeinfer.jl:226
+typeinf at ./compiler/typeinfer.jl:209
+typeinf_ext at ./compiler/typeinfer.jl:909
+typeinf_ext_toplevel at ./compiler/typeinfer.jl:942
+typeinf_ext_toplevel at ./compiler/typeinfer.jl:938
+jfptr_typeinf_ext_toplevel_10042 at /home/ufechner/tmp/KiteViewer/MakieSys-1.7-bug.so (unknown line)
+_jl_invoke at /buildworker/worker/package_linux64/build/src/gf.c:2247 [inlined]
+jl_apply_generic at /buildworker/worker/package_linux64/build/src/gf.c:2429
+jl_apply at /buildworker/worker/package_linux64/build/src/julia.h:1788 [inlined]
+jl_type_infer at /buildworker/worker/package_linux64/build/src/gf.c:295
+jl_generate_fptr at /buildworker/worker/package_linux64/build/src/jitlayers.cpp:338
+jl_compile_method_internal at /buildworker/worker/package_linux64/build/src/gf.c:1980
+jl_compile_method_internal at /buildworker/worker/package_linux64/build/src/gf.c:2246 [inlined]
+_jl_invoke at /buildworker/worker/package_linux64/build/src/gf.c:2239 [inlined]
+jl_apply_generic at /buildworker/worker/package_linux64/build/src/gf.c:2429
+macro expansion at /home/ufechner/tmp/KiteViewer/src/KiteViewerPure.jl:349 [inlined]
+#25 at ./task.jl:423
+unknown function (ip: 0x7f1989ac249f)
+_jl_invoke at /buildworker/worker/package_linux64/build/src/gf.c:2247 [inlined]
+jl_apply_generic at /buildworker/worker/package_linux64/build/src/gf.c:2429
+jl_apply at /buildworker/worker/package_linux64/build/src/julia.h:1788 [inlined]
+start_task at /buildworker/worker/package_linux64/build/src/task.c:877
+Allocations: 19792951 (Pool: 19787404; Big: 5547); GC: 27
+./kiteviewer_pure.sh: line 21: 15934 Segmentation fault      (core dumped) julia --startup-file=no -t 1 -J MakieSys-${julia_major}-${branch}.so --optimize=2 --project -e "push!(LOAD_PATH,joinpath(pwd(),\"src\"));include(\"./src/KiteViewerPure.jl\");main(true)"
