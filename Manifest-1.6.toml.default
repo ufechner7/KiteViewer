@@ -13,9 +13,9 @@ version = "0.3.4"
 
 [[Adapt]]
 deps = ["LinearAlgebra"]
-git-tree-sha1 = "9faf218ea18c51fcccaf956c8d39614c9d30fe8b"
+git-tree-sha1 = "af92965fb30777147966f58acb05da51c5616b5f"
 uuid = "79e6a3ab-5dfb-504d-930d-738a2a938a0e"
-version = "3.3.2"
+version = "3.3.3"
 
 [[Animations]]
 deps = ["Colors"]
@@ -61,12 +61,6 @@ version = "1.0.1"
 
 [[Base64]]
 uuid = "2a0f44e3-6c83-55bd-87e4-b1978d98bd5f"
-
-[[BenchmarkTools]]
-deps = ["JSON", "Logging", "Printf", "Profile", "Statistics", "UUIDs"]
-git-tree-sha1 = "940001114a0147b6e4d10624276d56d531dd9b49"
-uuid = "6e4b80f9-dd63-53aa-95a3-0cdb28fa8baf"
-version = "1.2.2"
 
 [[BitIntegers]]
 deps = ["Random"]
@@ -117,9 +111,9 @@ version = "0.5.1"
 
 [[ChainRulesCore]]
 deps = ["Compat", "LinearAlgebra", "SparseArrays"]
-git-tree-sha1 = "d711603452231bad418bd5e0c91f1abd650cba71"
+git-tree-sha1 = "926870acb6cbcf029396f2f2de030282b6bc1941"
 uuid = "d360d2e6-b24c-11e9-a2a3-2a2ae2dbcce4"
-version = "1.11.3"
+version = "1.11.4"
 
 [[ChangesOfVariables]]
 deps = ["ChainRulesCore", "LinearAlgebra", "Test"]
@@ -678,6 +672,12 @@ git-tree-sha1 = "591e8dc09ad18386189610acafb970032c519707"
 uuid = "5ab0869b-81aa-558d-bb23-cbf5423bbe9b"
 version = "0.6.3"
 
+[[KiteModels]]
+deps = ["Dierckx", "DocStringExtensions", "KitePodSimulator", "KiteUtils", "LinearAlgebra", "NLsolve", "Parameters", "StaticArrays"]
+git-tree-sha1 = "b6938d306cad5d25b2ad0ccf8d8d8750900137c8"
+uuid = "b94af626-7959-4878-9336-2adc27959007"
+version = "0.1.0"
+
 [[KitePodSimulator]]
 deps = ["KiteUtils", "Parameters"]
 git-tree-sha1 = "7ab969ab5d7c4322e1123af46104d307076d994a"
@@ -960,9 +960,9 @@ version = "1.10.8"
 
 [[Ogg_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
-git-tree-sha1 = "7937eda4681660b4d6aeeecc2f7e1c81c8ee4e2f"
+git-tree-sha1 = "887579a3eb005446d514ab7aeac5d1d027658b8f"
 uuid = "e7412a2a-1a6e-54c0-be00-318e2571c051"
-version = "1.3.5+0"
+version = "1.3.5+1"
 
 [[OpenBLAS_jll]]
 deps = ["Artifacts", "CompilerSupportLibraries_jll", "Libdl"]
@@ -1122,10 +1122,6 @@ version = "1.3.1"
 deps = ["Unicode"]
 uuid = "de0858da-6303-5e67-8744-51eddeeeb8d7"
 
-[[Profile]]
-deps = ["Printf"]
-uuid = "9abbd945-dff8-562f-b5e8-e1ebf5ef1b79"
-
 [[ProgressMeter]]
 deps = ["Distributed", "Printf"]
 git-tree-sha1 = "afadeba63d90ff223a6a48d2009434ecee2ec9e8"
@@ -1165,15 +1161,15 @@ version = "1.2.1"
 
 [[RecursiveArrayTools]]
 deps = ["Adapt", "ArrayInterface", "ChainRulesCore", "DocStringExtensions", "FillArrays", "LinearAlgebra", "RecipesBase", "Requires", "StaticArrays", "Statistics", "ZygoteRules"]
-git-tree-sha1 = "13d811040b088b234929dcde08a90be421eeede1"
+git-tree-sha1 = "af07d851ce564bfea5ec4ca182b6b317c7d48190"
 uuid = "731186ca-8d62-57ce-b412-fbd966d074cd"
-version = "2.22.0"
+version = "2.23.1"
 
 [[RecursiveFactorization]]
 deps = ["LinearAlgebra", "LoopVectorization", "Polyester", "StrideArraysCore", "TriangularSolve"]
-git-tree-sha1 = "40ca9722e6934f7c4c4bda57db653c05911540e8"
+git-tree-sha1 = "a6564a98066f512ff2efd438c8f1ce4262d69b87"
 uuid = "f2c3362d-daeb-58d1-803e-2bc74f2840b4"
-version = "0.2.6"
+version = "0.2.7"
 
 [[Reexport]]
 git-tree-sha1 = "45e428421666073eab6f2da5c9d310d99bb12f9b"
@@ -1436,9 +1432,9 @@ version = "0.5.3"
 
 [[TimeZones]]
 deps = ["Dates", "Downloads", "InlineStrings", "LazyArtifacts", "Mocking", "Printf", "RecipesBase", "Serialization", "Unicode"]
-git-tree-sha1 = "ce5aab0b0146b81efefae52f13002e19c2af57ac"
+git-tree-sha1 = "0f1017f68dc25f1a0cb99f4988f78fe4f2e7955f"
 uuid = "f269a46b-ccf7-5d73-abea-4c690281aa53"
-version = "1.7.0"
+version = "1.7.1"
 
 [[TranscodingStreams]]
 deps = ["Random", "Test"]
