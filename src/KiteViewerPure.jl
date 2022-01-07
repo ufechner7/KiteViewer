@@ -61,24 +61,6 @@ end
 
 include("common.jl")
 
-function reset_view(cam, scene3D)
-    update_cam!(scene3D.scene, [-15.425113, -18.925116, 5.5], [-1.5, -5.0, 5.5])
-end
-
-function zoom_scene(camera, scene, zoom=1.0f0)
-    @extractvalue camera (fov, near, lookat, eyeposition, upvector)
-    dir_vector = eyeposition - lookat
-    new_eyeposition = lookat + dir_vector * (2.0f0 - zoom)
-    update_cam!(scene, new_eyeposition, lookat)
-end
-
-function reset_and_zoom(camera, scene3D, zoom)
-    reset_view(camera, scene3D)
-    if ! (zoom ≈ 1.0) 
-        zoom_scene(camera, scene3D.scene, zoom)  
-    end
-end
-
 function main(gl_wait=true)
     scene, layout = layoutscene(resolution = (840, 900), backgroundcolor = RGBf0(0.7, 0.8, 1))
     scene3D = LScene(scene, scenekw = (show_axis=false, limits = Rect(-7,-10.0,0, 11,10,11), resolution = (800, 800)), raw=false)
