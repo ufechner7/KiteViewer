@@ -1,6 +1,4 @@
-using TestNLsolve
-
-include("test_kps3.jl")
+cd("..")
 let
     include("../src/Importer.jl")
 end

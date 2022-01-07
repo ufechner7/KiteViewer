@@ -1,3 +1,8 @@
+name = "KiteViewers"
+uuid = "07d907be-6f97-11ec-06da-95dadbf54921"
+authors = ["Uwe Fechner <fechner@aenarete.eu> and contributors"]
+version = "0.1.0"
+
 [deps]
 Arrow = "69666777-d1a9-59fb-9406-91d4454c9d45"
 CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
@@ -9,6 +14,7 @@ GeometryBasics = "5c1252a2-5f33-56bf-86c9-59e7332b4326"
 KiteModels = "b94af626-7959-4878-9336-2adc27959007"
 KitePodSimulator = "558fcde3-b420-4fcf-b6fa-fc874c7e75b7"
 KiteUtils = "90980105-b163-44e5-ba9f-8b1c83bb0533"
+LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 MeshIO = "7269a6da-0436-5bbc-96c2-40638cbb6118"
 NLsolve = "2774e3e8-f4cf-5e23-947b-6d7e65073b56"
 PackageCompiler = "9b87118b-4619-50d2-8e1e-99f35a4d4d9d"
@@ -33,3 +39,9 @@ KiteUtils = "0.2.5"
 Rotations = "~1.1"
 StaticArrays = "= 1.2.5"
 julia = "~1.6, ~1.7"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
