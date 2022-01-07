@@ -681,6 +681,12 @@ git-tree-sha1 = "591e8dc09ad18386189610acafb970032c519707"
 uuid = "5ab0869b-81aa-558d-bb23-cbf5423bbe9b"
 version = "0.6.3"
 
+[[deps.KiteModels]]
+deps = ["Dierckx", "DocStringExtensions", "KitePodSimulator", "KiteUtils", "LinearAlgebra", "NLsolve", "Parameters", "StaticArrays"]
+git-tree-sha1 = "b6938d306cad5d25b2ad0ccf8d8d8750900137c8"
+uuid = "b94af626-7959-4878-9336-2adc27959007"
+version = "0.1.0"
+
 [[deps.KitePodSimulator]]
 deps = ["KiteUtils", "Parameters"]
 git-tree-sha1 = "7ab969ab5d7c4322e1123af46104d307076d994a"
@@ -963,9 +969,9 @@ version = "1.10.8"
 
 [[deps.Ogg_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
-git-tree-sha1 = "7937eda4681660b4d6aeeecc2f7e1c81c8ee4e2f"
+git-tree-sha1 = "887579a3eb005446d514ab7aeac5d1d027658b8f"
 uuid = "e7412a2a-1a6e-54c0-be00-318e2571c051"
-version = "1.3.5+0"
+version = "1.3.5+1"
 
 [[deps.OpenBLAS_jll]]
 deps = ["Artifacts", "CompilerSupportLibraries_jll", "Libdl"]
