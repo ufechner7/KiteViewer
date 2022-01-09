@@ -23,6 +23,7 @@ SOFTWARE. =#
 using GeometryBasics, Rotations, GLMakie, FileIO, LinearAlgebra, Printf, Parameters
 
 using KiteUtils, Plot2D, RTSim, KitePodSimulator
+import KiteUtils:se
 
 @consts begin
     SCALE = 1.2 
@@ -34,27 +35,27 @@ using KiteUtils, Plot2D, RTSim, KitePodSimulator
     GUI_ACTIVE = [false]
     AXIS_LABEL_SIZE = 30
     TEXT_SIZE = 16
-    running   = Node(false)
+    running   = GLMakie.Observable(false)
     starting  = [0]
     zoom      = [1.0]
     steering  = [0.0]
-    textnode  = Node("")
-    textsize  = Node(TEXT_SIZE)
-    textsize2 = Node(AXIS_LABEL_SIZE)
-    status = Node("")
-    p1 = Node(Vector{Point2f0}(undef, 6000)) # 5 min
-    p2 = Node(Vector{Point2f0}(undef, 6000)) # 5 min
-    pos_x = Node(0.0f0)
-    y_label1 = Node("")
-    y_label2 = Node("")
+    textnode  = GLMakie.Observable("")
+    textsize  = GLMakie.Observable(TEXT_SIZE)
+    textsize2 = GLMakie.Observable(AXIS_LABEL_SIZE)
+    status = GLMakie.Observable("")
+    p1 = GLMakie.Observable(Vector{Point2f}(undef, 6000)) # 5 min
+    p2 = GLMakie.Observable(Vector{Point2f}(undef, 6000)) # 5 min
+    pos_x = GLMakie.Observable(0.0f0)
+    y_label1 = GLMakie.Observable("")
+    y_label2 = GLMakie.Observable("")
 
-    points          = Vector{Point3f0}(undef, se().segments+1)
-    quat            = Node(Quaternionf0(0,0,0,1))                        # orientation of the kite
-    kite_pos        = Node(Point3f0(1,0,0))                              # position of the kite
-    positions       = Node([Point3f0(x,0,0) for x in 1:se().segments])   # positions of the tether segments
-    part_positions  = Node([Point3f0(x,0,0) for x in 1:se().segments+1]) # positions of the tether particles
-    markersizes     = Node([Point3f0(1,1,1) for x in 1:se().segments])   # includes the segment length
-    rotations       = Node([Point3f0(1,0,0) for x in 1:se().segments])   # unit vectors corresponding with
+    points          = Vector{Point3f}(undef, se().segments+1)
+    quat            = GLMakie.Observable(Quaternionf(0,0,0,1))                        # orientation of the kite
+    kite_pos        = GLMakie.Observable(Point3f(1,0,0))                              # position of the kite
+    positions       = GLMakie.Observable([Point3f(x,0,0) for x in 1:se().segments])   # positions of the tether segments
+    part_positions  = GLMakie.Observable([Point3f(x,0,0) for x in 1:se().segments+1]) # positions of the tether particles
+    markersizes     = GLMakie.Observable([Point3f(1,1,1) for x in 1:se().segments])   # includes the segment length
+    rotations       = GLMakie.Observable([Point3f(1,0,0) for x in 1:se().segments])   # unit vectors corresponding with
                                                                            #   the orientation of the segments 
     energy = [0.0]
 end                                                                           
@@ -78,7 +79,7 @@ function steer_left()
 end
 
 function main(gl_wait=true)
-    scene, layout = layoutscene(resolution = (840+800, 900), backgroundcolor = RGBf0(0.7, 0.8, 1))
+    scene, layout = layoutscene(resolution = (840+800, 900), backgroundcolor = RGBf(0.7, 0.8, 1))
     scene3D = LScene(scene, scenekw = (show_axis=false, limits = Rect(-7,-10.0,0, 11,10,11), resolution = (800, 800)), raw=false)
     create_coordinate_system(scene3D)
     cam = cameracontrols(scene3D.scene)
@@ -90,11 +91,11 @@ function main(gl_wait=true)
 
     textsize[]  = TEXT_SIZE
     textsize2[] = AXIS_LABEL_SIZE
-    text!(scene3D, "z", position = Point3f0(0, 0, 14.6), textsize = textsize2, align = (:center, :center), show_axis = false)
-    text!(scene3D, "x", position = Point3f0(17, 0,0), textsize = textsize2, align = (:center, :center), show_axis = false)
-    text!(scene3D, "y", position = Point3f0( 0, 14.5, 0), textsize = textsize2, align = (:center, :center), show_axis = false)
+    text!(scene3D, "z", position = Point3f(0, 0, 14.6), textsize = textsize2, align = (:center, :center), show_axis = false)
+    text!(scene3D, "x", position = Point3f(17, 0,0), textsize = textsize2, align = (:center, :center), show_axis = false)
+    text!(scene3D, "y", position = Point3f( 0, 14.5, 0), textsize = textsize2, align = (:center, :center), show_axis = false)
 
-    text!(scene, status, position = Point2f0( 20, 0), textsize = TEXT_SIZE, align = (:left, :bottom), show_axis = false)
+    text!(scene, status, position = Point2f( 20, 0), textsize = TEXT_SIZE, align = (:left, :bottom), show_axis = false)
     status[]="Stopped"
 
     layout[1, 1] = scene3D
@@ -190,7 +191,7 @@ function main(gl_wait=true)
                 bt = catch_backtrace()
                 msg = sprint(showerror, e, bt)
                 println(msg)
-                raise(e)
+                throw(e)
             end 
             if isfile(logfile)
                 status[] = "Success!"
@@ -255,7 +256,7 @@ function main(gl_wait=true)
     # launch the kite on button click
     delta_t = 1.0 / se().sample_freq
     active = false
-    log = demo_log(7, "Launch test!")
+    log = KiteUtils.demo_log(7, "Launch test!")
     reset_view(camera, scene3D)
     
     simulation = @async begin
@@ -274,21 +275,21 @@ function main(gl_wait=true)
                         status[] = "Loading log file..."
                         reset_and_zoom(camera, scene3D, zoom[1])
                         try 
-                            log = load_log(se().segments+1, logfile)
+                            log = KiteUtils.load_log(se().segments+1, logfile)
                             dummy = log.syslog[1]
                             status[] = old 
                         catch e
                             bt = catch_backtrace()
                             msg = sprint(showerror, e, bt)
                             println(msg)
-                            raise(e)
+                            throw(e)
                             status[] = "Error loading log file: " * logfile
                         end 
                          
                     end
                     steps = length(log.syslog)  
                 else
-                    log = demo_log(7, "Launch test!")
+                    log = KiteUtils.demo_log(7, "Launch test!")
                     steps = Int64(round(1/delta_t * se().sim_time))  
                     integrator = init_sim(se().sim_time)
                 end  
@@ -308,7 +309,7 @@ function main(gl_wait=true)
                         bt = catch_backtrace()
                         msg = sprint(showerror, e, bt)
                         println(msg)
-                        raise(e)
+                        throw(e)
                     end
                 else
                     try
@@ -318,7 +319,7 @@ function main(gl_wait=true)
                         bt = catch_backtrace()
                         msg = sprint(showerror, e, bt)
                         println(msg)
-                        raise(e)
+                        throw(e)
                     end                   
                 end
                 if running[] || ! PLAYING[1]

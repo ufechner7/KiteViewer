@@ -4,8 +4,8 @@ using GLMakie
 export plot2d, buttons
 
 LOG = nothing
-const P1 = [Node(Vector{Point2f0}(undef, 6000))]
-const P2 = [Node(Vector{Point2f0}(undef, 6000))]
+const P1 = [Node(Vector{Point2f}(undef, 6000))]
+const P2 = [Node(Vector{Point2f}(undef, 6000))]
 
 function autoscale(ax, x, y)
     xlims!(ax, x[1], x[end])
