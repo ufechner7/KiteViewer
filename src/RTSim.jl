@@ -31,7 +31,7 @@ function SysState(P)
     elevation = calc_elevation(pos_kite)
     azimuth = azimuth_east(pos_kite)
     v_reelout = kps.v_reel_out
-    force = get_force(kps)
+    force = winch_force(kps)
     return KiteUtils.SysState{P}(kps.t_0, orient, elevation, azimuth, 0., v_reelout, force, 0., 0., X, Y, Z)
 end
 

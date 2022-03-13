@@ -27,7 +27,7 @@ function plot2d(se, ax, label1, log, points, field, lower=false)
     y = [1f0]
     if field == :height
         unit = "[m]"
-        y    = log.extlog.z ./ se().zoom
+        y    = log.z ./ se().zoom
     elseif field == :elevation
         unit = "[°]"
         y    = log.syslog.elevation/pi*180.0

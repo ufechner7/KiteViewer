@@ -172,7 +172,7 @@ function main(gl_wait=true)
                 else
                     plot2d(se, ax2, y_label2, log, p2, :elevation, true)
                 end
-                x2 = log.extlog.time
+                x2 = log.time
                 xlims!(ax2, x2[1], x2[end])
                 reset_and_zoom(camera, scene3D, zoom[1])  
             else
@@ -320,11 +320,18 @@ function main(gl_wait=true)
                         msg = sprint(showerror, e, bt)
                         println(msg)
                         throw(e)
-                    end                   
+                    end
                 end
                 if running[] || ! PLAYING[1]
                     if ! isnothing(state)
-                        @sync update_system(scene3D, state, i)
+                        try
+                            @sync update_system(scene3D, state, i)
+                        catch e
+                            bt = catch_backtrace()
+                            msg = sprint(showerror, e, bt)
+                            println(msg)
+                            throw(e)
+                        end   
                     else
                         println("Warning! isnothing(state)")
                     end

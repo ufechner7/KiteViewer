@@ -1,7 +1,30 @@
+authors = ["Uwe Fechner <fechner@aenarete.eu> and contributors"]
 name = "KiteViewers"
 uuid = "07d907be-6f97-11ec-06da-95dadbf54921"
-authors = ["Uwe Fechner <fechner@aenarete.eu> and contributors"]
-version = "0.1.0"
+version = "0.1.1"
+
+[compat]
+Arrow = "1.4"
+CSV = "0.9.11, 0.10"
+CodecXz = "0.7.0"
+DataFrames = "1.3.1"
+FileIO = "1.12.0"
+GLMakie = "0.4.7"
+GeometryBasics = "0.4.1"
+KiteModels = "0.2.0"
+KitePodSimulator = "0.2.0, 0.2.1, 0.2.2"
+KiteUtils = "0.3.0"
+MeshIO = "0.4.9"
+NLsolve = "4.5.1"
+PackageCompiler = "2.0.4"
+Parameters = "0.12.3"
+Revise = "3.3.1"
+Rotations = "~1.1"
+StaticArrays = "=1.2.5, 1.3.1"
+StructArrays = "0.6.3"
+Sundials = "4.9.0"
+YAML = "0.4.7"
+julia = "~1.6, ~1.7"
 
 [deps]
 Arrow = "69666777-d1a9-59fb-9406-91d4454c9d45"
@@ -26,30 +49,8 @@ StructArrays = "09ab397b-f2b6-538f-b94a-2f83cf4a842a"
 Sundials = "c3572dad-4567-51f8-b174-8c6c989267f4"
 YAML = "ddb6d928-2868-570f-bddf-ab3f9cf99eb6"
 
-[compat]
-Arrow = "1.4"
-CSV = "0.9.11"
-CodecXz = "0.7.0"
-DataFrames = "1.3.1"
-FileIO = "1.12.0"
-GLMakie = "0.4.7"
-GeometryBasics = "0.4.1"
-KiteModels = "0.1.0, 0.1.1"
-KitePodSimulator = "0.2.0, 0.2.1"
-KiteUtils = "0.2.5, 0.2.6"
-MeshIO = "0.4.9"
-NLsolve = "4.5.1"
-PackageCompiler = "2.0.4"
-Parameters = "0.12.3"
-Revise = "3.3.1"
-Rotations = "~1.1"
-StaticArrays = "=1.2.5, 1.3.1"
-StructArrays = "0.6.3"
-Sundials = "4.9.0"
-YAML = "0.4.7"
-julia = "~1.6, ~1.7"
-
 [extras]
+CPUSummary = "2a0fbf3d-bb9c-48f3-b0a9-814d99fd7ab9"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [targets]
