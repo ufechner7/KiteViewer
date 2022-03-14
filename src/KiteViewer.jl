@@ -337,6 +337,9 @@ function main(gl_wait=true)
                     end
                     pos_x[] = i*delta_t
                     i += 1
+                    if i == 2 
+                        reset_and_zoom(camera, scene3D, zoom[1])
+                    end
                 end
                 sleep(delta_t / se().time_lapse)
                 if i >= steps || (! PLAYING[1] && get_height() < 0.0)
