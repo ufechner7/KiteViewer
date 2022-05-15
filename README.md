@@ -97,9 +97,26 @@ More detailed explaination here: [SystemImage.md](./doc/SystemImage.md)
 ## Tests of the Simulator
 The simulator is tested against the results of the paper [Dynamic Model of a Pumping Kite Power System](http://arxiv.org/abs/1406.6218). For details of the tests see:  [Tests.md](./doc/Tests.md)
 
+## NEWS
+I am currently moving the code of this repository into a set of Julia packages, called "Julia Kite Power Tools". Advantages:
+- more modular code, use only the packages you need
+- automated unit tests
+- better, auto-generated documentation
+- easier installation, only Julia required, not git any more
+
+The code for viewing log files will be found in the package KiteViewers, the code for running simulations in the package KiteSimulators.
+
+### Overview Julia Kite Power Tools
+<p align="center"><img src="./doc/kite_power_tools.png" width="500" /></p>
+
+
+
 ## See also
 - [Research Fechner](https://research.tudelft.nl/en/publications/?search=Uwe+Fechner&pageSize=50&ordering=rating&descending=true) for the scientic background of this code
+- The application [KiteViewer](https://github.com/ufechner7/KiteViewer)
 - the package [KiteUtils](https://github.com/ufechner7/KiteUtils.jl)
-- the package [KitePodSimulator](https://github.com/ufechner7/KitePodSimulator.jl)
+- the packages  [KiteModels](https://github.com/ufechner7/KiteModels.jl) and [WinchModels](https://github.com/aenarete/WinchModels.jl) and [KitePodModels](https://github.com/aenarete/KitePodModels.jl) and [AtmosphericModels](https://github.com/aenarete/AtmosphericModels.jl)
+- the packages [KiteControllers](https://github.com/aenarete/KiteControllers.jl) and [KiteViewers](https://github.com/aenarete/KiteViewers.jl)
+
 
 Author: Uwe Fechner (uwe.fechner.msc@gmail.com)
