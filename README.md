@@ -69,7 +69,7 @@ To start the simulation, click the button "START". To steer the kite, use the ri
 For a first test, after pressing the START button press the right cursor twice and wait. If you started the main function
 from a Julia console you can see the setting of the steering as numbers in the console.
 
-To test the 4-point simulator and steer the kite with a joystick, look at [KiteSimulators](https://github.com/aenarete/KiteSimulators) .
+To test the 4-point simulator and steer the kite with a joystick, look at [KiteSimulators](https://github.com/aenarete/KiteSimulators.jl) .
 
 ## Hacking the code
 Use the package [Revise](https://timholy.github.io/Revise.jl/stable/) to speed up testing of code changes:
@@ -113,7 +113,7 @@ The code for viewing log files will be found in the package KiteViewers, the cod
 
 ## See also
 - [Research Fechner](https://research.tudelft.nl/en/publications/?search=Uwe+Fechner&pageSize=50&ordering=rating&descending=true) for the scientic background of this code
-- The metapackage [KiteSimulators](https://github.com/aenarete/KiteSimulators)
+- The metapackage [KiteSimulators](https://github.com/aenarete/KiteSimulators.jl)
 - the package [KiteUtils](https://github.com/ufechner7/KiteUtils.jl)
 - the packages  [KiteModels](https://github.com/ufechner7/KiteModels.jl) and [WinchModels](https://github.com/aenarete/WinchModels.jl) and [KitePodModels](https://github.com/aenarete/KitePodModels.jl) and [AtmosphericModels](https://github.com/aenarete/AtmosphericModels.jl)
 - the packages [KiteControllers](https://github.com/aenarete/KiteControllers.jl) and [KiteViewers](https://github.com/aenarete/KiteViewers.jl)
